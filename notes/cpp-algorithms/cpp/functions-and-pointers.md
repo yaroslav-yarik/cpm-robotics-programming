@@ -85,4 +85,4 @@ int main() {
 
 ---
 
-[→ Массивы, векторы и итераторы](arrays-and-vectors.md)
+[← Переменные, типы и память](variables-and-memory.md) · [→ Массивы, векторы и итераторы](arrays-and-vectors.md)
