@@ -19,6 +19,7 @@
 
 ## Материалы
 
+- [Справочник по C++ и алгоритмам](notes/cpp-algorithms/README.md).
 - [Конспекты](notes/README.md).
 - [Разборы задач](editorials/README.md).
 - [Официальные требования сезона 2026/27](https://robot.mipt.ru/uchastnikam/reglament/requirements_26_27/).
