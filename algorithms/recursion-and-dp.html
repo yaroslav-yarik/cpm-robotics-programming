@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Рекурсия и динамическое программирование · Справочник ЦПМ</title><link rel="stylesheet" href="../style.css"></head><body><main class="reader"><nav class="reader-nav"><a href="../index.html">Оглавление</a><span> / </span><a href="../index.html#algorithms">Базовые алгоритмы</a><a class="jump" href="#practice">К опыту</a></nav><article><h1>Рекурсия и динамическое программирование</h1>
+<h2>Рекурсия. Как перебрать все варианты</h2>
+<p>Найдём суммы всех подмножеств массива <code>[2, −1]</code>. Для каждого элемента есть два действия — пропустить его или взять. После выбора остаётся та же задача для оставшихся элементов. <strong>Рекурсия</strong> позволяет функции вызвать саму себя для этого более короткого остатка.</p>
+<table>
+<thead>
+<tr>
+<th>Выбор для 2</th>
+<th>Выбор для −1</th>
+<th align="right">Итоговая сумма</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Пропустить</td>
+<td>Пропустить</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td>Пропустить</td>
+<td>Взять</td>
+<td align="right">−1</td>
+</tr>
+<tr>
+<td>Взять</td>
+<td>Пропустить</td>
+<td align="right">2</td>
+</tr>
+<tr>
+<td>Взять</td>
+<td>Взять</td>
+<td align="right">1</td>
+</tr>
+</tbody></table>
+<p><img src="../assets/algorithms/recursion-and-dp.svg" alt="Из суммы 0 ветвимся в 0 и 2. Их потомки дают ответы 0, −1, 2 и 1."></p>
+<div id="practice"><section class="experiment">
+<h3>Пройди дерево решений</h3>
+<p>Попробуй получить все четыре подмножества чисел 2 и −1. Каждый выбор ведёт в следующий вызов. Вернись на один уровень и измени только последний выбор.</p>
+<div class="controls"><button type="button" name="skip">Пропустить</button><button type="button" name="take">Взять</button><button type="button" name="back">Вернуться на уровень</button><button type="button" name="reset">Очистить дерево</button></div>
+<p data-path></p><p data-state role="status"></p><ul data-leaves></ul>
+<noscript>Для работы этого примера нужен JavaScript.</noscript>
+<script>
+(() => {
+  const section = document.currentScript.closest('.experiment');
+  const pick = selector => section.querySelector(selector);
+  const a = [2, -1], path = [], leaves = new Map();
+  function render() {
+    const items = a.filter((_, i) => path[i] === true);
+    const sum = items.reduce((total, n) => total + n, 0);
+    const done = path.length === a.length;
+    if (done) leaves.set(path.map(Number).join(''), '{' + items.join(', ') + '} · сумма ' + sum);
+    pick('[name="take"]').disabled = pick('[name="skip"]').disabled = done;
+    pick('[name="back"]').disabled = !path.length;
+    pick('[data-path]').textContent = 'Путь от корня · ' + (path.map((take,i) => (take ? 'взять ' : 'пропустить ') + a[i]).join(' → ') || 'выборов пока нет');
+    const position = done ? 'Достигнут лист.' : 'Следующий элемент a[' + path.length + '] = ' + a[path.length] + '.';
+    pick('[data-state]').textContent = position + ' Текущая сумма ' + sum + '. Найдено подмножеств ' + leaves.size + ' из 4.';
+    const list = pick('[data-leaves]'); list.replaceChildren();
+    for (const value of leaves.values()) { const li = document.createElement('li'); li.textContent = value; list.append(li); }
+  }
+  pick('[name="take"]').onclick = () => { path.push(true); render(); };
+  pick('[name="skip"]').onclick = () => { path.push(false); render(); };
+  pick('[name="back"]').onclick = () => { path.pop(); render(); };
+  pick('[name="reset"]').onclick = () => { path.length = 0; leaves.clear(); render(); };
+  render();
+})();
+</script>
+</section>
+</div>
+
+<p>На рисунке видно всё дерево, но программа проходит только одну ветвь за раз. При обычной реализации рекурсивного вызова в стеке остаётся информация, чтобы вернуться к предыдущему выбору. Поэтому одновременно хранится цепочка глубины <code>n + 1</code>, хотя листьев в дереве <code>2ⁿ</code>.</p>
+<p>Каждый вызов помнит две величины. Индекс показывает, какой элемент рассматриваем, а <code>total</code> хранит сумму уже взятых элементов. В первой ветви увеличиваем только индекс. Во второй прибавляем к сумме значение взятого элемента.</p>
+<p>Когда индекс равен длине массива, выбора больше нет. Это <strong>базовый случай</strong>. Записываем сумму и завершаем вызов. Для пустого массива сразу запишем 0. Разные подмножества могут давать одинаковые суммы, поэтому в ответе возможны повторы.</p>
+<p>Вариантов <code>2ⁿ</code>, поэтому время перебора составляет <code>O(2ⁿ)</code>. При <code>n = 30</code> это уже больше миллиарда вариантов. Для цепочки вызовов нужно <code>O(n)</code> памяти, для списка ответов — <code>O(2ⁿ)</code>. Если требуется только количество подходящих подмножеств, можно вместо списка накапливать счётчик.</p>
+<p><strong>C++17</strong></p>
+<pre><code class="language-cpp">#include &lt;cstddef&gt;
+#include &lt;vector&gt;
+
+using Int = long long;
+using Numbers = std::vector&lt;Int&gt;;
+
+void visit_subsets(const Numbers&amp; a, std::size_t i, Int total, Numbers&amp; result) {
+    if (i == a.size()) {
+        result.push_back(total);
+        return;
+    }
+    visit_subsets(a, i + 1, total, result);
+    visit_subsets(a, i + 1, total + a[i], result);
+}
+
+Numbers subset_sums(const Numbers&amp; a) {
+    Numbers result;
+    visit_subsets(a, 0, 0, result);
+    return result;
+}
+</code></pre>
+<details>
+<summary>Тот же алгоритм на Python</summary>
+
+<pre><code class="language-python">def subset_sums(a):
+    answer = []
+
+    def visit(index, total):
+        if index == len(a):
+            answer.append(total)
+            return
+        visit(index + 1, total)
+        visit(index + 1, total + a[index])
+
+    visit(0, 0)
+    return answer
+</code></pre>
+</details>
+
+<h2>Динамическое программирование. Как выбрать самый дешёвый путь</h2>
+<p>Перед лестницей стоит человек. За шаг он поднимается на одну или две ступеньки. Попадание на ступеньку <code>i</code> стоит <code>cost[i]</code>. Нужно оказаться на последней ступеньке и заплатить как можно меньше.</p>
+<p>На каждую ступеньку ведут всего два последних шага. Зная наименьшую цену достижения двух предшествующих позиций, можно сразу вычислить лучшую цену для текущей. Такой способ получить ответ из ответов для меньших задач называется <strong>динамическим программированием</strong>.</p>
+<p>Для цен <code>[5, 2, 10, 1]</code> получаем следующую таблицу.</p>
+<table>
+<thead>
+<tr>
+<th>Позиция</th>
+<th align="right">Перед лестницей</th>
+<th align="right">0</th>
+<th align="right">1</th>
+<th align="right">2</th>
+<th align="right">3</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Цена посещения</td>
+<td align="right">—</td>
+<td align="right">5</td>
+<td align="right">2</td>
+<td align="right">10</td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td>Лучшая сумма до позиции</td>
+<td align="right">0</td>
+<td align="right">5</td>
+<td align="right">2</td>
+<td align="right">12</td>
+<td align="right">3</td>
+</tr>
+</tbody></table>
+<p>Например, на ступеньку 2 можно попасть со ступеньки 0 или 1. Выбираем меньшую из сумм 5 и 2, прибавляем цену посещения 10 и получаем 12. На последнюю ступеньку выгоднее перейти сразу со ступеньки 1. Весь путь стоит <code>2 + 1 = 3</code>.</p>
+<p>Для ступеньки 0 ответ равен её цене. Дальше работает правило <strong><code>dp[i] = cost[i] + min(dp[i − 1], dp[i − 2])</code></strong>. При <code>i = 1</code> позиция перед лестницей имеет цену 0. В коде её хранит отдельная переменная. Индекс <code>−1</code> в Python означал бы последний элемент списка.</p>
+<p>Для следующего расчёта нужны лишь две предыдущие суммы — <code>two_ago</code> и <code>previous</code>. После каждого шага сдвигаем обе на одну позицию. Время работы составляет <code>O(n)</code>, дополнительная память — <code>O(1)</code>. Если лестница пуста, функция возвращает 0.</p>
+<p><strong>C++17</strong></p>
+<pre><code class="language-cpp">#include &lt;algorithm&gt;
+#include &lt;cstddef&gt;
+#include &lt;vector&gt;
+
+using Int = long long;
+using Numbers = std::vector&lt;Int&gt;;
+
+Int min_stair_cost(const Numbers&amp; cost) {
+    if (cost.empty()) return 0;
+    Int two_ago = 0, previous = cost[0];
+    for (std::size_t i = 1; i &lt; cost.size(); ++i) {
+        Int current = cost[i] + std::min(two_ago, previous);
+        two_ago = previous;
+        previous = current;
+    }
+    return previous;
+}
+</code></pre>
+<details>
+<summary>Тот же алгоритм на Python</summary>
+
+<pre><code class="language-python">def min_stair_cost(cost):
+    if not cost:
+        return 0
+    two_ago, previous = 0, cost[0]
+    for i in range(1, len(cost)):
+        current = cost[i] + min(two_ago, previous)
+        two_ago, previous = previous, current
+    return previous
+</code></pre>
+</details>
+
+<hr>
+<p><a href="grid-traversal.html">← Обходы клеточной карты</a></p>
+</article></main></body></html>

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="266" viewBox="0 0 560 266" role="img" aria-labelledby="title desc"><title id="title">Поиск пути по клеточной карте</title><desc id="desc">Верхний ряд расстояний 2, 1, 0. Средний ряд 3 и две стены. Нижний ряд 4, 5, 6.</desc><rect width="560" height="266" fill="#fff"/>
+<text x="24" y="32" text-anchor="start" fill="#172e44" font-family="Arial,sans-serif" font-size="22" font-weight="700">Расстояния от старта при обходе в ширину</text>
+<rect x="36" y="58" width="51" height="47" rx="6" fill="#cdeee9" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="61.5" y="88.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">2</text>
+<rect x="92" y="58" width="51" height="47" rx="6" fill="#cdeee9" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="117.5" y="88.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">1</text>
+<rect x="148" y="58" width="51" height="47" rx="6" fill="#ffdf96" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="173.5" y="88.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">0</text>
+<rect x="36" y="111" width="51" height="47" rx="6" fill="#cdeee9" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="61.5" y="141.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">3</text>
+<rect x="92" y="111" width="51" height="47" rx="6" fill="#edf2f7" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="117.5" y="141.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">#</text>
+<rect x="148" y="111" width="51" height="47" rx="6" fill="#edf2f7" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="173.5" y="141.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">#</text>
+<rect x="36" y="164" width="51" height="47" rx="6" fill="#cdeee9" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="61.5" y="194.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">4</text>
+<rect x="92" y="164" width="51" height="47" rx="6" fill="#cdeee9" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="117.5" y="194.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">5</text>
+<rect x="148" y="164" width="51" height="47" rx="6" fill="#ffdf96" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="173.5" y="194.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">6</text>
+<text x="230" y="90" text-anchor="start" fill="#172e44" font-family="Arial,sans-serif" font-size="20" font-weight="700">0   старт</text>
+<text x="230" y="132" text-anchor="start" fill="#172e44" font-family="Arial,sans-serif" font-size="20" font-weight="400">#   стена</text>
+<text x="230" y="174" text-anchor="start" fill="#172e44" font-family="Arial,sans-serif" font-size="20" font-weight="700">6   финиш</text>
+<text x="30" y="246" text-anchor="start" fill="#172e44" font-family="Arial,sans-serif" font-size="18" font-weight="400">Число в клетке — минимум ходов от S.</text></svg>

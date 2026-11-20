@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Частоты · Справочник ЦПМ</title><link rel="stylesheet" href="../style.css"></head><body><main class="reader"><nav class="reader-nav"><a href="../index.html">Оглавление</a><span> / </span><a href="../index.html#algorithms">Базовые алгоритмы</a><a class="jump" href="#practice">К опыту</a></nav><article><h1>Частоты</h1>
+<h2>Сколько раз встретилось значение</h2>
+<p><strong>Частота</strong> — это число появлений конкретного значения. В последовательности <code>[7, 5, 7, 7]</code> частота семёрки равна 3, частота пятёрки равна 1. Такие количества можно накапливать за один проход. Хранить их удобно по самому значению.</p>
+<table>
+<thead>
+<tr>
+<th>Какие значения бывают</th>
+<th>Где хранить частоты</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Небольшие целые от 0 до <code>m − 1</code></td>
+<td>В массиве из <code>m</code> счётчиков. Для числа <code>x</code> увеличиваем <code>count[x]</code></td>
+</tr>
+<tr>
+<td>Произвольные целые, в том числе отрицательные</td>
+<td>В словаре. Число служит ключом, частота — значением</td>
+</tr>
+</tbody></table>
+<h2>Сколько есть пар одинаковых чисел</h2>
+<p>При встрече новой семёрки можно составить по одной паре с каждой предыдущей семёркой. Хватит числа таких семёрок, хранить их индексы не требуется.</p>
+<table>
+<thead>
+<tr>
+<th>Очередное число</th>
+<th align="right">Сколько таких было раньше</th>
+<th align="right">Всего пар после шага</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>7</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td>5</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td>7</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td>7</td>
+<td align="right">2</td>
+<td align="right">3</td>
+</tr>
+</tbody></table>
+<p><img src="../assets/algorithms/frequencies.svg" alt="Семёрки на позициях 0 и 2 дают две новые пары с семёркой на позиции 3."></p>
+<div id="practice"><section class="experiment">
+<h3>Собери пары одинаковых чисел</h3>
+<p>Добавь 7, 5, 7 и ещё раз 7. Перед последним нажатием попробуй назвать число новых пар. Порядок и состав последовательности можно менять.</p>
+<div class="controls"><button type="button" data-value="7">Добавить 7</button><button type="button" data-value="5">Добавить 5</button><button type="button" data-value="-2">Добавить −2</button><button type="button" name="undo">Убрать последнее</button><button type="button" name="reset">Очистить</button></div>
+<p data-array></p><p data-counts></p><p data-result role="status"></p>
+<noscript>Для работы этого примера нужен JavaScript.</noscript>
+<script>
+(() => {
+  const section = document.currentScript.closest('.experiment');
+  const pick = selector => section.querySelector(selector);
+  const values = [];
+  const addButtons = section.querySelectorAll('[data-value]');
+  function render() {
+    const seen = new Map();
+    let pairs = 0, added = 0;
+    for (const n of values) {
+      added = seen.get(n) || 0;
+      pairs += added;
+      seen.set(n, added + 1);
+    }
+    pick('[data-array]').textContent = 'Последовательность [' + values.join(', ') + ']';
+    pick('[data-counts]').textContent = 'Частоты · ' + (Array.from(seen, ([n, count]) => n + ' → ' + count).join(' · ') || 'пока пусто');
+    pick('[data-result]').textContent = values.length ? 'Последнее число ' + values[values.length - 1] + ' встретилось раньше ' + added + ' раз. Оно дало ' + added + ' новых пар. Всего ' + pairs + '.' : 'Пока нет ни одной пары.';
+    pick('[name="undo"]').disabled = pick('[name="reset"]').disabled = !values.length;
+    for (const button of addButtons) button.disabled = values.length >= 20;
+  }
+  for (const button of addButtons) button.onclick = () => { values.push(Number(button.dataset.value)); render(); };
+  pick('[name="undo"]').onclick = () => { values.pop(); render(); };
+  pick('[name="reset"]').onclick = () => { values.length = 0; render(); };
+  render();
+})();
+</script>
+</section>
+</div>
+
+<p>Для подсчёта пар сначала прибавляем <code>seen[value]</code> к ответу, а затем увеличиваем счётчик. Поменяв эти действия местами, мы засчитали бы пару элемента с самим собой.</p>
+<p>Если частоты лежат в массиве, индекс сразу задаёт смещение нужного счётчика в памяти. Для хеш-таблицы сначала вычисляют хеш ключа, затем ищут запись в выбранной группе. Если несколько ключей попали в одну группу, их приходится различать сравнением.</p>
+<p>В Python используем <code>Counter</code>, в C++ — <code>std::unordered_map</code>. Обращение к счётчику в хеш-таблице в среднем занимает <code>O(1)</code>. Для <code>n</code> чисел время в среднем составляет <code>O(n)</code>, память — <code>O(u)</code>, где <code>u</code> — количество различных чисел. Если нужен порядок по ключам, в C++ подойдёт <code>std::map</code>. Для него весь проход занимает <code>O(n log(u + 1))</code>.</p>
+<p><strong>C++17</strong></p>
+<pre><code class="language-cpp">#include &lt;unordered_map&gt;
+#include &lt;vector&gt;
+
+using Int = long long;
+using Numbers = std::vector&lt;Int&gt;;
+
+Int equal_pairs(const Numbers&amp; a) {
+    std::unordered_map&lt;Int, Int&gt; seen;
+    Int result = 0;
+    for (Int value : a) {
+        result += seen[value];
+        ++seen[value];
+    }
+    return result;
+}
+</code></pre>
+<details>
+<summary>Тот же алгоритм на Python</summary>
+
+<pre><code class="language-python">from collections import Counter
+
+
+def equal_pairs(a):
+    seen = Counter()
+    result = 0
+    for value in a:
+        result += seen[value]
+        seen[value] += 1
+    return result
+</code></pre>
+</details>
+
+<hr>
+<p><a href="two-pointers-and-window.html">← Два указателя и скользящее окно</a> · <a href="grid-traversal.html">→ Обходы клеточной карты</a></p>
+</article></main></body></html>

@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Массивы, векторы и итераторы · Справочник ЦПМ</title><link rel="stylesheet" href="../style.css"></head><body><main class="reader"><nav class="reader-nav"><a href="../index.html">Оглавление</a><span> / </span><a href="../index.html#cpp">Язык C++</a><a class="jump" href="#practice">К опыту</a></nav><article><h1>Массивы, векторы и итераторы</h1>
+<p>Массив хранит элементы одного типа по порядку. Номер позиции называется <strong>индексом</strong>. Отсчёт начинается с нуля, поэтому запись <code>a[2]</code> выбирает третье число.</p>
+<table>
+<thead>
+<tr>
+<th>Индекс</th>
+<th align="right">0</th>
+<th align="right">1</th>
+<th align="right">2</th>
+<th align="right">3</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Значение <code>a[i]</code></td>
+<td align="right">2</td>
+<td align="right">4</td>
+<td align="right">6</td>
+<td align="right">8</td>
+</tr>
+</tbody></table>
+<p>У этого массива четыре элемента. Последний из них — <code>a[3]</code>, его значение равно 8.</p>
+<h2>Фиксированный и переменный размер</h2>
+<table>
+<thead>
+<tr>
+<th>Запись</th>
+<th>Содержимое</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>std::array&lt;int, 4&gt; fixed{2, 4, 6, 8};</code></td>
+<td>Ровно четыре числа. Размер известен при компиляции</td>
+</tr>
+<tr>
+<td><code>std::vector&lt;int&gt; a{2, 4};</code></td>
+<td>Два элемента со значениями 2 и 4</td>
+</tr>
+<tr>
+<td><code>std::vector&lt;int&gt; b(2, 4);</code></td>
+<td>Два элемента со значением 4</td>
+</tr>
+<tr>
+<td><code>std::vector&lt;int&gt; c(n);</code></td>
+<td><code>n</code> нулей. Размер можно определить во время работы</td>
+</tr>
+<tr>
+<td><code>std::vector&lt;int&gt; empty;</code></td>
+<td>Пустой вектор</td>
+</tr>
+</tbody></table>
+<p>Для <code>std::array</code> подключай <code>&lt;array&gt;</code>, для <code>std::vector</code> — <code>&lt;vector&gt;</code>. Фигурные скобки с числами перечисляют элементы. Круглые скобки в конструкторе <code>vector</code> позволяют задать размер и начальное значение.</p>
+<h3>Как проверить индекс</h3>
+<p>Для обоих контейнеров <code>a.size()</code> даёт количество элементов, <code>a.empty()</code> проверяет, пуст ли контейнер. Оператор <code>a[i]</code> требует допустимого индекса. Метод <code>a.at(i)</code> проверяет границы и при ошибке выбрасывает <code>std::out_of_range</code>. У <code>std::array&lt;int, 4&gt; zeros{};</code> фигурные скобки обеспечивают нулевую инициализацию всех четырёх элементов. Вызов <code>zeros.fill(7)</code> запишет 7 в каждый элемент.</p>
+<h3>Как изменить размер вектора</h3>
+<p>Вектор поддерживает изменение размера. <code>push_back(x)</code> дописывает элемент, <code>pop_back()</code> снимает последний элемент непустого вектора. <code>resize(n)</code> оставляет первые <code>n</code> элементов, если вектор уменьшается, или добавляет новые элементы, если он растёт. <code>assign(n, x)</code> заменяет содержимое на <code>n</code> повторов <code>x</code>.</p>
+<h3>Встроенный массив</h3>
+<p>Встроенный массив <code>int raw[4]{}</code> тоже имеет фиксированный размер. При передаче в параметр вида <code>int values[]</code> параметр становится указателем, поэтому для обхода нужна отдельная длина. <code>sizeof raw</code> в области его объявления измеряет весь массив в байтах, а <code>sizeof</code> указателя измеряет только указатель. Для новых учебных решений с фиксированным размером удобнее <code>std::array</code>, где количество элементов даёт <code>size()</code>.</p>
+<h2>Перебор и итераторы</h2>
+<ul>
+<li><code>for (int value : a)</code> копирует очередное число в <code>value</code>.</li>
+<li><code>for (int&amp; value : a)</code> позволяет менять элементы массива или вектора.</li>
+<li><code>for (const auto&amp; value : a)</code> читает элементы без копирования. Это особенно полезно для целых строк таблицы.</li>
+<li>Если нужен индекс, используй цикл от 0 до <code>a.size()</code>, заканчивая перед <code>size()</code>.</li>
+</ul>
+<p>Итератор обозначает позицию. <code>a.begin()</code> указывает на первый элемент, <code>a.end()</code> — на позицию сразу за последним. У пустого контейнера эти позиции совпадают. Вызов <code>*it</code> читает элемент, а <code>++it</code> сдвигает итератор к следующему. Разыменовывать <code>end()</code> нельзя.</p>
+<p>Запись <code>[begin, end)</code> обозначает полуинтервал. Левая граница включается, правая исключается. В векторе можно получить итератор к элементу <code>i</code> как <code>a.begin() + i</code>. Например, диапазон <code>[a.begin() + 1, a.begin() + 4)</code> содержит элементы с индексами 1, 2 и 3, если длина вектора не меньше 4. Для обратного обхода есть <code>rbegin()</code> и <code>rend()</code>.</p>
+<h2>Таблица</h2>
+<p><code>std::vector&lt;std::vector&lt;int&gt;&gt;</code> хранит вектор строк. В записи <code>table[i][j]</code> первый индекс выбирает строку, второй выбирает элемент этой строки. Например, <code>std::vector&lt;std::vector&lt;int&gt;&gt; table(3, std::vector&lt;int&gt;(5, 0));</code> создаёт три строки по пять нулей. Отдельные строки в общем случае могут иметь разные длины, поэтому границу внутреннего цикла надо брать у текущей строки.</p>
+<p>Скопируем числа <code>2, 4, 6</code> в вектор и прибавим к каждому по единице. Первое из получившихся чисел запишем в таблицу.</p>
+<pre><code class="language-cpp">std::array&lt;int, 3&gt; fixed{2, 4, 6};
+std::vector&lt;int&gt; values(fixed.begin(), fixed.end());  // Копия диапазона.
+for (int&amp; value : values) {
+    ++value;  // Меняем элементы, а не временные копии.
+}
+std::vector&lt;std::vector&lt;int&gt;&gt; table(3, std::vector&lt;int&gt;(5, 0));
+table[1][4] = values[0];  // Во второй строке и пятом столбце теперь 3.
+</code></pre>
+<p>После цикла <code>values</code> содержит <code>3, 5, 7</code>. Запись <code>table[1][4]</code> выбирает вторую строку и пятый столбец. Если индексы приходят из входных данных, для каждого проверь обе границы. Индекс строки должен быть неотрицательным и меньше числа строк, индекс столбца — неотрицательным и меньше длины выбранной строки.</p>
+<p><strong>Как процессор доходит до нужной клетки.</strong> У <code>vector&lt;vector&lt;int&gt;&gt;</code> элементы внешнего вектора — объекты строк. У каждой строки свой непрерывный участок для чисел. Поэтому сначала нужен адрес данных второй строки. Уже к нему можно прибавить <code>4 * sizeof(int)</code>, чтобы попасть в пятый столбец.</p>
+<p><img src="../assets/cpp/vector-rows.svg" alt="Выбираем вторую строку таблицы из трёх строк, затем пятый элемент в её собственном буфере."></p>
+<div id="practice"><section class="experiment" id="lab-arrays-and-vectors">
+  <h3>В какую клетку попадёт запись?</h3>
+  <p>Выбери строку и столбец. Посмотри, какой элемент изменит команда записи. Затем попробуй обратиться к элементу сразу за последним столбцом.</p>
+  <div class="lab-controls"><label>Строка i <select data-row><option>0</option><option selected>1</option><option>2</option></select></label>
+  <label>Столбец j <select data-col><option>0</option><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option></select></label>
+  <label>Число <select data-val><option selected>3</option><option>7</option><option>0</option></select></label>
+  <button type="button" data-write>Записать</button><button type="button" data-clear>Обнулить таблицу</button></div>
+  <table><caption>Значения в table</caption><thead><tr><th scope="col">i ∖ j</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th></tr></thead><tbody data-table></tbody></table><pre><code data-code></code></pre>
+  <p data-status role="status"></p>
+<style>
+#lab-arrays-and-vectors .lab-controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin:.8rem 0} #lab-arrays-and-vectors .lab-cells{display:flex;flex-wrap:wrap;gap:.4rem;margin:.8rem 0} #lab-arrays-and-vectors .lab-cell{display:grid;justify-items:center;min-width:3rem;padding:.35rem .55rem;border:1px solid #96acb7;border-radius:.4rem;background:#eef3f5;color:#172f45} #lab-arrays-and-vectors .lab-cell.active{background:#ffe8a8;color:#473105;border-color:#8f6916} #lab-arrays-and-vectors .lab-cell small{font-size:.82rem} #lab-arrays-and-vectors pre{white-space:pre-wrap;overflow-wrap:anywhere} #lab-arrays-and-vectors table{width:auto} #lab-arrays-and-vectors th,#lab-arrays-and-vectors td{text-align:center;padding:.3rem .5rem} #lab-arrays-and-vectors .target-cell{background:#ffe8a8;color:#473105;font-weight:bold;outline:2px solid #86640d;outline-offset:-2px}
+</style>
+<script>
+(() => {
+  const root = document.getElementById('lab-arrays-and-vectors');
+  const get = selector => root.querySelector(selector);
+  const status = get('[data-status]');
+  const rows = Array.from({length:3}, () => [0, 0, 0, 0, 0]);
+  function draw(write = false) {
+    const i = Number(get('[data-row]').value);
+    const j = Number(get('[data-col]').value);
+    const value = Number(get('[data-val]').value);
+    const valid = j < rows[i].length;
+    if (write && valid) rows[i][j] = value;
+    get('[data-code]').textContent = 'table.at(' + i + ').at(' + j + ') = ' + value + ';';
+    const table = get('[data-table]');
+    table.replaceChildren();
+    rows.forEach((row, r) => {
+      const tr = document.createElement('tr');
+      const th = document.createElement('th');
+      th.scope = 'row'; th.textContent = String(r); tr.append(th);
+      row.forEach((number, c) => {
+        const td = document.createElement('td');
+        td.textContent = String(number);
+        if (r === i && c === j) td.className = 'target-cell';
+        tr.append(td);
+      });
+      table.append(tr);
+    });
+    status.textContent = !valid ? 'Столбца 5 нет: индексы идут от 0 до 4. В C++ вызов at(5) выбросит std::out_of_range, таблица сохранит значения.' :
+      (write ? 'Записано ' + value : 'Сейчас ' + rows[i][j]) + ' в клетке [' + i + '][' + j + ']. От начала этой строки до клетки ' + j + ' элементов.';
+  }
+  get('[data-row]').onchange = get('[data-col]').onchange = get('[data-val]').onchange = () => draw();
+  get('[data-write]').onclick = () => draw(true);
+  get('[data-clear]').onclick = () => { rows.forEach(row => row.fill(0)); draw(); };
+  draw();
+})();
+</script>
+</section>
+</div>
+
+<p>При обходе одной строки слева направо соседние числа часто оказываются в одной строке кэша. При переходе к следующей строке её данные могут находиться в другой части памяти. <a href="../hardware/memory.html">Что такое строка кэша</a>.</p>
+<h2>Порядок сортировки</h2>
+<p><code>std::sort(a.begin(), a.end())</code> сортирует весь вектор по возрастанию. Третьим аргументом можно передать <strong>компаратор</strong>. Он отвечает на вопрос «должен ли <code>left</code> идти раньше <code>right</code>?». Для равных по ключу элементов должен получаться <code>false</code> в обе стороны. Поэтому <code>left &lt;= right</code> — неверный компаратор. Сортировка диапазона из <code>n</code> элементов требует <code>O(n log n)</code> сравнений. Порядок равных по ключу элементов не гарантирован.</p>
+<h2>Сортировка чисел и строк таблицы</h2>
+<p>Зададим внутри строки порядок «сначала нечётные, потом чётные», а внутри каждой группы — по возрастанию. Затем отсортируем сами строки по элементу с индексом <code>row.size() / 2</code>. В примере все строки непустые. Элемент в центре этой специальной сортировки не обязательно равен медиане по числовому возрастанию.</p>
+<pre><code class="language-cpp">#include &lt;algorithm&gt;
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+
+bool odd_first(int left, int right) {
+    bool left_is_odd = left % 2 != 0;
+    bool right_is_odd = right % 2 != 0;
+    if (left_is_odd != right_is_odd) {
+        return left_is_odd;
+    }
+    return left &lt; right;
+}
+
+bool by_middle(const std::vector&lt;int&gt;&amp; left, const std::vector&lt;int&gt;&amp; right) {
+    return left[left.size() / 2] &lt; right[right.size() / 2];
+}
+
+int main() {
+    std::vector&lt;std::vector&lt;int&gt;&gt; table{{2, -1, 3, 0}, {4, -5, 1, -2}};
+    for (auto&amp; row : table) {
+        std::sort(row.begin(), row.end(), odd_first);
+    }
+    std::sort(table.begin(), table.end(), by_middle);
+
+    for (const auto&amp; row : table) {
+        for (int value : row) {
+            std::cout &lt;&lt; value &lt;&lt; &#39; &#39;;
+        }
+        std::cout &lt;&lt; &#39;\n&#39;;
+    }
+}
+</code></pre>
+<p>После двух сортировок строки выводятся в таком порядке.</p>
+<pre><code class="language-text">-5 1 -2 4
+-1 3 0 2
+</code></pre>
+<p>Отрицательное число тоже нечётное, когда его остаток от деления на 2 отличен от нуля. Проверка <code>value % 2 == 1</code> пропустит, например, <code>-5</code>. После сортировки строк ключ первой исходной строки становится 0, второй — −2. Поэтому вторая перемещается вверх.</p>
+<hr>
+<p><a href="functions-and-pointers.html">← Функции, ссылки и указатели</a> · <a href="strings.html">→ Строки</a></p>
+</article></main></body></html>

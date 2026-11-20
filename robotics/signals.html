@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Обработка сигналов · Справочник ЦПМ</title><link rel="stylesheet" href="../style.css"></head><body><main class="reader"><nav class="reader-nav"><a href="../index.html">Оглавление</a><span> / </span><a href="../index.html#robotics">Прикладные алгоритмы</a><a class="jump" href="#practice">К опыту</a></nav><article><h1>Обработка сигналов</h1>
+<p>Показания датчика образуют последовательность, например <code>4, 4, 9, 9, 4</code>. По такой записи можно найти участки постоянного уровня, отличить устойчивое изменение от короткого скачка или подсчитать значения выше выбранного порога.</p>
+<h2>Где начинается и заканчивается серия</h2>
+<p><strong>Серия</strong> — максимальный участок подряд идущих одинаковых значений. Здесь число <code>4</code> встречается в двух отдельных сериях.</p>
+<table>
+<thead>
+<tr>
+<th>Индекс</th>
+<th>0</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Показание</td>
+<td>4</td>
+<td>4</td>
+<td>9</td>
+<td>9</td>
+<td>4</td>
+</tr>
+<tr>
+<td>Серия</td>
+<td>A</td>
+<td>A</td>
+<td>B</td>
+<td>B</td>
+<td>C</td>
+</tr>
+</tbody></table>
+<p>Серия B начинается в позиции <code>2</code> и заканчивается перед позицией <code>4</code>. Такую границу записывают как полуинтервал <code>[2, 4)</code>. Число отсчётов равно <code>4 − 2 = 2</code>.</p>
+<p>Функция возвращает тройки <code>(начало, конец, значение)</code>. На этом примере получатся <code>(0, 2, 4)</code>, <code>(2, 4, 9)</code> и <code>(4, 5, 4)</code>.</p>
+<p>Индекс <code>start</code> отмечает начало текущей серии. Как только значение изменилось, записываем готовую серию и переносим <code>start</code>. Последнюю серию записываем, когда <code>end</code> доходит до длины массива. Условие проверяет конец первым, и тогда <code>or</code> в Python и <code>||</code> в C++ пропускают чтение <code>values[end]</code>.</p>
+<p><strong>C++17</strong></p>
+<pre><code class="language-cpp">#include &lt;cstddef&gt;
+#include &lt;tuple&gt;
+#include &lt;vector&gt;
+
+using Run = std::tuple&lt;std::size_t, std::size_t, int&gt;;
+
+std::vector&lt;Run&gt; runs(const std::vector&lt;int&gt;&amp; values) {
+    std::vector&lt;Run&gt; result;
+    std::size_t start = 0;
+    for (std::size_t end = 1; end &lt;= values.size(); ++end) {
+        if (end == values.size() || values[end] != values[start]) {
+            result.emplace_back(start, end, values[start]);
+            start = end;
+        }
+    }
+    return result;
+}
+</code></pre>
+<details>
+<summary>Тот же алгоритм на Python</summary>
+
+<pre><code class="language-python">def runs(values):
+    result = []
+    start = 0
+    for end in range(1, len(values) + 1):
+        if end == len(values) or values[end] != values[start]:
+            result.append((start, end, values[start]))
+            start = end
+    return result
+</code></pre>
+</details>
+
+<p><strong>Если ищем импульс выше порога.</strong> Для ряда <code>4, 8, 9, 4</code> и порога <code>6</code> сравнения <code>x &gt; 6</code> дадут <code>ложь, истина, истина, ложь</code>. Так числа <code>8</code> и <code>9</code> попадут в один импульс <code>[1, 3)</code>. Если в задаче нужен фон с обеих сторон, проверь отдельно импульсы у краёв записи.</p>
+<p>Соседство в кольце требует дополнительного шага. Если линейных серий больше одной и значения первой и последней совпадают, эти две серии на кольце образуют одну. Храни их как два исходных полуинтервала, если нужны реальные индексы. Обработка серий занимает <code>O(n)</code>.</p>
+<h2>Подтверждение устойчивого сигнала</h2>
+<p>При дребезге механической кнопки короткие смены уровня пропускают, а новый уровень принимают после непрерывного интервала устойчивости. В дискретной модели ниже новый уровень подтверждается после <code>needed</code> одинаковых отсчётов подряд. Счётчик сбрасывается при каждой смене сырого уровня. Начальное подтверждённое состояние равно 0, а <code>needed &gt; 0</code>.</p>
+<p><strong>C++17</strong></p>
+<pre><code class="language-cpp">#include &lt;cstddef&gt;
+#include &lt;vector&gt;
+
+std::vector&lt;int&gt; stable_levels(const std::vector&lt;int&gt;&amp; samples,
+                               std::size_t needed) {
+    int confirmed = 0;
+    int candidate = 0;
+    std::size_t length = 0;
+    std::vector&lt;int&gt; result;
+    for (int value : samples) {
+        if (value != candidate) {
+            candidate = value;
+            length = 0;
+        }
+        ++length;
+        if (length == needed) {
+            confirmed = candidate;
+        }
+        result.push_back(confirmed);
+    }
+    return result;
+}
+</code></pre>
+<details>
+<summary>Тот же алгоритм на Python</summary>
+
+<pre><code class="language-python">def stable_levels(samples, needed):
+    confirmed = candidate = 0
+    length = 0
+    result = []
+    for value in samples:
+        if value != candidate:
+            candidate, length = value, 0
+        length += 1
+        if length == needed:
+            confirmed = candidate
+        result.append(confirmed)
+    return result
+</code></pre>
+</details>
+
+<p><img src="../assets/io/debounce.svg" alt="Показания кнопки 1, 0, 1, 1 и результат фильтра 0, 0, 0, 1."></p>
+<div id="practice"><section class="experiment">
+<h3>Измени отсчёты кнопки</h3>
+<p>Каждая кнопка ниже — один отсчёт. Нажми на него, чтобы сменить сырой уровень. Попробуй получить подтверждённую единицу уже на втором чтении. Затем увеличь требуемую длину серии.</p>
+<label>Нужны подряд <select data-count><option value="1">1 отсчёт</option><option selected value="2">2 отсчёта</option><option value="3">3 отсчёта</option><option value="4">4 отсчёта</option></select></label>
+<table><thead><tr><th scope="col">Чтение</th><th scope="col">1</th><th scope="col">2</th><th scope="col">3</th><th scope="col">4</th></tr></thead><tbody>
+<tr><th scope="row">Вход</th><td><button type="button" data-sample="0" aria-label="Единица на входе при чтении 1" aria-pressed="true">1</button></td><td><button type="button" data-sample="1" aria-label="Единица на входе при чтении 2" aria-pressed="false">0</button></td><td><button type="button" data-sample="2" aria-label="Единица на входе при чтении 3" aria-pressed="true">1</button></td><td><button type="button" data-sample="3" aria-label="Единица на входе при чтении 4" aria-pressed="true">1</button></td></tr>
+<tr><th scope="row">Длина серии</th><td data-run></td><td data-run></td><td data-run></td><td data-run></td></tr>
+<tr><th scope="row">Выход</th><td data-out></td><td data-out></td><td data-out></td><td data-out></td></tr></tbody></table>
+<p role="status"></p><button type="button" data-reset>Исходный сигнал</button>
+<script>
+(() => {
+  const root = document.currentScript.closest(".experiment");
+  const find = selector => root.querySelector(selector);
+  const buttons = Array.from(root.querySelectorAll('[data-sample]'));
+  const runs = root.querySelectorAll('[data-run]');
+  const outputs = root.querySelectorAll('[data-out]');
+  const threshold = find('[data-count]');
+  let samples;
+  function update() {
+    let confirmed = 0;
+    let length = 0;
+    const changes = [];
+    samples.forEach((value, i) => {
+      length = value === samples[i - 1] ? length + 1 : 1;
+      if (length >= Number(threshold.value) && confirmed !== value) {
+        confirmed = value;
+        changes.push('чтение ' + (i + 1) + ' → ' + value);
+      }
+      buttons[i].textContent = value;
+      buttons[i].setAttribute('aria-pressed', String(Boolean(value)));
+      runs[i].textContent = length;
+      outputs[i].textContent = confirmed;
+    });
+    find('[role=status]').textContent = changes.length ? 'Изменения выхода: ' + changes.join(', ') + '.' : 'Выход остаётся равным начальному уровню 0.';
+  }
+  buttons.forEach((button, i) => button.addEventListener('click', () => {
+    samples[i] ^= 1;
+    update();
+  }));
+  function reset() {
+    samples = [1, 0, 1, 1];
+    threshold.value = '2';
+    update();
+  }
+  threshold.addEventListener('change', update);
+  find('[data-reset]').addEventListener('click', reset);
+  reset();
+})();
+</script>
+</section>
+</div>
+
+<p>При нажатии металлические контакты могут несколько раз разомкнуться и снова коснуться друг друга. Вход микроконтроллера при этом успевает прочитать разные уровни. На рисунке показаны именно моменты чтения. Между ними вход мог переключаться ещё раз. В примере Arduino момент последней смены уровня запоминают и принимают новое состояние после заданной задержки. <a href="https://github.com/arduino/Arduino/blob/1.8.13/build/shared/examples/02.Digital/Debounce/Debounce.ino">Пример Debounce, 2006–2016</a> · <a href="../hardware/io.html">Откуда берутся отсчёты</a></p>
+<p>При <code>needed = 2</code> одиночная единица пропадает после следующего чтения. Разберём четыре отсчёта с начальным подтверждённым уровнем <code>0</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Отсчёт</th>
+<th>Кандидат</th>
+<th>Длина серии</th>
+<th>Подтверждённый уровень</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>1</code></td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td><code>0</code></td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td><code>1</code></td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td><code>1</code></td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+</tr>
+</tbody></table>
+<p>Каждый отсчёт обрабатывается один раз, поэтому время работы <code>O(n)</code>. Для отсчётов с неравными интервалами удобнее сравнивать отметки времени. Вместо длины серии храни момент появления кандидата и проверяй прошедшее время. При анализе записи учитывай последнюю известную отметку, чтобы не предполагать устойчивость за её пределами.</p>
+<h2>Как перебрать существенные пороги</h2>
+<p>Для правила <code>x &gt;= threshold</code> на целых числах состав выбранных элементов меняется только после перехода через наблюдаемое значение. Например, для значений 4 и 9 пороги 5, 6, 7, 8 и 9 выбирают один и тот же набор. Поэтому для поиска лучшего порога можно рассмотреть наблюдавшиеся значения и один порог выше максимума. Промежуточные пороги дают те же наборы.</p>
+<p>Например, для отсортированного массива <code>[4, 4, 9]</code> достаточно трёх проверок.</p>
+<table>
+<thead>
+<tr>
+<th>Порог</th>
+<th>Какие элементы проходят</th>
+<th>Сколько</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>4</code></td>
+<td><code>4, 4, 9</code></td>
+<td>3</td>
+</tr>
+<tr>
+<td><code>9</code></td>
+<td><code>9</code></td>
+<td>1</td>
+</tr>
+<tr>
+<td><code>10</code></td>
+<td>∅</td>
+<td>0</td>
+</tr>
+</tbody></table>
+<p>Функции возвращают пары <code>(порог, количество)</code>. Сортируем вход. При встрече новой группы одинаковых значений все элементы от начала группы до конца массива проходят порог. Из этих сведений можно построить оценку по своему критерию. Предполагаем, что <code>max(values) + 1</code> помещается в знаковый 64-битный тип.</p>
+<p><strong>C++17</strong></p>
+<pre><code class="language-cpp">#include &lt;algorithm&gt;
+#include &lt;cstddef&gt;
+#include &lt;utility&gt;
+#include &lt;vector&gt;
+
+std::vector&lt;std::pair&lt;long long, std::size_t&gt;&gt;
+threshold_counts(std::vector&lt;long long&gt; ordered) {
+    std::sort(ordered.begin(), ordered.end());
+    std::vector&lt;std::pair&lt;long long, std::size_t&gt;&gt; result;
+    for (std::size_t i = 0; i &lt; ordered.size(); ++i) {
+        if (i == 0 || ordered[i] != ordered[i - 1]) {
+            result.emplace_back(ordered[i], ordered.size() - i);
+        }
+    }
+    if (!ordered.empty()) {
+        result.emplace_back(ordered.back() + 1, 0);
+    }
+    return result;
+}
+</code></pre>
+<details>
+<summary>Тот же алгоритм на Python</summary>
+
+<pre><code class="language-python">def threshold_counts(values):
+    ordered = sorted(values)
+    result = []
+    for i, threshold in enumerate(ordered):
+        if i == 0 or threshold != ordered[i - 1]:
+            result.append((threshold, len(ordered) - i))
+    if ordered:
+        result.append((ordered[-1] + 1, 0))
+    return result
+</code></pre>
+</details>
+
+<p>Сортировка и проход требуют <code>O(n log n)</code> времени. Когда порог ограничен заданными границами или при совпадении оценок нужен конкретный порог, отдельно выясни, какой представитель допустим в каждом промежутке.</p>
+<hr>
+<p><a href="state-and-events.html">← Состояние и события</a> · <a href="grids-and-images.html">→ Клеточные карты и изображения</a></p>
+</article></main></body></html>

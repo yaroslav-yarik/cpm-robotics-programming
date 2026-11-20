@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="231" viewBox="0 0 560 231" role="img" aria-labelledby="title desc"><title id="title">Перебор пар для суммы 10</title><desc id="desc">В верхнем треугольнике суммы 10, 9 и 7. Первая проверка находит 10, до остальных цикл не доходит.</desc><rect width="560" height="231" fill="#fff"/>
+<text x="28" y="32" text-anchor="start" fill="#172e44" font-family="Arial,sans-serif" font-size="23" font-weight="700">Какие пары индексов проверяет перебор?</text>
+<text x="166" y="68" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="16" font-weight="400">j = 0</text>
+<text x="236" y="68" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="16" font-weight="400">j = 1</text>
+<text x="306" y="68" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="16" font-weight="400">j = 2</text>
+<text x="108" y="109" text-anchor="end" fill="#172e44" font-family="Arial,sans-serif" font-size="17" font-weight="400">i = 0</text>
+<rect x="135" y="81" width="62" height="41" rx="6" fill="#edf2f7" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="166.0" y="108.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">—</text>
+<rect x="205" y="81" width="62" height="41" rx="6" fill="#ffdf96" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="236.0" y="108.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">10</text>
+<rect x="275" y="81" width="62" height="41" rx="6" fill="#cdeee9" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="306.0" y="108.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">9</text>
+<text x="108" y="158" text-anchor="end" fill="#172e44" font-family="Arial,sans-serif" font-size="17" font-weight="400">i = 1</text>
+<rect x="135" y="130" width="62" height="41" rx="6" fill="#edf2f7" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="166.0" y="157.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">—</text>
+<rect x="205" y="130" width="62" height="41" rx="6" fill="#edf2f7" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="236.0" y="157.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">—</text>
+<rect x="275" y="130" width="62" height="41" rx="6" fill="#cdeee9" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="306.0" y="157.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">7</text>
+<text x="108" y="207" text-anchor="end" fill="#172e44" font-family="Arial,sans-serif" font-size="17" font-weight="400">i = 2</text>
+<rect x="135" y="179" width="62" height="41" rx="6" fill="#edf2f7" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="166.0" y="206.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">—</text>
+<rect x="205" y="179" width="62" height="41" rx="6" fill="#edf2f7" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="236.0" y="206.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">—</text>
+<rect x="275" y="179" width="62" height="41" rx="6" fill="#edf2f7" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="306.0" y="206.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">—</text>
+<text x="367" y="115" text-anchor="start" fill="#172e44" font-family="Arial,sans-serif" font-size="18" font-weight="700">Первая пара</text>
+<text x="367" y="144" text-anchor="start" fill="#006d69" font-family="Arial,sans-serif" font-size="21" font-weight="700">6 + 4 = 10</text>
+<text x="367" y="178" text-anchor="start" fill="#172e44" font-family="Arial,sans-serif" font-size="16" font-weight="400">Поиск окончен.</text></svg>

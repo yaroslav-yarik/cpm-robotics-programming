@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Биты, маски и std::bitset · Справочник ЦПМ</title><link rel="stylesheet" href="../style.css"></head><body><main class="reader"><nav class="reader-nav"><a href="../index.html">Оглавление</a><span> / </span><a href="../index.html#cpp">Язык C++</a><a class="jump" href="#practice">К опыту</a></nav><article><h1>Биты, маски и std::bitset</h1>
+<p>Бит принимает одно из двух значений, 0 или 1. Несколько битов подряд могут обозначать число. Чтобы прочитать его, сложи веса всех позиций, в которых стоит единица.</p>
+<table>
+<thead>
+<tr>
+<th>Номер позиции</th>
+<th align="right">3</th>
+<th align="right">2</th>
+<th align="right">1</th>
+<th align="right">0</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Вес</td>
+<td align="right">8</td>
+<td align="right">4</td>
+<td align="right">2</td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td>Биты числа 13</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+</tbody></table>
+<p>Позиции нумеруются справа налево с нуля. В числе <code>1101</code> единицы стоят на позициях 3, 2 и 0, поэтому его значение равно <code>8 + 4 + 1 = 13</code>. В C++ префикс <code>0b</code> обозначает двоичную запись числа, а <code>0x</code> — шестнадцатеричную.</p>
+<h2>Побитовые операции</h2>
+<table>
+<thead>
+<tr>
+<th>Выражение</th>
+<th>Когда бит результата равен 1</th>
+<th>Для <code>x = 0b1100</code> и <code>y = 0b1010</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>x &amp; y</code></td>
+<td>Оба входных бита равны 1</td>
+<td><code>0b1000</code></td>
+</tr>
+<tr>
+<td><code>x | y</code></td>
+<td>Хотя бы один входной бит равен 1</td>
+<td><code>0b1110</code></td>
+</tr>
+<tr>
+<td><code>x ^ y</code></td>
+<td>Входные биты различаются</td>
+<td><code>0b0110</code></td>
+</tr>
+<tr>
+<td><code>~x</code></td>
+<td>Бит <code>x</code> равен 0</td>
+<td>Младшие четыре бита равны <code>0011</code>, остальные биты тоже меняются</td>
+</tr>
+</tbody></table>
+<p>Например, чтобы вычислить <code>1100 &amp; 1010</code>, сравни два числа по столбцам. Только в крайнем левом столбце стоят две единицы. Получится <code>1000</code>.</p>
+<p><strong>Как операция И выглядит в железе.</strong> Логический элемент И принимает два электрических сигнала. Уровни напряжения кодируют 0 и 1. Если оба входа кодируют единицу, выход тоже кодирует единицу. Для целого числа одинаковое правило применяется отдельно в каждом разряде.</p>
+<p><img src="../assets/cpp/and-lanes.svg" alt="Каждая пара входных битов подаётся на отдельное логическое И. Для 1100 и 1010 получается 1000."></p>
+<div id="practice"><section class="experiment">
+<style>
+.bitboard{max-width:46rem}.bitboard fieldset{margin:0 0 1.25rem;padding:.65rem 1rem;border:1px solid #9dadbc;border-radius:.5rem}.bitboard fieldset label{display:inline-flex;gap:.3rem;align-items:center;margin:.25rem 1rem .25rem 0}.bitboard input[type=radio]{width:auto}.bitrow{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:clamp(2px,1vw,8px);text-align:center}.bitrow button,.bitrow output{box-sizing:border-box;display:grid;place-items:center;min-width:0;height:2.8rem;border-radius:.35rem;font:600 clamp(1rem,3vw,1.3rem)/1 monospace;padding:0}.bitrow button{border:1px solid #7c909e;background:#fff;color:#243a49}.bitrow button[aria-pressed=true]{background:#185d59;color:#fff}.bitrow button:disabled{opacity:.78}.bitrow output{border:1px solid #acbbc4;background:#edf3f4;color:#253b42}.bitrow output[data-on=true]{background:#ffe6ab;border-color:#90691c;color:#49320d}.bitlabels{font:500 .85rem/1.4 monospace;color:#455765}.bitboard .rowtitle{margin:.9rem 0 .35rem;font-weight:650}.bitboard .rowtitle span{font-weight:400}.bitboard .controls{display:flex;flex-wrap:wrap;gap:.5rem}.bitboard .detail{padding:.65rem 1rem;background:#edf5f4;color:#213f3e;border-left:3px solid #167368}.bitboard .exercise{margin-top:1.75rem}.bitrow button:focus-visible{outline:3px solid #ad5d00;outline-offset:2px}
+</style>
+<h3>Побитовые операции</h3>
+<p>Нажми на бит числа A или B. Посмотри, что изменилось в том же столбце результата, и попробуй другую операцию.</p>
+<div class="bitboard">
+<fieldset><legend>Операция</legend>
+<label><input type="radio" name="operation" value="and" checked> И (&amp;)</label>
+<label><input type="radio" name="operation" value="or"> ИЛИ (|)</label>
+<label><input type="radio" name="operation" value="xor"> Исключающее ИЛИ (^)</label>
+</fieldset>
+<p class="rowtitle">Номер разряда</p>
+<div class="bitrow bitlabels" aria-hidden="true"><span>7</span><span>6</span><span>5</span><span>4</span><span>3</span><span>2</span><span>1</span><span>0</span></div>
+<p class="rowtitle">A <span id="a-dec"></span></p><div class="bitrow" id="a"></div>
+<p class="rowtitle">B <span id="b-dec"></span></p><div class="bitrow" id="b"></div>
+<p class="rowtitle">Результат <span id="result-dec"></span></p><div class="bitrow" id="result" aria-hidden="true"></div>
+<p><code id="expression"></code></p>
+<p class="detail" id="detail" aria-live="polite"></p>
+<section class="exercise"><h4>Как переключить два флага?</h4>
+<p>В числе A = 12 нужно переключить разряды 3 и 0, сохранив остальные. Включи задачу и собери для XOR подходящую маску B.</p>
+<div class="controls"><button type="button" id="start">Начать задачу</button><button type="button" id="check" hidden>Проверить маску</button><button type="button" id="reset">Сбросить</button></div>
+<p id="feedback" role="status"></p></section>
+</div>
+<noscript>Для переключения битов включи JavaScript в браузере.</noscript>
+<script>
+(() => {
+const byId = id => document.getElementById(id);
+const operations = {
+  and: {symbol: '&', apply: (a,b) => a & b, rule: 'Единица получается, когда оба входа равны 1.'},
+  or: {symbol: '|', apply: (a,b) => a | b, rule: 'Единица получается, когда хотя бы один вход равен 1.'},
+  xor: {symbol: '^', apply: (a,b) => a ^ b, rule: 'Единица получается, когда входы различаются.'}
+};
+const state = {a:12, b:10, operation:'and', position:3, challenge:false};
+const radios = Array.from(document.querySelectorAll('input[name=operation]'));
+const bit = (value, position) => (value >> position) & 1;
+const binary = value => value.toString(2).padStart(8, '0');
+
+for (const name of ['a', 'b', 'result']) {
+  for (let position = 7; position >= 0; position--) {
+    const cell = document.createElement(name === 'result' ? 'output' : 'button');
+    if (name !== 'result') {
+      cell.type = 'button';
+      cell.setAttribute('aria-label', name.toUpperCase() + ', разряд ' + position);
+      cell.addEventListener('click', () => {
+        state[name] ^= 1 << position;
+        state.position = position;
+        byId('feedback').textContent = '';
+        render();
+      });
+    }
+    byId(name).append(cell);
+  }
+}
+function render() {
+  const {a,b,position,challenge} = state;
+  const op = operations[state.operation];
+  const result = op.apply(a,b);
+  for (const [name,value] of [['a',a],['b',b],['result',result]]) {
+    byId(name+'-dec').textContent = '= '+value;
+    Array.from(byId(name).children).forEach((cell,index) => {
+      const digit = bit(value,7-index);
+      cell.textContent = digit;
+      if (name === 'result') cell.dataset.on = String(Boolean(digit));
+      else {
+        cell.setAttribute('aria-pressed', String(Boolean(digit)));
+        cell.disabled = challenge && name === 'a';
+      }
+    });
+  }
+  for (const radio of radios) {
+    radio.checked = radio.value === state.operation;
+    radio.disabled = challenge;
+  }
+  byId('expression').textContent = '0b'+binary(a)+' '+op.symbol+' 0b'+binary(b)+' = 0b'+binary(result);
+  byId('detail').textContent = 'Разряд '+position+' (вес '+(2 ** position)+'). '+bit(a,position)+' '+op.symbol+' '+bit(b,position)+' = '+bit(result,position)+'. '+op.rule;
+  byId('check').hidden = !challenge;
+  byId('start').textContent = challenge ? 'Начать задачу заново' : 'Начать задачу';
+}
+for (const radio of radios) radio.addEventListener('change', () => {
+  state.operation = radio.value;
+  render();
+});
+byId('start').addEventListener('click', () => {
+  Object.assign(state, {a:12,b:0,operation:'xor',position:3,challenge:true});
+  render();
+  byId('feedback').textContent = 'Изменяй биты маски B. Когда маска будет готова, проверь ответ.';
+});
+byId('check').addEventListener('click', () => {
+  const wrong = state.b ^ 9;
+  if (wrong === 0) {
+    byId('feedback').textContent = 'Верно. Маска 00001001 переключает биты 3 и 0. Из 00001100 (12) получилось 00000101 (5).';
+    return;
+  }
+  const position = Math.floor(Math.log2(wrong));
+  byId('feedback').textContent = 'Проверь разряд '+position+'. '+(bit(9,position) ? 'Этот флаг должен измениться. Каким битом маски XOR его переключить?' : 'Этот флаг должен сохранить значение. Каким битом маски XOR его оставить?');
+});
+byId('reset').addEventListener('click', () => {
+  Object.assign(state, {a:12,b:10,operation:'and',position:3,challenge:false});
+  render();
+  byId('feedback').textContent = 'Снова можно менять оба числа и выбирать операцию.';
+});
+render();
+})();
+</script>
+</section>
+</div>
+
+<p>Между соседними столбцами нет переноса. Такую операцию над машинным словом обычно выполняет арифметико-логическое устройство процессора за одну команду AND. Рисунок показывает четыре младших разряда для удобства чтения. <a href="../hardware/cpu.html">Как устроен процессор</a>.</p>
+<p>Операторы <code>&amp;&amp;</code>, <code>||</code> и <code>!</code> определяют истинность целого выражения. Например, <code>2 &amp;&amp; 1</code> даёт <code>true</code>, а <code>2 &amp; 1</code> даёт 0, потому что у этих чисел нет общих установленных битов. Запись <code>^</code> обозначает исключающее ИЛИ. В C++ она не возводит в степень.</p>
+<h2>Сдвиги и отдельные биты</h2>
+<p>Для беззнаковых чисел сдвиги заполняют освободившиеся разряды нулями. Сдвиг <code>x &lt;&lt; k</code> перемещает биты в сторону больших весов и отбрасывает старшие биты, которым не хватило места. Когда потерь нет, это умножение на 2 в степени <code>k</code>. Сдвиг <code>x &gt;&gt; k</code> равен целочисленному делению на ту же степень двойки. Например, <code>13u &lt;&lt; 1</code> равно 26, а <code>13u &gt;&gt; 1</code> равно 6.</p>
+<p><strong>Маска</strong> — число, у которого единицами отмечены интересующие нас позиции. Если нужен только бит 1, берём число <code>0001</code> и сдвигаем его влево на одну позицию. Получится <code>0010</code>.</p>
+<p>В примерах <code>1ULL</code> имеет тип <code>unsigned long long</code>. Выбирай <code>k</code> от 0 до 63, чтобы сдвиг гарантированно помещался в ширину этого типа на любой реализации.</p>
+<p>Для ширины в конкретном окружении есть <code>std::numeric_limits&lt;unsigned long long&gt;::digits</code> из <code>&lt;limits&gt;</code>. Сдвиг на отрицательное число или на число, равное ширине типа после целочисленных продвижений или больше, недопустим. Тип левого операнда важен. В выражении <code>1 &lt;&lt; k</code> сдвигается <code>int</code>, даже если результат присваивается широкой переменной.</p>
+<pre><code class="language-cpp">unsigned long long flags = 0b1101;
+unsigned k = 1;
+auto bit = 1ULL &lt;&lt; k;      // Маска из одной единицы: 0010.
+
+bool was_set = (flags &amp; bit) != 0;  // false: второй справа бит выключен.
+flags |= bit;                       // 1111: включить выбранный бит.
+flags &amp;= ~bit;                      // 1101: выключить только этот бит.
+flags ^= bit;                       // 1111: переключить выбранный бит.
+auto digit = (flags &gt;&gt; k) &amp; 1ULL;   // 1: выбранный бит перемещён на позицию 0.
+</code></pre>
+<p>Скобки в <code>(flags &amp; bit) != 0</code> задают нужный порядок: сначала применить маску, затем сравнить с нулём. Если требуется проверить сразу несколько флагов, <code>(flags &amp; mask) != 0</code> означает «установлен хотя бы один», а <code>(flags &amp; mask) == mask</code> — «установлены все». Например, маска <code>0b1010</code> проверяет биты 1 и 3.</p>
+<h2>Подсчёт единиц</h2>
+<p>Для положительного <code>x</code> число <code>x - 1</code> меняет младшую единицу на ноль, а стоящие справа нули — на единицы. Поэтому <code>x &amp; (x - 1)</code> убирает ровно младшую единицу. Например, из <code>0b101100</code> получится <code>0b101000</code>.</p>
+<pre><code class="language-cpp">int count_ones(unsigned long long x) {
+    int count = 0;
+    while (x != 0) {
+        x &amp;= x - 1;
+        ++count;
+    }
+    return count;
+}
+// count_ones(0b101100) даёт 3, count_ones(0) даёт 0.
+</code></pre>
+<p>Цикл работает столько итераций, сколько в исходном числе единиц. В C++20 доступен <code>std::popcount(x)</code> из <code>&lt;bit&gt;</code> для беззнаковых типов.</p>
+<h2>Набор битов фиксированной длины</h2>
+<p>Тип <code>std::bitset&lt;N&gt;</code> из <code>&lt;bitset&gt;</code> хранит ровно <code>N</code> битов. Размер известен при компиляции. Например, <code>std::bitset&lt;8&gt;(13)</code> хранит <code>00001101</code>. Конструирование из целого использует младшие <code>N</code> битов. В записи для человека старший бит слева, а индекс 0 по-прежнему обозначает крайний бит справа.</p>
+<pre><code class="language-cpp">#include &lt;bitset&gt;
+#include &lt;iostream&gt;
+
+int main() {
+    std::bitset&lt;8&gt; before(0b00001101);
+    std::bitset&lt;8&gt; after(&quot;00000111&quot;);
+    auto changed = before ^ after;  // Единицы в местах изменений.
+
+    std::cout &lt;&lt; changed &lt;&lt; &#39;\n&#39;;          // 00001010
+    std::cout &lt;&lt; changed.count() &lt;&lt; &#39;\n&#39;;  // 2
+    std::cout &lt;&lt; changed.test(3) &lt;&lt; &#39;\n&#39;;  // 1
+
+    changed.reset(3);   // 00000010
+    changed.set(0);     // 00000011
+    changed.flip(1);    // 00000001
+    std::cout &lt;&lt; changed.to_ullong() &lt;&lt; &#39;\n&#39;;  // 1
+}
+</code></pre>
+<p>В строках <code>00001101</code> и <code>00000111</code> различаются биты 3 и 1. Поэтому результат XOR равен <code>00001010</code>, а <code>count()</code> возвращает 2.</p>
+<table>
+<thead>
+<tr>
+<th>Что нужно узнать или изменить</th>
+<th>Метод</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Бит на позиции <code>i</code></td>
+<td><code>test(i)</code> проверяет границы. <code>b[i]</code> подходит для заведомо допустимого индекса</td>
+</tr>
+<tr>
+<td>Есть единицы? Все биты нулевые? Все единичные?</td>
+<td><code>any()</code>, <code>none()</code>, <code>all()</code> соответственно</td>
+</tr>
+<tr>
+<td>Поставить 1, поставить 0 или переключить бит</td>
+<td><code>set(i)</code>, <code>reset(i)</code>, <code>flip(i)</code></td>
+</tr>
+<tr>
+<td>Сделать то же для всех позиций</td>
+<td><code>set()</code>, <code>reset()</code>, <code>flip()</code></td>
+</tr>
+</tbody></table>
+<p>Два набора одинакового размера можно объединять через <code>&amp;</code>, <code>|</code>, <code>^</code>. Сдвиг на <code>N</code> позиций и больше даёт нулевой набор. <code>to_string()</code> сохраняет все <code>N</code> разрядов, включая ведущие нули. <code>to_ullong()</code> выбрасывает <code>std::overflow_error</code>, когда значение слишком велико для результата.</p>
+<hr>
+<p><a href="sequence-operations.html">← Преобразование и редактирование последовательностей</a></p>
+</article></main></body></html>

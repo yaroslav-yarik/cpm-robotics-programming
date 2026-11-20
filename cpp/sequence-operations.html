@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Преобразование и редактирование последовательностей · Справочник ЦПМ</title><link rel="stylesheet" href="../style.css"></head><body><main class="reader"><nav class="reader-nav"><a href="../index.html">Оглавление</a><span> / </span><a href="../index.html#cpp">Язык C++</a><a class="jump" href="#practice">К опыту</a></nav><article><h1>Преобразование и редактирование последовательностей</h1>
+<p>Пусть в векторе стоят числа <code>10, 20, 30</code>. Чтобы поместить <code>99</code> между первым и вторым числами, нужно указать позицию <strong>перед</strong> <code>20</code>. В C++ эту позицию задаёт итератор <code>a.begin() + 1</code>.</p>
+<h2>Вставка и удаление по позиции</h2>
+<p>Пусть <code>a</code> — вектор, а <code>pos</code> — допустимый итератор в нём.</p>
+<table>
+<thead>
+<tr>
+<th>Запись</th>
+<th>Результат</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>a.push_back(value)</code></td>
+<td>Дописывает значение в конец</td>
+</tr>
+<tr>
+<td><code>a.insert(pos, value)</code></td>
+<td>Вставляет значение перед позицией <code>pos</code></td>
+</tr>
+<tr>
+<td><code>a.insert(pos, count, value)</code></td>
+<td>Вставляет <code>count</code> копий</td>
+</tr>
+<tr>
+<td><code>a.insert(pos, b.begin(), b.end())</code></td>
+<td>Вставляет все элементы другого вектора <code>b</code></td>
+</tr>
+<tr>
+<td><code>a.erase(pos)</code></td>
+<td>Удаляет элемент в позиции <code>pos</code></td>
+</tr>
+<tr>
+<td><code>a.erase(first, last)</code></td>
+<td>Удаляет полуинтервал <code>[first, last)</code></td>
+</tr>
+</tbody></table>
+<p>Вставка перед <code>end()</code> дописывает в конец. Сам <code>end()</code> нельзя удалить как элемент. Посмотрим, как меняются позиции при двух правках подряд.</p>
+<pre><code class="language-cpp">std::vector&lt;int&gt; a{10, 20, 30};
+a.insert(a.begin() + 1, 99);                // 10, 99, 20, 30
+a.erase(a.begin() + 1, a.begin() + 3);      // 10, 30
+</code></pre>
+<p>При удалении левая граница указывает на <code>99</code>, правая — на <code>30</code>. Элемент на правой границе сохраняется.</p>
+<p><strong>Почему вставка в середину требует работы.</strong> Представим, что в буфере вектора есть место для четвёртого числа. На рисунке точка обозначает запас места за последним элементом. Чтобы освободить вторую позицию, достаточно сдвинуть хвост на одну позицию вправо, начиная с конца. Если первым переписать 30 числом 20, прежнее значение 30 будет потеряно.</p>
+<p><img src="../assets/cpp/vector-insert.svg" alt="Если место есть, хвост из 20 и 30 можно перенести вправо, начиная с конца, затем записать 99 на индекс 1."></p>
+<div id="practice"><section class="experiment" id="lab-sequence-operations">
+  <h3>Сколько чисел придётся сдвинуть?</h3>
+  <p>В буфере вектора есть место ещё для одного элемента. Выбери позицию вставки и перемести хвост по одной ячейке. Сравни вставку в начало и в конец.</p>
+  <div class="lab-controls"><label>Позиция <select data-pos><option>0</option><option selected>1</option><option>2</option><option>3</option></select></label><label>Новое число <select data-new><option selected>99</option><option>42</option></select></label></div>
+  <div class="lab-cells" data-buffer></div><pre><code data-code></code></pre>
+  <div class="lab-controls"><button data-step type="button">Сдвинуть элемент</button><button data-reset type="button">Сначала</button></div>
+  <p data-status role="status"></p>
+<style>
+#lab-sequence-operations .lab-controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin:.8rem 0} #lab-sequence-operations .lab-cells{display:flex;flex-wrap:wrap;gap:.4rem;margin:.8rem 0} #lab-sequence-operations .lab-cell{display:grid;justify-items:center;min-width:3rem;padding:.35rem .55rem;border:1px solid #96acb7;border-radius:.4rem;background:#eef3f5;color:#172f45} #lab-sequence-operations .lab-cell.active{background:#ffe8a8;color:#473105;border-color:#8f6916} #lab-sequence-operations .lab-cell small{font-size:.82rem} #lab-sequence-operations pre{white-space:pre-wrap;overflow-wrap:anywhere}
+</style>
+<script>
+(() => {
+  const root = document.getElementById('lab-sequence-operations');
+  const get = selector => root.querySelector(selector);
+  const status = get('[data-status]');
+  const initial = [10, 20, 30];
+  let step = 0;
+  function render() {
+    const pos = Number(get('[data-pos]').value);
+    const value = Number(get('[data-new]').value);
+    const shifts = initial.length - pos;
+    const done = step === shifts + 1;
+    const buffer = [...initial, null];
+    let changed = -1;
+    for (let i = 0; i < Math.min(step, shifts); i++) {
+      changed = initial.length - i;
+      buffer[changed] = buffer[changed - 1];
+    }
+    if (done) { changed = pos; buffer[pos] = value; }
+    const cells = get('[data-buffer]'); cells.replaceChildren();
+    buffer.forEach((x, i) => {
+      const cell = document.createElement('span');
+      cell.className = 'lab-cell' + (i === changed ? ' active' : '');
+      const index = document.createElement('small'); index.textContent = 'слот ' + i;
+      cell.append(index, x === null ? 'запас' : String(x)); cells.append(cell);
+    });
+    get('[data-code]').textContent = 'a.insert(a.begin() + ' + pos + ', ' + value + ');';
+    get('[data-step]').disabled = done;
+    get('[data-step]').textContent = done ? 'Вставка завершена' : step === shifts ? 'Записать ' + value : 'Сдвинуть ' + buffer[initial.length - step - 1] + ' вправо';
+    status.textContent = done ? 'Получился вектор [' + buffer.join(', ') + ']. Сдвигов: ' + shifts + '. Затем один раз записали ' + value + '.' :
+      'Сдвигов выполнено: ' + step + ' из ' + shifts + '. ' + (step < shifts ? 'Переносим хвост с конца, чтобы сохранить каждое число.' : 'Теперь можно записать новое число в слот ' + pos + '.');
+  }
+  const reset = () => { step = 0; render(); };
+  get('[data-pos]').onchange = get('[data-new]').onchange = reset;
+  get('[data-step]').onclick = () => { if (!get('[data-step]').disabled) step++; render(); };
+  get('[data-reset]').onclick = reset;
+  render();
+})();
+</script>
+</section>
+</div>
+
+<p>На уровне памяти это перенос содержимого соседних ячеек. Для простых типов библиотека может перемещать сразу блок байтов. Если свободной позиции за концом нет, вектор получает более вместительный буфер и размещает элементы уже в нём. <a href="../hardware/memory.html">Как размещаются данные</a>.</p>
+<p>При вставке в середину и удалении могут сдвигаться многие элементы. Если вектор перераспределил память, старые итераторы и ссылки на его элементы недействительны. При <code>erase</code> становятся недействительными итераторы и ссылки на удалённые и последующие позиции. Для учебных примеров безопасное правило простое: после изменения вектора вычисляй позиции заново.</p>
+<p>В цикле, который удаляет по итератору, продолжай с результата <code>it = a.erase(it)</code>, если ты удалил элемент, и делай <code>++it</code> только в ветке, где его сохранил. Для удаления многих элементов по условию эффективнее сделать один проход с <code>remove_if</code>.</p>
+<h2>Копирование и преобразование</h2>
+<p><code>std::copy</code> копирует исходный диапазон. <code>std::transform</code> вызывает функцию для каждого элемента и записывает результат. Алгоритмы сами не знают размер вектора назначения. Вызов <code>std::back_inserter(result)</code> из <code>&lt;iterator&gt;</code> создаёт итератор, запись в который вызывает <code>result.push_back(...)</code>.</p>
+<ul>
+<li><code>copy(..., result.begin())</code> требует, чтобы в <code>result</code> уже было достаточно элементов для записи.</li>
+<li><code>copy(..., std::back_inserter(result))</code> дописывает в существующий вектор.</li>
+<li><code>transform(..., std::back_inserter(result), f)</code> дописывает преобразованные значения.</li>
+<li>Конструктор <code>std::vector&lt;int&gt; part(a.begin(), a.begin() + 2);</code> сразу создаёт копию первых двух элементов, если они есть.</li>
+</ul>
+<p>Если вызвать <code>copy</code> с <code>back_inserter</code>, а затем <code>transform</code> с тем же выходным вектором, преобразованные значения добавятся после уже скопированных.</p>
+<h2>Как удалить соседние повторы</h2>
+<p><code>std::unique</code> оставляет по одному элементу от каждой <strong>соседней</strong> группы равных. Для <code>{4, 4, 2, 4}</code> полезная часть станет <code>{4, 2, 4}</code>. Длина вектора остаётся прежней. Алгоритм возвращает новый конец полезной части. Поэтому обычно пишут:</p>
+<pre><code class="language-cpp">a.erase(std::unique(a.begin(), a.end()), a.end());
+</code></pre>
+<p>Если нужны все разные числа и изменение порядка допустимо, сначала отсортируй вектор: тогда равные числа окажутся рядом.</p>
+<h2>Как удалить элементы по условию</h2>
+<p>С <code>remove_if</code> похожий принцип. Алгоритм сдвигает вперёд элементы, которые надо сохранить, а хвост удаляет сам вектор:</p>
+<pre><code class="language-cpp">a.erase(std::remove_if(a.begin(), a.end(),
+                       [](int value) { return value &lt; 0; }),
+        a.end());
+</code></pre>
+<p>Чтобы убрать точное значение <code>x</code>, в таком же шаблоне используй <code>std::remove(a.begin(), a.end(), x)</code>. Начиная с <strong>C++20</strong>, для вектора можно написать <code>std::erase(a, x)</code> или <code>std::erase_if(a, pred)</code>. Это свободные функции, а <code>a.erase(pos)</code> — метод вектора. Для решения под C++17 используй два предыдущих шаблона.</p>
+<h2>Как сложить элементы</h2>
+<p><code>std::accumulate(first, last, initial)</code> из <code>&lt;numeric&gt;</code> последовательно прибавляет элементы к начальному значению. Тип начального значения задаёт тип суммы. Для суммы больших <code>int</code> пиши <code>0LL</code>, если сумма помещается в <code>long long</code>. Запись <code>long long sum = std::accumulate(..., 0);</code> сначала считает в <code>int</code>, и позднее преобразование не защищает от переполнения.</p>
+<h2>Преобразование измерений и сумма</h2>
+<p>Оставим одно число из каждой соседней группы и удалим отрицательные числа. Потом сохраним очищенный ряд и допишем квадраты в тот же выходной вектор.</p>
+<pre><code class="language-cpp">#include &lt;algorithm&gt;
+#include &lt;iostream&gt;
+#include &lt;iterator&gt;
+#include &lt;numeric&gt;
+#include &lt;vector&gt;
+
+int main() {
+    std::vector&lt;int&gt; values{2, 2, -5, 3, 3, 2};
+    values.erase(std::unique(values.begin(), values.end()), values.end());
+    values.erase(std::remove_if(values.begin(), values.end(),
+                                [](int value) { return value &lt; 0; }),
+                 values.end());
+
+    std::vector&lt;long long&gt; result;
+    std::copy(values.begin(), values.end(), std::back_inserter(result));
+    std::transform(values.begin(), values.end(), std::back_inserter(result),
+                   [](int value) { return 1LL * value * value; });
+
+    for (long long value : result) {
+        std::cout &lt;&lt; value &lt;&lt; &#39; &#39;;
+    }
+    std::cout &lt;&lt; &#39;\n&#39; &lt;&lt; std::accumulate(result.begin(), result.end(), 0LL) &lt;&lt; &#39;\n&#39;;
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Шаг</th>
+<th>Что получилось</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Сжали соседние повторы</td>
+<td><code>2, -5, 3, 2</code></td>
+</tr>
+<tr>
+<td>Убрали отрицательные числа</td>
+<td><code>2, 3, 2</code></td>
+</tr>
+<tr>
+<td>Скопировали числа в <code>result</code> и дописали их квадраты</td>
+<td><code>2, 3, 2, 4, 9, 4</code></td>
+</tr>
+<tr>
+<td>Сложили все элементы <code>result</code></td>
+<td><code>24</code></td>
+</tr>
+</tbody></table>
+<p>Порядок действий имеет значение. После удаления отрицательных элементов соседними могут стать числа, которые раньше разделял удалённый элемент. Если нужно схлопнуть и такие новые группы, вызывай <code>unique</code> после фильтрации.</p>
+<hr>
+<p><a href="stl-and-lambdas.html">← Алгоритмы стандартной библиотеки и лямбды</a> · <a href="bits-and-bitset.html">→ Биты, маски и std::bitset</a></p>
+</article></main></body></html>

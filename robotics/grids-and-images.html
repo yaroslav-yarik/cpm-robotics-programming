@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Клеточные карты и изображения · Справочник ЦПМ</title><link rel="stylesheet" href="../style.css"></head><body><main class="reader"><nav class="reader-nav"><a href="../index.html">Оглавление</a><span> / </span><a href="../index.html#robotics">Прикладные алгоритмы</a><a class="jump" href="#practice">К опыту</a></nav><article><h1>Клеточные карты и изображения</h1>
+<p>Клетку карты задаёт пара <code>(строка, столбец)</code>. Эти же координаты используются для пикселей изображения. Нумерацию начинаем с нуля.</p>
+<h2>Как координаты превращаются в адрес пикселя</h2>
+<p>Пусть в монохромном изображении три строки по четыре пикселя. Каждый пиксель хранит яркость в одном байте. Если строки плоского буфера идут подряд без выравнивающих промежутков, смещение пикселя равно <code>row * width + col</code> байтам. Перед клеткой <code>(1, 2)</code> лежит целая первая строка и два байта второй. Значит, её смещение равно <code>1 * 4 + 2 = 6</code>.</p>
+<p><img src="../assets/io/pixel.svg" alt="Три строки по четыре байта и их развёртка в плоский буфер. Клетка (1, 2) и шестое смещение выделены одинаково."></p>
+<div id="practice"><section class="experiment">
+<h3>Запиши байт в кадровый буфер</h3>
+<p>Выбери яркость и нажми на клетку экрана. Затем выбери адрес в буфере и запиши другое значение по тому же адресу. Обе записи меняют один массив из 12 байтов.</p>
+<label>Яркость <select data-light><option value="0">0 — чёрный</option><option value="85">85</option><option value="170">170</option><option selected value="255">255 — белый</option></select></label>
+<p>Экран · 3 строки × 4 столбца</p>
+<div data-screen style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.25rem;max-width:20rem"><button type="button" data-pixel="0" aria-label="Строка 0, столбец 0">0</button><button type="button" data-pixel="1" aria-label="Строка 0, столбец 1">0</button><button type="button" data-pixel="2" aria-label="Строка 0, столбец 2">0</button><button type="button" data-pixel="3" aria-label="Строка 0, столбец 3">0</button><button type="button" data-pixel="4" aria-label="Строка 1, столбец 0">0</button><button type="button" data-pixel="5" aria-label="Строка 1, столбец 1">0</button><button type="button" data-pixel="6" aria-label="Строка 1, столбец 2">0</button><button type="button" data-pixel="7" aria-label="Строка 1, столбец 3">0</button><button type="button" data-pixel="8" aria-label="Строка 2, столбец 0">0</button><button type="button" data-pixel="9" aria-label="Строка 2, столбец 1">0</button><button type="button" data-pixel="10" aria-label="Строка 2, столбец 2">0</button><button type="button" data-pixel="11" aria-label="Строка 2, столбец 3">0</button></div>
+<p><label>Смещение <select data-offset><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6" selected>6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option></select></label> <button data-write type="button">Записать байт</button></p>
+<p>Байты буфера по возрастанию адресов</p><p><samp data-buffer></samp></p><p role="status"></p><button type="button" data-reset>Очистить экран</button>
+<script>
+(() => {
+  const root = document.currentScript.closest(".experiment");
+  const find = selector => root.querySelector(selector);
+  const data = new Uint8Array(12);
+  const offset = find('[data-offset]');
+  const cells = root.querySelectorAll('[data-pixel]');
+  function show(message) {
+    cells.forEach((button, index) => {
+      const value = data[index];
+      button.textContent = value;
+      button.style.backgroundColor = 'rgb(' + [value, value, value].join(',') + ')';
+      button.style.color = value >= 170 ? '#000' : '#fff';
+      button.setAttribute('aria-label', 'Строка ' + Math.floor(index / 4) + ', столбец ' + (index % 4) + ', яркость ' + value);
+    });
+    find('[data-buffer]').textContent = Array.from(data, value => value.toString(16).toUpperCase().padStart(2, '0')).join(' ');
+    find('[role=status]').textContent = message;
+  }
+  function write(index) {
+    const value = Number(find('[data-light]').value);
+    const row = Math.floor(index / 4);
+    const col = index % 4;
+    data[index] = value;
+    offset.value = String(index);
+    show('Пиксель (' + row + ', ' + col + '): смещение ' + row + ' × 4 + ' + col + ' = ' + index + '. Записана яркость ' + value + '.');
+  }
+  cells.forEach((button, index) => button.addEventListener('click', () => write(index)));
+  find('[data-write]').addEventListener('click', () => write(Number(offset.value)));
+  find('[data-reset]').addEventListener('click', () => {
+    data.fill(0);
+    show('Во всех двенадцати ячейках записаны нули.');
+  });
+  show('Буфер заполнен нулями. Найди пиксель со смещением 6.');
+})();
+</script>
+</section>
+</div>
+
+<p>Так можно хранить данные для контроллера дисплея. В примерах ниже встречается и <code>vector&lt;vector&lt;...&gt;&gt;</code>. У каждой строки такого вектора собственная область памяти. Чтобы добраться до клетки, сначала выбираем строку, затем элемент этой строки. <a href="../hardware/io.html">Как кадр попадает на экран</a></p>
+<h2>Как направление меняет координаты</h2>
+<p>Строки считаются сверху вниз, столбцы слева направо. При одном шаге меняется только одна координата.</p>
+<table>
+<thead>
+<tr>
+<th>Номер</th>
+<th>Направление</th>
+<th>Прибавить к строке</th>
+<th>Прибавить к столбцу</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>↑ север</td>
+<td>−1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>→ восток</td>
+<td>0</td>
+<td>+1</td>
+</tr>
+<tr>
+<td>2</td>
+<td>↓ юг</td>
+<td>+1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>3</td>
+<td>← запад</td>
+<td>0</td>
+<td>−1</td>
+</tr>
+</tbody></table>
+<p>Координаты и направление вместе образуют <strong>позу</strong>. При повороте направо новый номер направления равен <code>(direction + 1) % 4</code>. При движении прямо умножаем сдвиг из таблицы на число шагов. Например, два шага на север из <code>(3, 2)</code> ведут через <code>(2, 2)</code> в <code>(1, 2)</code>.</p>
+<p><strong>C++17</strong></p>
+<pre><code class="language-cpp">#include &lt;utility&gt;
+
+std::pair&lt;long long, long long&gt; move(long long row, long long col,
+                                     int direction, long long steps) {
+    const int dr[] = {-1, 0, 1, 0};
+    const int dc[] = {0, 1, 0, -1};
+    return {row + steps * dr[direction], col + steps * dc[direction]};
+}
+</code></pre>
+<details>
+<summary>Тот же алгоритм на Python</summary>
+
+<pre><code class="language-python">def move(row, col, direction, steps):
+    offsets = [(-1, 0), (0, 1), (1, 0), (0, -1)]
+    dr, dc = offsets[direction]
+    return row + steps * dr, col + steps * dc
+</code></pre>
+</details>
+
+<p>Формула описывает движение по свободной плоскости для направлений от 0 до 3. Если есть стены, проверь допустимость каждой промежуточной позиции или вычисли расстояние до препятствия перед решением о перемещении.</p>
+<h2>Рамка группы клеток</h2>
+<p>После <a href="../algorithms/grid-traversal.html">обхода карты</a> известны клетки одной связной области. Возьмём три клетки <code>(1, 1)</code>, <code>(1, 2)</code> и <code>(2, 1)</code>. На схеме они отмечены <code>×</code>.</p>
+<pre><code class="language-text">             столбец 1   столбец 2
+строка 1         ×           ×
+строка 2         ×           ·
+</code></pre>
+<p>Самая верхняя строка области — <code>1</code>, самая нижняя — <code>2</code>. По столбцам границы тоже <code>1</code> и <code>2</code>. Чтобы найти такую рамку у любой непустой области, начинаем с первой клетки и расширяем границы после чтения каждой следующей.</p>
+<p><strong>C++17</strong></p>
+<pre><code class="language-cpp">#include &lt;algorithm&gt;
+#include &lt;array&gt;
+#include &lt;utility&gt;
+#include &lt;vector&gt;
+
+std::array&lt;int, 4&gt; bounding_box(const std::vector&lt;std::pair&lt;int, int&gt;&gt;&amp; cells) {
+    int top = cells.front().first;
+    int bottom = top;
+    int left = cells.front().second;
+    int right = left;
+    for (auto [row, col] : cells) {
+        top = std::min(top, row);
+        bottom = std::max(bottom, row);
+        left = std::min(left, col);
+        right = std::max(right, col);
+    }
+    return {top, left, bottom, right};
+}
+</code></pre>
+<details>
+<summary>Тот же алгоритм на Python</summary>
+
+<pre><code class="language-python">def bounding_box(cells):
+    top = bottom = cells[0][0]
+    left = right = cells[0][1]
+    for row, col in cells:
+        top = min(top, row)
+        bottom = max(bottom, row)
+        left = min(left, col)
+        right = max(right, col)
+    return top, left, bottom, right
+</code></pre>
+</details>
+
+<p>Функция возвращает <code>(верх, лево, низ, право)</code>. Обе границы включены, поэтому площадь равна <code>(низ − верх + 1) · (право − лево + 1)</code>. На схеме площадь равна четырём, а заняты три клетки. Если список не содержит повторов, равенство площади рамки и числа клеток означает, что рамка заполнена целиком. Рамку можно обновлять прямо в ходе обхода компоненты, если потом не требуется хранить сами клетки.</p>
+<h2>Как сохранить несколько признаков одной клетки</h2>
+<p>Состояние клетки может учитывать сразу несколько источников. Например, если один датчик обнаруживает синий цвет, а другой жёлтый, по одному биту на каждый цвет сохраняет оба свидетельства. Начнём с маски <code>00</code>. Синий цвет (бит 0) даёт <code>01</code>. После жёлтого (бит 1) получим <code>01 | 10 = 11</code>. Повторное наблюдение синего оставит <code>11 | 01 = 11</code>. Так <a href="../cpp/bits-and-bitset.html">побитовое ИЛИ</a> сохраняет оба признака в любом порядке. Перед первым наблюдением все маски в <code>grid</code> равны нулю.</p>
+<p><strong>C++17</strong></p>
+<pre><code class="language-cpp">#include &lt;cstdint&gt;
+#include &lt;vector&gt;
+
+void record_color(std::vector&lt;std::vector&lt;std::uint32_t&gt;&gt;&amp; grid,
+                  int row, int col, unsigned color) {
+    grid[row][col] |= std::uint32_t{1} &lt;&lt; color;
+}
+</code></pre>
+<details>
+<summary>Тот же алгоритм на Python</summary>
+
+<pre><code class="language-python">def record_color(grid, row, col, color):
+    grid[row][col] |= 1 &lt;&lt; color
+</code></pre>
+</details>
+
+<p>Координаты должны быть допустимыми, номер цвета в C++ лежит в диапазоне от 0 до 31. Если клетки приходят от лучевого датчика, перечисли клетки вдоль известного луча и для каждой запиши соответствующее свидетельство. Что значит последний отсчёт и могут ли наблюдения противоречить друг другу, зависит от модели датчика. Приведённая функция хранит факт наблюдения. Когда нужно число наблюдений, требуются счётчики.</p>
+<h2>Как совместить два набора точек</h2>
+<p>Поворот квадрата со стороной <code>n</code> на 90° по часовой стрелке переводит клетку <code>(row, col)</code> в <code>(col, n - 1 - row)</code>. Для совмещения двух наборов точек при фиксированном повороте сравни координаты. Если точка <code>(br, bc)</code> второго набора должна перейти в <code>(ar, ac)</code> первого, возможен ровно один сдвиг <code>(ar - br, ac - bc)</code>. Например, в первом наборе отмечены <code>(1, 2)</code> и <code>(1, 3)</code>, а во втором — <code>(0, 0)</code> и <code>(0, 1)</code>. Сдвиг <code>(1, 2)</code> совмещает обе пары точек. Сдвиг <code>(1, 3)</code> совмещает только <code>(0, 0)</code> с <code>(1, 3)</code>.</p>
+<p>Вместо наложения целых карт каждая пара точек отдаёт один «голос» за свой сдвиг. Если точки внутри каждого набора различны, число голосов равно числу совпадений. <code>rotate_point</code> поворачивает точку, а <code>shift_votes</code> считает голоса уже при выбранном повороте.</p>
+<p><strong>C++17</strong></p>
+<pre><code class="language-cpp">#include &lt;map&gt;
+#include &lt;utility&gt;
+#include &lt;vector&gt;
+
+using Point = std::pair&lt;int, int&gt;;
+
+Point rotate_point(int row, int col, int n) {
+    return {col, n - 1 - row};
+}
+
+std::map&lt;Point, long long&gt; shift_votes(const std::vector&lt;Point&gt;&amp; first,
+                                      const std::vector&lt;Point&gt;&amp; second) {
+    std::map&lt;Point, long long&gt; votes;
+    for (auto [ar, ac] : first) {
+        for (auto [br, bc] : second) {
+            ++votes[{ar - br, ac - bc}];
+        }
+    }
+    return votes;
+}
+</code></pre>
+<details>
+<summary>Тот же алгоритм на Python</summary>
+
+<pre><code class="language-python">from collections import Counter
+
+def rotate_point(row, col, n):
+    return col, n - 1 - row
+
+def shift_votes(first, second):
+    votes = Counter()
+    for ar, ac in first:
+        for br, bc in second:
+            votes[ar - br, ac - bc] += 1
+    return votes
+</code></pre>
+</details>
+
+<p>Оба фрагмента возвращают голоса для сдвигов с хотя бы одним совпадением. Если пустые маски или сдвиги с нулём совпадений важны, учти их отдельно. Метод перебирает <code>a · b</code> пар для наборов размеров <code>a</code> и <code>b</code>. Каждое добавление в <code>Counter</code> в среднем занимает постоянное время, а в <code>std::map</code> зависит логарифмически от числа разных сдвигов. Память пропорциональна числу разных сдвигов.</p>
+<h2>Предвычисление расстояния до преграды</h2>
+<p>Если на прямоугольной карте много запросов «сколько свободных клеток подряд справа», можно заполнить таблицу одним проходом. Для свободной клетки ответ равен 1 плюс ответ её правого соседа, если сосед тоже свободен. Если справа стена или край, ответ 0. Поэтому обходи строку справа налево. В примере свободная клетка обозначена точкой, стена — решёткой.</p>
+<p><strong>C++17</strong></p>
+<pre><code class="language-cpp">#include &lt;cstddef&gt;
+#include &lt;string&gt;
+#include &lt;vector&gt;
+
+std::vector&lt;std::vector&lt;std::size_t&gt;&gt;
+free_to_right(const std::vector&lt;std::string&gt;&amp; grid) {
+    std::vector&lt;std::vector&lt;std::size_t&gt;&gt; result;
+    for (const auto&amp; row : grid) {
+        std::vector&lt;std::size_t&gt; distances(row.size(), 0);
+        for (std::size_t next = row.size(); next &gt; 1; --next) {
+            const std::size_t col = next - 2;
+            if (row[col] == &#39;.&#39; &amp;&amp; row[col + 1] == &#39;.&#39;) {
+                distances[col] = 1 + distances[col + 1];
+            }
+        }
+        result.push_back(distances);
+    }
+    return result;
+}
+</code></pre>
+<details>
+<summary>Тот же алгоритм на Python</summary>
+
+<pre><code class="language-python">def free_to_right(grid):
+    result = []
+    for row in grid:
+        distances = [0] * len(row)
+        for col in range(len(row) - 2, -1, -1):
+            if row[col] == row[col + 1] == &quot;.&quot;:
+                distances[col] = 1 + distances[col + 1]
+        result.append(distances)
+    return result
+</code></pre>
+</details>
+
+<p>Для строки <code>...#..</code> удобно проверить таблицу справа налево.</p>
+<table>
+<thead>
+<tr>
+<th>Столбец</th>
+<th>0</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Клетка</td>
+<td><code>.</code></td>
+<td><code>.</code></td>
+<td><code>.</code></td>
+<td><code>#</code></td>
+<td><code>.</code></td>
+<td><code>.</code></td>
+</tr>
+<tr>
+<td>Свободно справа</td>
+<td>2</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+</tr>
+</tbody></table>
+<p>Из столбца <code>1</code> можно сделать один шаг до стены. В столбце <code>3</code> стоит сама стена, поэтому храним служебный ноль. Для остальных направлений меняй ось и порядок обхода так, чтобы сосед был уже обработан. Предвычисление для карты <code>h × w</code> занимает <code>O(h · w)</code> времени и памяти, затем один запрос выполняется за <code>O(1)</code>.</p>
+<p>Таблица пригодится и при сопоставлении показаний с картой. Когда известна карта, а начальная поза неизвестна, перебери допустимые позы. Для каждой поддерживай текущую позу и сверяй предвычисленное показание в момент, когда по журналу был сделан замер. Первое несовпадение исключает начальную позу. Если хранишь найденные варианты, записывай начальную позу отдельно от текущей.</p>
+<hr>
+<p><a href="signals.html">← Обработка сигналов</a></p>
+</article></main></body></html>

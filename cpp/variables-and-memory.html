@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Что такое переменная · Справочник ЦПМ</title><link rel="stylesheet" href="../style.css"></head><body><main class="reader"><nav class="reader-nav"><a href="../index.html">Оглавление</a><span> / </span><a href="../index.html#cpp">Язык C++</a><a class="jump" href="#practice">К опыту</a></nav><article><h1>Что такое переменная</h1>
+<p><strong>Переменная</strong> позволяет программе сохранить значение и позже обратиться к нему по имени. Допустим, мы считаем сумму двух чисел. Получили первое число — нужно запомнить его до того момента, когда прибавим второе. Назовём текущую сумму <code>sum</code>.</p>
+<pre><code class="language-cpp">int sum = 7;
+sum = sum + 5;
+</code></pre>
+<p>Прочитаем первую строку слева направо. <strong><code>int</code></strong> задаёт тип — будем хранить целое число. <strong><code>sum</code></strong> — имя, которое мы выбрали для переменной. <strong><code>7</code></strong> — её начальное значение. Когда переменной задают значение при создании, это называют <strong>инициализацией</strong>.</p>
+<p>Во второй строке <code>=</code> означает <strong>присваивание</strong>. Сначала программа вычисляет правую часть, используя текущее значение. Затем записывает результат в переменную слева.</p>
+<p><strong>Как процессор складывает числа.</strong> Регистр — маленькое хранилище внутри процессора. Если текущее значение уже в регистре, команда сложения может взять оттуда 7, прибавить 5 и вернуть 12 в тот же регистр. Читать оперативную память для каждого присваивания при этом не требуется.</p>
+<p><img src="../assets/cpp/sum-register.svg" alt="Из регистра берут 7, складывают с 5 и записывают 12 обратно в регистр."></p>
+<p>Компилятор выбирает команды с учётом окружающего кода. В этом коротком примере оба числа известны заранее, поэтому он может сразу подставить 12. Так что по имени <code>sum</code> в исходном тексте нельзя определить конкретный регистр или адрес. <a href="../hardware/cpu.html">Как процессор выполняет команды</a>.</p>
+<p>Следующая строка с именем <code>sum</code> прочитает уже 12. Если написать внутри функции просто <code>int sum;</code>, начального числа у нас ещё нет. Чтобы накапливать сумму с нуля, пишут <code>int sum = 0;</code>.</p>
+<h2>Что произойдёт, если запомнить сумму под другим именем?</h2>
+<pre><code class="language-cpp">int sum = 7;
+int saved = sum;
+sum = sum + 5;
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Выполненная строка</th>
+<th align="right"><code>sum</code></th>
+<th align="right"><code>saved</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>int sum = 7;</code></td>
+<td align="right">7</td>
+<td align="right">ещё не создана</td>
+</tr>
+<tr>
+<td><code>int saved = sum;</code></td>
+<td align="right">7</td>
+<td align="right">7</td>
+</tr>
+<tr>
+<td><code>sum = sum + 5;</code></td>
+<td align="right">12</td>
+<td align="right">7</td>
+</tr>
+</tbody></table>
+<p>При создании <code>saved</code> программа один раз прочитала <code>sum</code> и скопировала число. Теперь у каждой переменной своё место для значения. В терминах C++ это два отдельных <strong>объекта</strong>.</p>
+<p>Иногда нужны два имени для одного объекта. Для этого в C++ есть <strong>ссылка</strong>. Продолжим пример после последней строки таблицы.</p>
+<pre><code class="language-cpp">int&amp; current = sum;
+current = 20;
+</code></pre>
+<p>Теперь и <code>sum</code>, и <code>current</code> дают 20. Обращаясь по любому из этих имён, мы читаем или меняем одно число. В <code>saved</code> по-прежнему хранится 7.</p>
+<div id="practice"><section class="experiment" id="lab-variables-and-memory">
+  <h3>Когда копия перестаёт совпадать с оригиналом?</h3>
+  <p>Сохрани текущее значение <code>sum</code> в <code>saved</code>, затем прибавь число к сумме. Предскажи, что покажет каждая переменная.</p>
+  <div class="lab-cells"><span class="lab-cell"><small>sum</small><strong data-sum>7</strong></span><span class="lab-cell"><small>saved</small><strong data-saved>—</strong></span></div>
+  <div class="lab-controls"><button type="button" data-copy>Сохранить копию</button><label>Прибавить <select data-delta><option>1</option><option selected>5</option><option>−3</option></select></label><button type="button" data-add>Изменить sum</button><button type="button" data-reset>Сначала</button></div>
+  <pre><code data-line>int sum = 7;</code></pre>
+  <p data-status role="status"></p>
+<style>
+#lab-variables-and-memory .lab-controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin:.8rem 0} #lab-variables-and-memory .lab-cells{display:flex;flex-wrap:wrap;gap:.4rem;margin:.8rem 0} #lab-variables-and-memory .lab-cell{display:grid;justify-items:center;min-width:3rem;padding:.35rem .55rem;border:1px solid #96acb7;border-radius:.4rem;background:#eef3f5;color:#172f45} #lab-variables-and-memory .lab-cell.active{background:#ffe8a8;color:#473105;border-color:#8f6916} #lab-variables-and-memory .lab-cell small{font-size:.82rem} #lab-variables-and-memory pre{white-space:pre-wrap;overflow-wrap:anywhere}
+</style>
+<script>
+(() => {
+  const root = document.getElementById('lab-variables-and-memory');
+  const get = selector => root.querySelector(selector);
+  const status = get('[data-status]');
+  let sum = 7;
+  let saved = null;
+  function show(code, explanation) {
+    get('[data-sum]').textContent = String(sum);
+    get('[data-saved]').textContent = saved === null ? '—' : String(saved);
+    get('[data-line]').textContent = code;
+    status.textContent = explanation;
+  }
+  get('[data-copy]').onclick = () => {
+    const first = saved === null;
+    saved = sum;
+    show(first ? 'int saved = sum;' : 'saved = sum;', 'В saved записана копия числа ' + sum + '.');
+  };
+  get('[data-add]').onclick = () => {
+    const delta = Number(get('[data-delta]').value.replace('−', '-'));
+    const before = sum;
+    sum += delta;
+    show('sum += ' + delta + ';', 'Прежнее значение sum: ' + before + '. Новое: ' + sum + '. ' +
+      (saved === null ? 'Копия ещё не создана.' : 'В saved по-прежнему ' + saved + '.'));
+  };
+  get('[data-reset]').onclick = () => {
+    sum = 7;
+    saved = null;
+    get('[data-delta]').value = '5';
+    show('int sum = 7;', 'У sum начальное значение 7. Имя saved появится при первом сохранении.');
+  };
+  get('[data-reset]').onclick();
+})();
+</script>
+</section>
+</div>
+
+<h2>Как выбрать тип?</h2>
+<table>
+<thead>
+<tr>
+<th>Что храним</th>
+<th>Пример объявления</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Количество элементов</td>
+<td><code>int count = 7;</code></td>
+</tr>
+<tr>
+<td>Целое число, которое может превысить диапазон <code>int</code></td>
+<td><code>long long total = 3&#39;000&#39;000&#39;000LL;</code></td>
+</tr>
+<tr>
+<td>Число с дробной частью</td>
+<td><code>double weight = 1.25;</code></td>
+</tr>
+<tr>
+<td>Ответ «да» или «нет»</td>
+<td><code>bool found = false;</code></td>
+</tr>
+<tr>
+<td>Один символ базового набора</td>
+<td><code>char letter = &#39;A&#39;;</code></td>
+</tr>
+<tr>
+<td>Строку текста</td>
+<td><code>std::string word = &quot;abc&quot;;</code> из <code>&lt;string&gt;</code></td>
+</tr>
+</tbody></table>
+<p>При выборе типа учитывай <strong>промежуточный результат</strong>. Например, сторона квадрата равна 100 000. На платформе с 32-битным <code>int</code> сторона помещается в этот тип, а площадь 10 000 000 000 уже выходит за его диапазон.</p>
+<pre><code class="language-cpp">int side = 100&#39;000;
+long long area = 1LL * side * side;
+</code></pre>
+<p>Здесь <code>1LL</code> — единица типа <code>long long</code>. С ней оба умножения выполняются в широком типе. Если записать только <code>long long area = side * side;</code>, умножение двух <code>int</code> переполнится ещё до присваивания.</p>
+<hr>
+<p><a href="memory-layout.html">Дальше → Как устроена память</a></p>
+</article></main></body></html>
