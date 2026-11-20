@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Побитовые операции · Справочник по C++</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.bitboard{max-width:46rem}.bitboard fieldset{margin:0 0 1.25rem;padding:.65rem 1rem;border:1px solid #9dadbc;border-radius:.5rem}.bitboard fieldset label{display:inline-flex;gap:.3rem;align-items:center;margin:.25rem 1rem .25rem 0}.bitboard input[type=radio]{width:auto}.bitrow{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:clamp(2px,1vw,8px);text-align:center}.bitrow button,.bitrow output{box-sizing:border-box;display:grid;place-items:center;min-width:0;height:2.8rem;border-radius:.35rem;font:600 clamp(1rem,3vw,1.3rem)/1 monospace;padding:0}.bitrow button{border:1px solid #7c909e;background:#fff;color:#243a49}.bitrow button[aria-pressed=true]{background:#185d59;color:#fff}.bitrow button:disabled{opacity:.78}.bitrow output{border:1px solid #acbbc4;background:#edf3f4;color:#253b42}.bitrow output[data-on=true]{background:#ffe6ab;border-color:#90691c;color:#49320d}.bitlabels{font:500 .85rem/1.4 monospace;color:#455765}.bitboard .rowtitle{margin:.9rem 0 .35rem;font-weight:650}.bitboard .rowtitle span{font-weight:400}.bitboard .controls{display:flex;flex-wrap:wrap;gap:.5rem}.bitboard .detail{padding:.65rem 1rem;background:#edf5f4;color:#213f3e;border-left:3px solid #167368}.bitboard .exercise{margin-top:1.75rem}.bitrow button:focus-visible{outline:3px solid #ad5d00;outline-offset:2px}
+</style>
+</head>
+<body><main>
+<nav aria-label="Навигация"><a href="index.html">Все интерактивные примеры</a></nav>
+<h1>Побитовые операции</h1>
+<p>Нажми на бит числа A или B. Посмотри, что изменилось в том же столбце результата, и попробуй другую операцию.</p>
+<div class="bitboard">
+<fieldset><legend>Операция</legend>
+<label><input type="radio" name="operation" value="and" checked> И (&amp;)</label>
+<label><input type="radio" name="operation" value="or"> ИЛИ (|)</label>
+<label><input type="radio" name="operation" value="xor"> Исключающее ИЛИ (^)</label>
+</fieldset>
+<p class="rowtitle">Номер разряда</p>
+<div class="bitrow bitlabels" aria-hidden="true"><span>7</span><span>6</span><span>5</span><span>4</span><span>3</span><span>2</span><span>1</span><span>0</span></div>
+<p class="rowtitle">A <span id="a-dec"></span></p><div class="bitrow" id="a"></div>
+<p class="rowtitle">B <span id="b-dec"></span></p><div class="bitrow" id="b"></div>
+<p class="rowtitle">Результат <span id="result-dec"></span></p><div class="bitrow" id="result" aria-hidden="true"></div>
+<p><code id="expression"></code></p>
+<p class="detail" id="detail" aria-live="polite"></p>
+<section class="exercise"><h2>Как переключить два флага?</h2>
+<p>В числе A = 12 нужно переключить разряды 3 и 0, сохранив остальные. Включи задачу и собери для XOR подходящую маску B.</p>
+<div class="controls"><button type="button" id="start">Начать задачу</button><button type="button" id="check" hidden>Проверить маску</button><button type="button" id="reset">Сбросить</button></div>
+<p id="feedback" role="status"></p></section>
+</div>
+<noscript>Для переключения битов включи JavaScript в браузере.</noscript>
+</main>
+<script>
+const byId = id => document.getElementById(id);
+const operations = {
+  and: {symbol: '&', apply: (a,b) => a & b, rule: 'Единица получается, когда оба входа равны 1.'},
+  or: {symbol: '|', apply: (a,b) => a | b, rule: 'Единица получается, когда хотя бы один вход равен 1.'},
+  xor: {symbol: '^', apply: (a,b) => a ^ b, rule: 'Единица получается, когда входы различаются.'}
+};
+const state = {a:12, b:10, operation:'and', position:3, challenge:false};
+const radios = Array.from(document.querySelectorAll('input[name=operation]'));
+const bit = (value, position) => (value >> position) & 1;
+const binary = value => value.toString(2).padStart(8, '0');
+
+for (const name of ['a', 'b', 'result']) {
+  for (let position = 7; position >= 0; position--) {
+    const cell = document.createElement(name === 'result' ? 'output' : 'button');
+    if (name !== 'result') {
+      cell.type = 'button';
+      cell.setAttribute('aria-label', name.toUpperCase() + ', разряд ' + position);
+      cell.addEventListener('click', () => {
+        state[name] ^= 1 << position;
+        state.position = position;
+        byId('feedback').textContent = '';
+        render();
+      });
+    }
+    byId(name).append(cell);
+  }
+}
+function render() {
+  const {a,b,position,challenge} = state;
+  const op = operations[state.operation];
+  const result = op.apply(a,b);
+  for (const [name,value] of [['a',a],['b',b],['result',result]]) {
+    byId(name+'-dec').textContent = '= '+value;
+    Array.from(byId(name).children).forEach((cell,index) => {
+      const digit = bit(value,7-index);
+      cell.textContent = digit;
+      if (name === 'result') cell.dataset.on = String(Boolean(digit));
+      else {
+        cell.setAttribute('aria-pressed', String(Boolean(digit)));
+        cell.disabled = challenge && name === 'a';
+      }
+    });
+  }
+  for (const radio of radios) {
+    radio.checked = radio.value === state.operation;
+    radio.disabled = challenge;
+  }
+  byId('expression').textContent = '0b'+binary(a)+' '+op.symbol+' 0b'+binary(b)+' = 0b'+binary(result);
+  byId('detail').textContent = 'Разряд '+position+' (вес '+(2 ** position)+'). '+bit(a,position)+' '+op.symbol+' '+bit(b,position)+' = '+bit(result,position)+'. '+op.rule;
+  byId('check').hidden = !challenge;
+  byId('start').textContent = challenge ? 'Начать задачу заново' : 'Начать задачу';
+}
+for (const radio of radios) radio.addEventListener('change', () => {
+  state.operation = radio.value;
+  render();
+});
+byId('start').addEventListener('click', () => {
+  Object.assign(state, {a:12,b:0,operation:'xor',position:3,challenge:true});
+  render();
+  byId('feedback').textContent = 'Изменяй биты маски B. Когда маска будет готова, проверь ответ.';
+});
+byId('check').addEventListener('click', () => {
+  const wrong = state.b ^ 9;
+  if (wrong === 0) {
+    byId('feedback').textContent = 'Верно. Маска 00001001 переключает биты 3 и 0. Из 00001100 (12) получилось 00000101 (5).';
+    return;
+  }
+  const position = Math.floor(Math.log2(wrong));
+  byId('feedback').textContent = 'Проверь разряд '+position+'. '+(bit(9,position) ? 'Этот флаг должен измениться. Каким битом маски XOR его переключить?' : 'Этот флаг должен сохранить значение. Каким битом маски XOR его оставить?');
+});
+byId('reset').addEventListener('click', () => {
+  Object.assign(state, {a:12,b:10,operation:'and',position:3,challenge:false});
+  render();
+  byId('feedback').textContent = 'Снова можно менять оба числа и выбирать операцию.';
+});
+render();
+</script>
+</body></html>

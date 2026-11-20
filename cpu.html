@@ -1,0 +1,39 @@
+<!doctype html><html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Одна строка на процессоре</title><link rel="stylesheet" href="style.css"><main><nav><a href="index.html">Все интерактивы</a></nav><h1>Одна строка на процессоре</h1><p>Выполни <code>value = value + 5;</code> по одной машинной инструкции. Определи момент, когда результат уже вычислен, а в памяти ещё лежит старое число.</p>
+<label for="initial">Начальное значение <output id="amount" for="initial">7</output></label><br><input id="initial" type="range" min="-16" max="32" value="7">
+<ol class="ops"><li><code>lw t0, 0(a0)</code> — прочитать из памяти</li><li><code>addi t0, t0, 5</code> — прибавить 5</li><li><code>sw t0, 0(a0)</code> — записать по адресу</li></ol>
+<div class="chips"><div class="chip" id="regBox">Регистр t0<strong id="reg">?</strong></div><div class="chip" id="memBox">Память · 0x1000<strong id="mem">7</strong></div></div>
+<div class="controls"><button id="next" class="primary">Выполнить lw</button><button id="back">Шаг назад</button><button id="reset">Сначала</button></div>
+<p id="explain" class="readout" role="status"></p><p>Регистр <code>a0</code> всё время хранит адрес <code>0x1000</code>. Знак вопроса означает, что прежнее значение <code>t0</code> нам неизвестно. В этой модели RISC-V показан один возможный вариант компиляции.</p>
+<p><a href="https://github.com/yaroslav-yarik/cpm-robotics-programming/blob/main/notes/cpp-algorithms/hardware/cpu.md">Объяснение в справочнике</a></p></main>
+<script>
+const element = id => document.getElementById(id);
+const commands = ['lw', 'addi', 'sw'];
+let step = 0;
+function render() {
+  const initial = Number(element('initial').value);
+  const result = initial + 5;
+  element('amount').textContent = initial;
+  element('reg').textContent = ['?', initial, result, result][step];
+  element('mem').textContent = step === 3 ? result : initial;
+  element('regBox').classList.toggle('changed', step === 1 || step === 2);
+  element('memBox').classList.toggle('changed', step === 3);
+  document.querySelectorAll('.ops li').forEach((row, i) => {
+    if (i === step) row.setAttribute('aria-current', 'step');
+    else row.removeAttribute('aria-current');
+  });
+  element('explain').textContent = [
+    'Сейчас число находится по адресу 0x1000. Следующая команда прочитает его.',
+    'Из памяти в t0 скопировано ' + initial + '. По адресу 0x1000 всё ещё хранится ' + initial + '.',
+    'В t0 уже ' + result + '. По адресу 0x1000 пока ' + initial + '. Сложение изменило только регистр.',
+    'Команда sw записала ' + result + ' по адресу 0x1000. Теперь память и t0 содержат одно значение.'
+  ][step];
+  element('next').textContent = step === 3 ? 'Запись завершена' : 'Выполнить ' + commands[step];
+  element('next').disabled = step === 3;
+  element('back').disabled = step === 0;
+  element('reset').disabled = step === 0;
+}
+element('next').onclick = () => { step = Math.min(3, step + 1); render(); };
+element('back').onclick = () => { step = Math.max(0, step - 1); render(); };
+element('initial').oninput = element('reset').onclick = () => { step = 0; render(); };
+render();
+</script></html>
