@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="265" viewBox="0 0 560 265" role="img" aria-labelledby="title desc"><title id="title">Поиск пары с суммой 6</title><desc id="desc">Проверяем числа 1 и 8, затем 1 и 4, затем 2 и 4.</desc><rect width="560" height="265" fill="#fff"/>
+<text x="24" y="32" text-anchor="start" fill="#172e44" font-family="Arial,sans-serif" font-size="23" font-weight="700">Два края движутся навстречу</text>
+<rect x="25" y="62" width="55" height="41" rx="6" fill="#ffdf96" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="52.5" y="89.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">1</text>
+<rect x="86" y="62" width="55" height="41" rx="6" fill="#cdeee9" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="113.5" y="89.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">2</text>
+<rect x="147" y="62" width="55" height="41" rx="6" fill="#cdeee9" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="174.5" y="89.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">4</text>
+<rect x="208" y="62" width="55" height="41" rx="6" fill="#ffdf96" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="235.5" y="89.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">8</text>
+<text x="304" y="90" text-anchor="start" fill="#172e44" font-family="Arial,sans-serif" font-size="22" font-weight="700">1 + 8 &gt; 6</text>
+<rect x="25" y="120" width="55" height="41" rx="6" fill="#ffdf96" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="52.5" y="147.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">1</text>
+<rect x="86" y="120" width="55" height="41" rx="6" fill="#cdeee9" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="113.5" y="147.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">2</text>
+<rect x="147" y="120" width="55" height="41" rx="6" fill="#ffdf96" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="174.5" y="147.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">4</text>
+<rect x="208" y="120" width="55" height="41" rx="6" fill="#edf2f7" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="235.5" y="147.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">8</text>
+<text x="304" y="148" text-anchor="start" fill="#172e44" font-family="Arial,sans-serif" font-size="22" font-weight="700">1 + 4 &lt; 6</text>
+<rect x="25" y="178" width="55" height="41" rx="6" fill="#edf2f7" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="52.5" y="205.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">1</text>
+<rect x="86" y="178" width="55" height="41" rx="6" fill="#ffdf96" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="113.5" y="205.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">2</text>
+<rect x="147" y="178" width="55" height="41" rx="6" fill="#ffdf96" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="174.5" y="205.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">4</text>
+<rect x="208" y="178" width="55" height="41" rx="6" fill="#edf2f7" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="235.5" y="205.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">8</text>
+<text x="304" y="206" text-anchor="start" fill="#172e44" font-family="Arial,sans-serif" font-size="22" font-weight="700">2 + 4 = 6</text>
+<text x="25" y="245" text-anchor="start" fill="#172e44" font-family="Arial,sans-serif" font-size="17" font-weight="400">Жёлтым отмечены два числа, которые сейчас складываем.</text></svg>

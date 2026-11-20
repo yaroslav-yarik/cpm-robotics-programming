@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="236" viewBox="0 0 560 236" role="img" aria-labelledby="title desc"><title id="title">Последний элемент образует две новые пары</title><desc id="desc">Семёрки на позициях 0 и 2 дают две новые пары с семёркой на позиции 3.</desc><rect width="560" height="236" fill="#fff"/>
+<text x="24" y="32" text-anchor="start" fill="#172e44" font-family="Arial,sans-serif" font-size="22" font-weight="700">С кем образует пару последняя семёрка?</text>
+<rect x="53" y="80" width="58" height="42" rx="6" fill="#cdeee9" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="82.0" y="108.14" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">7</text>
+<text x="82" y="66" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="15" font-weight="400">i = 0</text>
+<rect x="169" y="80" width="58" height="42" rx="6" fill="#edf2f7" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="198.0" y="108.14" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">5</text>
+<text x="198" y="66" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="15" font-weight="400">i = 1</text>
+<rect x="285" y="80" width="58" height="42" rx="6" fill="#cdeee9" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="314.0" y="108.14" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">7</text>
+<text x="314" y="66" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="15" font-weight="400">i = 2</text>
+<rect x="401" y="80" width="58" height="42" rx="6" fill="#ffdf96" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="430.0" y="108.14" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">7</text>
+<text x="430" y="66" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="15" font-weight="400">i = 3</text>
+<path d="M 82 125 L 82 180" fill="none" stroke="#006d69" stroke-width="3" stroke-linecap="round"/>
+<path d="M 82 180 L 430 180" fill="none" stroke="#006d69" stroke-width="3" stroke-linecap="round"/>
+<path d="M 430 180 L 430 125" fill="none" stroke="#006d69" stroke-width="3" stroke-linecap="round"/>
+<path d="M 314 125 L 314 147" fill="none" stroke="#006d69" stroke-width="3" stroke-linecap="round"/>
+<path d="M 314 147 L 430 147" fill="none" stroke="#006d69" stroke-width="3" stroke-linecap="round"/>
+<path d="M 430 147 L 430 125" fill="none" stroke="#006d69" stroke-width="3" stroke-linecap="round"/>
+<text x="280" y="215" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="19" font-weight="700">Две новые пары: (0, 3) и (2, 3)</text></svg>

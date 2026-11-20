@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="660" height="275" viewBox="0 0 660 275" role="img" aria-labelledby="title desc">
+<title id="title">Трёхбитный АЦП</title><desc id="desc">Восемь интервалов по полвольта. Уровень 2,7 вольта попадает в шестой интервал с кодом 101.</desc>
+<rect width="660" height="275" rx="8" fill="#f6f9fb"/>
+<g font-family="Arial, sans-serif">
+<text x="24" y="38" font-size="26" fill="#173449" text-anchor="start">От напряжения к двоичному коду</text>
+<text x="24" y="76" font-size="19" fill="#173449" text-anchor="start">Шкала 0–4 В, восемь равных интервалов</text>
+<rect x="35" y="123" width="70" height="54" rx="4" fill="#dee7ed" stroke="none"/>
+<text x="70" y="157" font-size="21" fill="#173449" text-anchor="middle">000</text>
+<text x="35" y="204" font-size="16" fill="#173449" text-anchor="middle">0</text>
+<rect x="108" y="123" width="70" height="54" rx="4" fill="#dee7ed" stroke="none"/>
+<text x="143" y="157" font-size="21" fill="#173449" text-anchor="middle">001</text>
+<text x="108" y="204" font-size="16" fill="#173449" text-anchor="middle">0,5</text>
+<rect x="181" y="123" width="70" height="54" rx="4" fill="#dee7ed" stroke="none"/>
+<text x="216" y="157" font-size="21" fill="#173449" text-anchor="middle">010</text>
+<text x="181" y="204" font-size="16" fill="#173449" text-anchor="middle">1</text>
+<rect x="254" y="123" width="70" height="54" rx="4" fill="#dee7ed" stroke="none"/>
+<text x="289" y="157" font-size="21" fill="#173449" text-anchor="middle">011</text>
+<text x="254" y="204" font-size="16" fill="#173449" text-anchor="middle">1,5</text>
+<rect x="327" y="123" width="70" height="54" rx="4" fill="#dee7ed" stroke="none"/>
+<text x="362" y="157" font-size="21" fill="#173449" text-anchor="middle">100</text>
+<text x="327" y="204" font-size="16" fill="#173449" text-anchor="middle">2</text>
+<rect x="400" y="123" width="70" height="54" rx="4" fill="#09635b" stroke="none"/>
+<text x="435" y="157" font-size="21" fill="white" text-anchor="middle">101</text>
+<text x="400" y="204" font-size="16" fill="#173449" text-anchor="middle">2,5</text>
+<rect x="473" y="123" width="70" height="54" rx="4" fill="#dee7ed" stroke="none"/>
+<text x="508" y="157" font-size="21" fill="#173449" text-anchor="middle">110</text>
+<text x="473" y="204" font-size="16" fill="#173449" text-anchor="middle">3</text>
+<rect x="546" y="123" width="70" height="54" rx="4" fill="#dee7ed" stroke="none"/>
+<text x="581" y="157" font-size="21" fill="#173449" text-anchor="middle">111</text>
+<text x="546" y="204" font-size="16" fill="#173449" text-anchor="middle">3,5</text>
+<text x="619" y="204" font-size="16" fill="#173449" text-anchor="middle">4 В</text>
+<path d="M429 92 L429 121" fill="none" stroke="#9a4a14" stroke-width="3"/>
+<text x="440" y="103" font-size="18" fill="#9a4a14" text-anchor="start">2,7 В</text>
+<text x="24" y="246" font-size="21" fill="#173449" text-anchor="start">От 2,5 В до 3 В прибор выдаёт 101₂, то есть 5.</text>
+</g></svg>
