@@ -1,5 +1,5 @@
 <section class="experiment">
-<h3>Сколько сравнений успеет сделать цикл?</h3>
+<h3>Сколько пар проверит цикл?</h3>
 <p>Измени размер массива и искомую сумму. Если совпадение встретится рано, часть пар так и останется непроверенной.</p>
 <label>Число элементов <select name="length"><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option></select></label>
 <label>Искомая сумма <select name="sum"><option>7</option><option>9</option><option selected>10</option><option>14</option><option>20</option></select></label>
@@ -26,7 +26,7 @@
     const n = Number(length.value);
     const sum = source[left] + source[right];
     const item = document.createElement('li');
-    item.textContent = 'a[' + left + '] + a[' + right + '] = ' + source[left] + ' + ' + source[right] + ' = ' + sum;
+    item.textContent = 'values[' + left + '] + values[' + right + '] = ' + source[left] + ' + ' + source[right] + ' = ' + sum;
     log.append(item);
     checks++;
     right++;

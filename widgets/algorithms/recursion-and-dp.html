@@ -17,7 +17,7 @@
     pick('[name="take"]').disabled = pick('[name="skip"]').disabled = done;
     pick('[name="back"]').disabled = !path.length;
     pick('[data-path]').textContent = 'Путь от корня · ' + (path.map((take,i) => (take ? 'взять ' : 'пропустить ') + a[i]).join(' → ') || 'выборов пока нет');
-    const position = done ? 'Достигнут лист.' : 'Следующий элемент a[' + path.length + '] = ' + a[path.length] + '.';
+    const position = done ? 'Достигнут лист.' : 'Следующий элемент values[' + path.length + '] = ' + a[path.length] + '.';
     pick('[data-state]').textContent = position + ' Текущая сумма ' + sum + '. Найдено подмножеств ' + leaves.size + ' из 4.';
     const list = pick('[data-leaves]'); list.replaceChildren();
     for (const value of leaves.values()) { const li = document.createElement('li'); li.textContent = value; list.append(li); }

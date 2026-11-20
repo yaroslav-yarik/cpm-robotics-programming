@@ -32,12 +32,14 @@ using std::string;
 
 string word = &quot;robot&quot;;
 string line;
-cin &gt;&gt; word;                // Одно слово до пробела.
-getline(cin, line);     // Остаток текущей строки.
+cin &gt;&gt; word;         // Одно слово до пробела.
+getline(cin, line);  // Остаток текущей строки.
 </code></pre>
 <p>Если ввести <code>blue sky</code>, то <code>word</code> получит <code>&quot;blue&quot;</code>, а <code>line</code> — <code>&quot; sky&quot;</code> с пробелом в начале. Если сразу после слова нажать Enter, <code>line</code> будет пустой.</p>
 <p>После <code>std::cin &gt;&gt; number</code> символ конца строки остаётся во входном потоке. Если нужно читать <strong>следующую</strong> строку, сначала убери остаток текущей. Например, если число стоит отдельно на своей строке:</p>
-<pre><code class="language-cpp">// Заголовки &lt;iostream&gt;, &lt;limits&gt; и &lt;string&gt;.
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;limits&gt;
+#include &lt;string&gt;
 
 using std::cin;
 using std::getline;
@@ -107,13 +109,13 @@ if (cin &gt;&gt; number) {
 <td><code>&quot;rAAot&quot;</code></td>
 </tr>
 </tbody></table>
-<p>В <code>substr(match_index, count)</code>, <code>erase(match_index, count)</code> и <code>replace(match_index, count, replacement)</code> второй аргумент — число символов. Если нужна подстрока с индексами от <code>left</code> до <code>right</code> включительно, количество символов равно <code>right - left + 1</code>. Обращайся к символам только при индексе меньше <code>text.size()</code>, а <code>pop_back()</code> вызывай для непустой строки. После правок строки проще получить итераторы заново.</p>
-<p>У обычной <code>std::string</code> индекс обозначает элемент типа <code>char</code>. Для ASCII-строки это отдельный символ. В UTF-8 одна русская буква может занимать несколько элементов, поэтому посимвольные примеры здесь используют ASCII.</p>
+<p>В <code>substr(match_index, count)</code>, <code>erase(match_index, count)</code> и <code>replace(match_index, count, replacement)</code> второй аргумент — число элементов <code>char</code>. В строках UTF-8 на платформе с восьмибитным байтом это число байтов. Если нужна подстрока с индексами от <code>left</code> до <code>right</code> включительно, длина участка равна <code>right - left + 1</code>. Обращайся к символам только при индексе меньше <code>text.size()</code>, а <code>pop_back()</code> вызывай для непустой строки. После правок строки проще получить итераторы заново.</p>
+<p>У обычной <code>std::string</code> индекс обозначает элемент типа <code>char</code>. Для ASCII-строки это отдельный символ. В UTF-8 одна русская буква занимает несколько байтов, поэтому посимвольные примеры здесь используют ASCII.</p>
 <p><strong>Что именно читает процессор.</strong> Возьмём строку <code>u8&quot;Я!&quot;</code> в C++17 на компьютере с восьмибитным байтом. Текст содержит два символа, а <code>std::string text = u8&quot;Я!&quot;;</code> сохраняет три байта текста. Буква «Я» записана двумя байтами UTF-8, затем идёт байт восклицательного знака. В схеме значения байтов указаны в шестнадцатеричной системе.</p>
 <p><img src="../assets/cpp/utf8-bytes.svg" alt="В UTF-8 буква Я занимает D0 AF, а восклицательный знак начинается с индекса 2."></p>
 <div id="practice"><section class="experiment" id="lab-strings">
   <h3>Что лежит в text[i]?</h3>
-  <p>Введи короткий текст, затем выбери любой байт. Для кириллицы и эмодзи сравни индекс байта с порядковым номером кодовой точки Unicode.</p>
+  <p>Введи короткий текст, затем выбери любой байт. Попробуй русскую букву и эмодзи. Посмотри, сколько байтов занимает каждый из них.</p>
   <div class="lab-controls"><label>Текст в UTF-8 <input type="text" data-text value="Я!" maxlength="24"></label></div>
   <div class="lab-cells" data-bytes aria-label="Байты строки"></div><pre><code data-code></code></pre>
   <p data-status role="status"></p>
@@ -147,7 +149,7 @@ if (cin &gt;&gt; number) {
             item.classList.toggle('active', item === button);
             item.setAttribute('aria-pressed', String(item === button));
           });
-          get('[data-code]').textContent = 'text.size() = ' + encoder.encode(text).length + '  ·  static_cast<unsigned char>(text[' + index + ']) = 0x' + hex;
+          get('[data-code]').textContent = 'text.size()  // ' + encoder.encode(text).length + '\nstatic_cast<unsigned char>(text[' + index + '])  // 0x' + hex;
           const codePoint = character.codePointAt(0).toString(16).toUpperCase().padStart(4, '0');
           status.textContent = 'Символ «' + character + '» (U+' + codePoint + ') занимает ' + bytes.length + ' байт. Здесь выбран байт ' + (within + 1) + ' из ' + bytes.length + '. Кодовых точек в строке: ' + Array.from(text).length + '.';
         };
@@ -158,7 +160,7 @@ if (cin &gt;&gt; number) {
     }
     if (firstButton) firstButton.onclick();
     else {
-      get('[data-code]').textContent = 'text.size() = 0';
+      get('[data-code]').textContent = 'text.size()  // 0';
       status.textContent = 'Строка пуста. Байт текста выбрать пока нельзя.';
     }
   }

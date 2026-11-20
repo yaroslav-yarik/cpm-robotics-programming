@@ -200,7 +200,7 @@ auto selected_bit = (flags &gt;&gt; position) &amp; 1ULL;   // 1: выбранн
 </code></pre>
 <p>Цикл работает столько итераций, сколько в исходном числе единиц. В C++20 доступен <code>std::popcount(number)</code> из <code>&lt;bit&gt;</code> для беззнаковых типов.</p>
 <h2>Набор битов фиксированной длины</h2>
-<p>Тип <code>std::bitset&lt;N&gt;</code> из <code>&lt;bitset&gt;</code> хранит ровно <code>N</code> битов. Размер известен при компиляции. Например, <code>std::bitset&lt;8&gt;(13)</code> хранит <code>00001101</code>. Конструирование из целого использует младшие <code>N</code> битов. В записи для человека старший бит слева, а индекс 0 по-прежнему обозначает крайний бит справа.</p>
+<p>Тип <code>std::bitset&lt;N&gt;</code> из <code>&lt;bitset&gt;</code> хранит ровно <code>N</code> битов. Размер известен при компиляции. Например, <code>std::bitset&lt;8&gt;(13)</code> хранит <code>00001101</code>. Конструирование из целого использует младшие <code>N</code> битов. При выводе старший бит находится слева, а индекс 0 по-прежнему обозначает крайний бит справа.</p>
 <pre><code class="language-cpp">#include &lt;bitset&gt;
 #include &lt;iostream&gt;
 
@@ -232,7 +232,7 @@ int main() {
 </thead>
 <tbody><tr>
 <td>Бит на позиции <code>i</code></td>
-<td><code>test(i)</code> проверяет границы. <code>b[i]</code> подходит для заведомо допустимого индекса</td>
+<td><code>test(index)</code> проверяет границы и выбрасывает <code>std::out_of_range</code> при ошибке. <code>bits[index]</code> подходит для заведомо допустимого индекса</td>
 </tr>
 <tr>
 <td>Есть единицы? Все биты нулевые? Все единичные?</td>
@@ -240,7 +240,7 @@ int main() {
 </tr>
 <tr>
 <td>Поставить 1, поставить 0 или переключить бит</td>
-<td><code>set(i)</code>, <code>reset(i)</code>, <code>flip(i)</code></td>
+<td><code>set(index)</code>, <code>reset(index)</code>, <code>flip(index)</code></td>
 </tr>
 <tr>
 <td>Сделать то же для всех позиций</td>

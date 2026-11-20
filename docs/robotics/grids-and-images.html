@@ -2,16 +2,16 @@
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Клеточные карты и изображения · Справочник ЦПМ</title><link rel="stylesheet" href="../style.css"></head><body><main class="reader"><nav class="reader-nav"><a href="../index.html">Оглавление</a><span> / </span><a href="../index.html#robotics">Прикладные алгоритмы</a><a class="jump" href="#practice">К опыту</a></nav><article><h1>Клеточные карты и изображения</h1>
 <p>Клетку карты задаёт пара <code>(строка, столбец)</code>. Эти же координаты используются для пикселей изображения. Нумерацию начинаем с нуля.</p>
 <h2>Как координаты превращаются в адрес пикселя</h2>
-<p>Пусть в монохромном изображении три строки по четыре пикселя. Каждый пиксель хранит яркость в одном байте. Если строки плоского буфера идут подряд без выравнивающих промежутков, смещение пикселя равно <code>row * width + col</code> байтам. Перед клеткой <code>(1, 2)</code> лежит целая первая строка и два байта второй. Значит, её смещение равно <code>1 * 4 + 2 = 6</code>.</p>
-<p><img src="../assets/io/pixel.svg" alt="Три строки по четыре байта и их развёртка в плоский буфер. Клетка (1, 2) и шестое смещение выделены одинаково."></p>
+<p>Пусть в изображении в оттенках серого три строки по четыре пикселя. Каждый пиксель хранит яркость в одном байте. Если строки плоского буфера идут подряд без выравнивающих промежутков, смещение пикселя равно <code>row * width + col</code> байтам. Перед клеткой <code>(1, 2)</code> лежит целая первая строка и два байта второй. Значит, её смещение равно <code>1 * 4 + 2 = 6</code>.</p>
+<p><img src="../assets/io/pixel.svg" alt="Три строки по четыре байта и их развёртка в плоский буфер. Клетка (1, 2) и байт со смещением 6 выделены одним цветом."></p>
 <div id="practice"><section class="experiment">
 <h3>Запиши байт в кадровый буфер</h3>
-<p>Выбери яркость и нажми на клетку экрана. Затем выбери адрес в буфере и запиши другое значение по тому же адресу. Обе записи меняют один массив из 12 байтов.</p>
+<p>Выбери яркость и нажми на клетку экрана. Затем выбери смещение в буфере и запиши по нему другое значение для той же клетки. Обе записи меняют один массив из 12 байтов.</p>
 <label>Яркость <select data-light><option value="0">0 — чёрный</option><option value="85">85</option><option value="170">170</option><option selected value="255">255 — белый</option></select></label>
 <p>Экран · 3 строки × 4 столбца</p>
 <div data-screen style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.25rem;max-width:20rem"><button type="button" data-pixel="0" aria-label="Строка 0, столбец 0">0</button><button type="button" data-pixel="1" aria-label="Строка 0, столбец 1">0</button><button type="button" data-pixel="2" aria-label="Строка 0, столбец 2">0</button><button type="button" data-pixel="3" aria-label="Строка 0, столбец 3">0</button><button type="button" data-pixel="4" aria-label="Строка 1, столбец 0">0</button><button type="button" data-pixel="5" aria-label="Строка 1, столбец 1">0</button><button type="button" data-pixel="6" aria-label="Строка 1, столбец 2">0</button><button type="button" data-pixel="7" aria-label="Строка 1, столбец 3">0</button><button type="button" data-pixel="8" aria-label="Строка 2, столбец 0">0</button><button type="button" data-pixel="9" aria-label="Строка 2, столбец 1">0</button><button type="button" data-pixel="10" aria-label="Строка 2, столбец 2">0</button><button type="button" data-pixel="11" aria-label="Строка 2, столбец 3">0</button></div>
 <p><label>Смещение <select data-offset><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6" selected>6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option></select></label> <button data-write type="button">Записать байт</button></p>
-<p>Байты буфера по возрастанию адресов</p><p><samp data-buffer></samp></p><p role="status"></p><button type="button" data-reset>Очистить экран</button>
+<p>Байты буфера в hex, по возрастанию адресов</p><p><samp data-buffer></samp></p><p role="status"></p><button type="button" data-reset>Очистить экран</button>
 <script>
 (() => {
   const root = document.currentScript.closest(".experiment");
@@ -94,7 +94,7 @@
 using std::pair;
 
 pair&lt;long long, long long&gt; move(long long row, long long col,
-                                     int direction, long long steps) {
+                                int direction, long long steps) {
     const int row_offsets[] = {-1, 0, 1, 0};
     const int col_offsets[] = {0, 1, 0, -1};
     return {row + steps * row_offsets[direction], col + steps * col_offsets[direction]};
@@ -110,7 +110,7 @@ pair&lt;long long, long long&gt; move(long long row, long long col,
 </code></pre>
 </details>
 
-<p>Формула описывает движение по свободной плоскости для направлений от 0 до 3. Если есть стены, проверь допустимость каждой промежуточной позиции или вычисли расстояние до препятствия перед решением о перемещении.</p>
+<p>Формула описывает движение по свободной плоскости. Номер направления должен быть от 0 до 3, число шагов — неотрицательным, а результат вычислений в C++ должен помещаться в <code>long long</code>. Если есть стены, проверь допустимость каждой промежуточной позиции или вычисли расстояние до препятствия перед решением о перемещении.</p>
 <h2>Рамка группы клеток</h2>
 <p>После <a href="../algorithms/grid-traversal.html">обхода карты</a> известны клетки одной связной области. Возьмём три клетки <code>(1, 1)</code>, <code>(1, 2)</code> и <code>(2, 1)</code>. На схеме они отмечены <code>×</code>.</p>
 <pre><code class="language-text">             столбец 1   столбец 2
@@ -161,7 +161,7 @@ array&lt;int, 4&gt; bounding_box(const vector&lt;pair&lt;int, int&gt;&gt;&amp; c
 
 <p>Функция возвращает <code>(верх, лево, низ, право)</code>. Обе границы включены, поэтому площадь равна <code>(низ − верх + 1) · (право − лево + 1)</code>. На схеме площадь равна четырём, а заняты три клетки. Если список не содержит повторов, равенство площади рамки и числа клеток означает, что рамка заполнена целиком. Рамку можно обновлять прямо в ходе обхода компоненты, если потом не требуется хранить сами клетки.</p>
 <h2>Как сохранить несколько признаков одной клетки</h2>
-<p>Состояние клетки может учитывать сразу несколько источников. Например, если один датчик обнаруживает синий цвет, а другой жёлтый, по одному биту на каждый цвет сохраняет оба свидетельства. Начнём с маски <code>00</code>. Синий цвет (бит 0) даёт <code>01</code>. После жёлтого (бит 1) получим <code>01 | 10 = 11</code>. Повторное наблюдение синего оставит <code>11 | 01 = 11</code>. Так <a href="../cpp/bits-and-bitset.html">побитовое ИЛИ</a> сохраняет оба признака в любом порядке. Перед первым наблюдением все маски в <code>grid</code> равны нулю.</p>
+<p>Состояние клетки может учитывать сразу несколько источников. Например, если один датчик обнаруживает синий цвет, а другой жёлтый, по одному биту на каждый цвет сохраняет оба свидетельства. Начнём с двоичной маски <code>00</code>. Синий цвет (бит 0) даёт <code>01</code>. После жёлтого (бит 1) получим <code>01 | 10 = 11</code>. Повторное наблюдение синего оставит <code>11 | 01 = 11</code>. Так <a href="../cpp/bits-and-bitset.html">побитовое ИЛИ</a> сохраняет оба признака в любом порядке. Перед первым наблюдением все маски в <code>grid</code> равны нулю.</p>
 <p><strong>C++</strong></p>
 <pre><code class="language-cpp">#include &lt;cstdint&gt;
 #include &lt;vector&gt;
@@ -184,7 +184,7 @@ void record_color(vector&lt;vector&lt;uint32_t&gt;&gt;&amp; grid,
 
 <p>Координаты должны быть допустимыми, номер цвета в C++ лежит в диапазоне от 0 до 31. Если клетки приходят от лучевого датчика, перечисли клетки вдоль известного луча и для каждой запиши соответствующее свидетельство. Что значит последний отсчёт и могут ли наблюдения противоречить друг другу, зависит от модели датчика. Приведённая функция хранит факт наблюдения. Когда нужно число наблюдений, требуются счётчики.</p>
 <h2>Как совместить два набора точек</h2>
-<p>Поворот квадрата со стороной <code>side_length</code> на 90° по часовой стрелке переводит клетку <code>(row, col)</code> в <code>(col, side_length - 1 - row)</code>. Для совмещения двух наборов точек при фиксированном повороте сравни координаты. Если точка <code>(second_row, second_col)</code> второго набора должна перейти в <code>(first_row, first_col)</code> первого, возможен ровно один сдвиг <code>(first_row - second_row, first_col - second_col)</code>. Например, в первом наборе отмечены <code>(1, 2)</code> и <code>(1, 3)</code>, а во втором — <code>(0, 0)</code> и <code>(0, 1)</code>. Сдвиг <code>(1, 2)</code> совмещает обе пары точек. Сдвиг <code>(1, 3)</code> совмещает только <code>(0, 0)</code> с <code>(1, 3)</code>.</p>
+<p>Поворот квадрата со стороной <code>side_length</code> на 90° по часовой стрелке переводит клетку <code>(row, col)</code> в <code>(col, side_length - 1 - row)</code>. Для совмещения двух наборов точек при фиксированном повороте сравни координаты. Если точка <code>(second_row, second_col)</code> второго набора должна перейти в <code>(first_row, first_col)</code> первого, возможен ровно один сдвиг <code>(first_row - second_row, first_col - second_col)</code>. Например, в первом наборе отмечены <code>(1, 2)</code> и <code>(1, 3)</code>, а во втором — <code>(0, 0)</code> и <code>(0, 1)</code>. Сдвиг <code>(1, 2)</code> совмещает обе пары точек. Со сдвигом <code>(1, 3)</code> точка <code>(0, 0)</code> попадает в <code>(1, 3)</code>, а <code>(0, 1)</code> — в <code>(1, 4)</code>, где совпадения уже нет.</p>
 <p>Вместо наложения целых карт каждая пара точек отдаёт один «голос» за свой сдвиг. Если точки внутри каждого набора различны, число голосов равно числу совпадений. <code>rotate_point</code> поворачивает точку, а <code>shift_votes</code> считает голоса уже при выбранном повороте.</p>
 <p><strong>C++</strong></p>
 <pre><code class="language-cpp">#include &lt;map&gt;
@@ -201,12 +201,16 @@ Point rotate_point(int row, int col, int side_length) {
     return {col, side_length - 1 - row};
 }
 
-map&lt;Point, long long&gt; shift_votes(const vector&lt;Point&gt;&amp; first,
-                                      const vector&lt;Point&gt;&amp; second) {
-    map&lt;Point, long long&gt; votes;
+using Shift = pair&lt;long long, long long&gt;;
+
+map&lt;Shift, long long&gt; shift_votes(const vector&lt;Point&gt;&amp; first,
+                                 const vector&lt;Point&gt;&amp; second) {
+    map&lt;Shift, long long&gt; votes;
     for (auto [first_row, first_col] : first) {
         for (auto [second_row, second_col] : second) {
-            ++votes[{first_row - second_row, first_col - second_col}];
+            const long long row_shift = static_cast&lt;long long&gt;(first_row) - second_row;
+            const long long col_shift = static_cast&lt;long long&gt;(first_col) - second_col;
+            ++votes[{row_shift, col_shift}];
         }
     }
     return votes;
@@ -305,7 +309,7 @@ free_to_right(const vector&lt;string&gt;&amp; grid) {
 </tr>
 </tbody></table>
 <p>Из столбца <code>1</code> можно сделать один шаг до стены. В столбце <code>3</code> стоит сама стена, поэтому храним служебный ноль. Для остальных направлений меняй ось и порядок обхода так, чтобы сосед был уже обработан. Предвычисление для карты <code>h × w</code> занимает <code>O(h · w)</code> времени и памяти, затем один запрос выполняется за <code>O(1)</code>.</p>
-<p>Таблица пригодится и при сопоставлении показаний с картой. Когда известна карта, а начальная поза неизвестна, перебери допустимые позы. Для каждой поддерживай текущую позу и сверяй предвычисленное показание в момент, когда по журналу был сделан замер. Первое несовпадение исключает начальную позу. Если хранишь найденные варианты, записывай начальную позу отдельно от текущей.</p>
+<p>Таблица пригодится и при сопоставлении показаний с картой, если показание датчика в модели равно числу свободных клеток до препятствия в выбранном направлении. Когда известна карта, а начальная поза неизвестна, перебери допустимые позы. Для каждой поддерживай текущую позу и сверяй предвычисленное показание в момент, когда по журналу был сделан замер. Первое несовпадение исключает начальную позу. Если хранишь найденные варианты, записывай начальную позу отдельно от текущей.</p>
 <hr>
 <p><a href="signals.html">← Обработка сигналов</a></p>
 </article></main></body></html>

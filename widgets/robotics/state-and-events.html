@@ -16,7 +16,7 @@
   for (const button of root.querySelectorAll('[data-advance]')) {
     button.addEventListener('click', () => {
       now += Number(button.dataset.advance);
-      show('Часы передвинуты. Переменная off_at обновится при чтении.');
+      show('Время изменилось. Чтобы проверить срок, прочитай индикатор.');
     });
   }
   find('[data-read]').addEventListener('click', () => {

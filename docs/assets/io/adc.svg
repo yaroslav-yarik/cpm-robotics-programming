@@ -31,5 +31,5 @@
 <text x="619" y="204" font-size="16" fill="#173449" text-anchor="middle">4 В</text>
 <path d="M429 92 L429 121" fill="none" stroke="#9a4a14" stroke-width="3"/>
 <text x="440" y="103" font-size="18" fill="#9a4a14" text-anchor="start">2,7 В</text>
-<text x="24" y="246" font-size="21" fill="#173449" text-anchor="start">От 2,5 В до 3 В прибор выдаёт 101₂, то есть 5.</text>
+<text x="24" y="246" font-size="21" fill="#173449" text-anchor="start">Если 2,5 В ≤ напряжение &lt; 3 В, код равен 101₂.</text>
 </g></svg>

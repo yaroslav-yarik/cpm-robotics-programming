@@ -19,7 +19,7 @@
     [hidden] { display:none !important; }
   </style>
 <h3>Двоичный поиск</h3>
-  <p>Найди индекс первого числа, которое больше или равно цели. Если подходят обе тройки, ответом будет индекс первой. Если не подходит ни один элемент, ответом будет длина массива.</p>
+  <p>Найди индекс первого числа, которое больше или равно цели. Если цель равна 3, подойдут обе тройки. Ответом будет индекс первой из них. Если не подходит ни один элемент, ответом будет длина массива.</p>
   <div class="search-controls">
     <label for="goal">Цель</label>
     <select id="goal">
@@ -79,7 +79,7 @@ function render() {
       : "Первое число, которое подходит для цели " + goal + ", — " + values[left] + " на позиции " + left + ".";
     byId("current").textContent = "Границы встретились: l = r = " + left + ". " + explanation;
   } else {
-    byId("current").textContent = "Проверяем [" + left + ", " + right + "). Середина mid = " + mid + ", число a[mid] = " + values[mid] + ". Цель — " + goal + ".";
+    byId("current").textContent = "Проверяем [" + left + ", " + right + "). Середина mid = " + mid + ", число values[mid] = " + values[mid] + ". Цель — " + goal + ".";
     byId("left").textContent = "l = mid + 1 = " + (mid + 1);
     byId("right").textContent = "r = mid = " + mid;
   }
