@@ -88,7 +88,7 @@
 </tr>
 </tbody></table>
 <p>Координаты и направление вместе образуют <strong>позу</strong>. При повороте направо новый номер направления равен <code>(direction + 1) % 4</code>. При движении прямо умножаем сдвиг из таблицы на число шагов. Например, два шага на север из <code>(3, 2)</code> ведут через <code>(2, 2)</code> в <code>(1, 2)</code>.</p>
-<p><strong>C++17</strong></p>
+<p><strong>C++</strong></p>
 <pre><code class="language-cpp">#include &lt;utility&gt;
 
 using std::pair;
@@ -105,8 +105,8 @@ pair&lt;long long, long long&gt; move(long long row, long long col,
 
 <pre><code class="language-python">def move(row, col, direction, steps):
     offsets = [(-1, 0), (0, 1), (1, 0), (0, -1)]
-    dr, dc = offsets[direction]
-    return row + steps * dr, col + steps * dc
+    row_offset, col_offset = offsets[direction]
+    return row + steps * row_offset, col + steps * col_offset
 </code></pre>
 </details>
 
@@ -118,7 +118,7 @@ pair&lt;long long, long long&gt; move(long long row, long long col,
 строка 2         ×           ·
 </code></pre>
 <p>Самая верхняя строка области — <code>1</code>, самая нижняя — <code>2</code>. По столбцам границы тоже <code>1</code> и <code>2</code>. Чтобы найти такую рамку у любой непустой области, начинаем с первой клетки и расширяем границы после чтения каждой следующей.</p>
-<p><strong>C++17</strong></p>
+<p><strong>C++</strong></p>
 <pre><code class="language-cpp">#include &lt;algorithm&gt;
 #include &lt;array&gt;
 #include &lt;utility&gt;
@@ -162,7 +162,7 @@ array&lt;int, 4&gt; bounding_box(const vector&lt;pair&lt;int, int&gt;&gt;&amp; c
 <p>Функция возвращает <code>(верх, лево, низ, право)</code>. Обе границы включены, поэтому площадь равна <code>(низ − верх + 1) · (право − лево + 1)</code>. На схеме площадь равна четырём, а заняты три клетки. Если список не содержит повторов, равенство площади рамки и числа клеток означает, что рамка заполнена целиком. Рамку можно обновлять прямо в ходе обхода компоненты, если потом не требуется хранить сами клетки.</p>
 <h2>Как сохранить несколько признаков одной клетки</h2>
 <p>Состояние клетки может учитывать сразу несколько источников. Например, если один датчик обнаруживает синий цвет, а другой жёлтый, по одному биту на каждый цвет сохраняет оба свидетельства. Начнём с маски <code>00</code>. Синий цвет (бит 0) даёт <code>01</code>. После жёлтого (бит 1) получим <code>01 | 10 = 11</code>. Повторное наблюдение синего оставит <code>11 | 01 = 11</code>. Так <a href="../cpp/bits-and-bitset.html">побитовое ИЛИ</a> сохраняет оба признака в любом порядке. Перед первым наблюдением все маски в <code>grid</code> равны нулю.</p>
-<p><strong>C++17</strong></p>
+<p><strong>C++</strong></p>
 <pre><code class="language-cpp">#include &lt;cstdint&gt;
 #include &lt;vector&gt;
 
@@ -186,7 +186,7 @@ void record_color(vector&lt;vector&lt;uint32_t&gt;&gt;&amp; grid,
 <h2>Как совместить два набора точек</h2>
 <p>Поворот квадрата со стороной <code>side_length</code> на 90° по часовой стрелке переводит клетку <code>(row, col)</code> в <code>(col, side_length - 1 - row)</code>. Для совмещения двух наборов точек при фиксированном повороте сравни координаты. Если точка <code>(second_row, second_col)</code> второго набора должна перейти в <code>(first_row, first_col)</code> первого, возможен ровно один сдвиг <code>(first_row - second_row, first_col - second_col)</code>. Например, в первом наборе отмечены <code>(1, 2)</code> и <code>(1, 3)</code>, а во втором — <code>(0, 0)</code> и <code>(0, 1)</code>. Сдвиг <code>(1, 2)</code> совмещает обе пары точек. Сдвиг <code>(1, 3)</code> совмещает только <code>(0, 0)</code> с <code>(1, 3)</code>.</p>
 <p>Вместо наложения целых карт каждая пара точек отдаёт один «голос» за свой сдвиг. Если точки внутри каждого набора различны, число голосов равно числу совпадений. <code>rotate_point</code> поворачивает точку, а <code>shift_votes</code> считает голоса уже при выбранном повороте.</p>
-<p><strong>C++17</strong></p>
+<p><strong>C++</strong></p>
 <pre><code class="language-cpp">#include &lt;map&gt;
 #include &lt;utility&gt;
 #include &lt;vector&gt;
@@ -217,14 +217,14 @@ map&lt;Point, long long&gt; shift_votes(const vector&lt;Point&gt;&amp; first,
 
 <pre><code class="language-python">from collections import Counter
 
-def rotate_point(row, col, n):
-    return col, n - 1 - row
+def rotate_point(row, col, side_length):
+    return col, side_length - 1 - row
 
 def shift_votes(first, second):
     votes = Counter()
-    for ar, ac in first:
-        for br, bc in second:
-            votes[ar - br, ac - bc] += 1
+    for first_row, first_col in first:
+        for second_row, second_col in second:
+            votes[first_row - second_row, first_col - second_col] += 1
     return votes
 </code></pre>
 </details>
@@ -232,7 +232,7 @@ def shift_votes(first, second):
 <p>Оба фрагмента возвращают голоса для сдвигов с хотя бы одним совпадением. Если пустые маски или сдвиги с нулём совпадений важны, учти их отдельно. Метод перебирает <code>a · b</code> пар для наборов размеров <code>a</code> и <code>b</code>. Каждое добавление в <code>Counter</code> в среднем занимает постоянное время, а в <code>std::map</code> зависит логарифмически от числа разных сдвигов. Память пропорциональна числу разных сдвигов.</p>
 <h2>Предвычисление расстояния до преграды</h2>
 <p>Если на прямоугольной карте много запросов «сколько свободных клеток подряд справа», можно заполнить таблицу одним проходом. Для свободной клетки ответ равен 1 плюс ответ её правого соседа, если сосед тоже свободен. Если справа стена или край, ответ 0. Поэтому обходи строку справа налево. В примере свободная клетка обозначена точкой, стена — решёткой.</p>
-<p><strong>C++17</strong></p>
+<p><strong>C++</strong></p>
 <pre><code class="language-cpp">#include &lt;cstddef&gt;
 #include &lt;string&gt;
 #include &lt;vector&gt;

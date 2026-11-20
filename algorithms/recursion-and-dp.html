@@ -70,7 +70,7 @@
 <p>Каждый вызов помнит две величины. Индекс показывает, какой элемент рассматриваем, а <code>subset_sum</code> хранит сумму уже взятых элементов. В первой ветви увеличиваем только индекс. Во второй прибавляем к сумме значение взятого элемента.</p>
 <p>Когда индекс равен длине массива, выбора больше нет. Это <strong>базовый случай</strong>. Записываем сумму и завершаем вызов. Для пустого массива сразу запишем 0. Разные подмножества могут давать одинаковые суммы, поэтому в ответе возможны повторы.</p>
 <p>Вариантов <code>2ⁿ</code>, поэтому время перебора составляет <code>O(2ⁿ)</code>. При <code>n = 30</code> это уже больше миллиарда вариантов. Для цепочки вызовов нужно <code>O(n)</code> памяти, для списка ответов — <code>O(2ⁿ)</code>. Если требуется только количество подходящих подмножеств, можно вместо списка накапливать счётчик.</p>
-<p><strong>C++17</strong></p>
+<p><strong>C++</strong></p>
 <pre><code class="language-cpp">#include &lt;cstddef&gt;
 #include &lt;vector&gt;
 
@@ -98,18 +98,18 @@ Numbers subset_sums(const Numbers&amp; values) {
 <details>
 <summary>Тот же алгоритм на Python</summary>
 
-<pre><code class="language-python">def subset_sums(a):
-    answer = []
+<pre><code class="language-python">def subset_sums(values):
+    result = []
 
-    def visit(index, total):
-        if index == len(a):
-            answer.append(total)
+    def visit(index, subset_sum):
+        if index == len(values):
+            result.append(subset_sum)
             return
-        visit(index + 1, total)
-        visit(index + 1, total + a[index])
+        visit(index + 1, subset_sum)
+        visit(index + 1, subset_sum + values[index])
 
     visit(0, 0)
-    return answer
+    return result
 </code></pre>
 </details>
 
@@ -147,8 +147,8 @@ Numbers subset_sums(const Numbers&amp; values) {
 </tbody></table>
 <p>Например, на ступеньку 2 можно попасть со ступеньки 0 или 1. Выбираем меньшую из сумм 5 и 2, прибавляем цену посещения 10 и получаем 12. На последнюю ступеньку выгоднее перейти сразу со ступеньки 1. Весь путь стоит <code>2 + 1 = 3</code>.</p>
 <p>Для ступеньки 0 ответ равен её цене. Дальше работает правило <strong><code>dp[index] = cost[index] + min(dp[index − 1], dp[index − 2])</code></strong>. При <code>index = 1</code> позиция перед лестницей имеет цену 0. В коде её хранит отдельная переменная. Индекс <code>−1</code> в Python означал бы последний элемент списка.</p>
-<p>Для следующего расчёта нужны лишь две предыдущие суммы — <code>two_ago</code> и <code>previous</code>. После каждого шага сдвигаем обе на одну позицию. Время работы составляет <code>O(n)</code>, дополнительная память — <code>O(1)</code>. Если лестница пуста, функция возвращает 0.</p>
-<p><strong>C++17</strong></p>
+<p>Для следующего расчёта нужны лишь две предыдущие суммы — <code>cost_two_steps_back</code> и <code>previous_cost</code>. После каждого шага сдвигаем обе на одну позицию. Время работы составляет <code>O(n)</code>, дополнительная память — <code>O(1)</code>. Если лестница пуста, функция возвращает 0.</p>
+<p><strong>C++</strong></p>
 <pre><code class="language-cpp">#include &lt;algorithm&gt;
 #include &lt;cstddef&gt;
 #include &lt;vector&gt;
@@ -162,13 +162,13 @@ using Numbers = vector&lt;Int&gt;;
 
 Int min_stair_cost(const Numbers&amp; cost) {
     if (cost.empty()) return 0;
-    Int two_ago = 0, previous = cost[0];
+    Int cost_two_steps_back = 0, previous_cost = cost[0];
     for (size_t index = 1; index &lt; cost.size(); ++index) {
-        Int current = cost[index] + min(two_ago, previous);
-        two_ago = previous;
-        previous = current;
+        Int current_cost = cost[index] + min(cost_two_steps_back, previous_cost);
+        cost_two_steps_back = previous_cost;
+        previous_cost = current_cost;
     }
-    return previous;
+    return previous_cost;
 }
 </code></pre>
 <details>
@@ -177,11 +177,11 @@ Int min_stair_cost(const Numbers&amp; cost) {
 <pre><code class="language-python">def min_stair_cost(cost):
     if not cost:
         return 0
-    two_ago, previous = 0, cost[0]
-    for i in range(1, len(cost)):
-        current = cost[i] + min(two_ago, previous)
-        two_ago, previous = previous, current
-    return previous
+    cost_two_steps_back, previous_cost = 0, cost[0]
+    for index in range(1, len(cost)):
+        current_cost = cost[index] + min(cost_two_steps_back, previous_cost)
+        cost_two_steps_back, previous_cost = previous_cost, current_cost
+    return previous_cost
 </code></pre>
 </details>
 

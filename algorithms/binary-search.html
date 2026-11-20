@@ -184,7 +184,7 @@ restart();
 <p>Индекс середины позволяет сразу вычислить адрес элемента в непрерывном массиве C++. Для объекта размером 8 байтов элемент с индексом 2 начинается на 16 байтов дальше первого. В большом массиве последовательные проверки могут попасть в разные <a href="../hardware/memory.html">строки кэша</a>, поэтому длительность одного шага бывает разной.</p>
 <p>Теперь <code>left == right == 1</code>. Это индекс первой тройки. Для верхней границы тройку считаем слишком маленькой и продолжаем поиск справа от неё.</p>
 <p>В C++ функция ниже с параметром <code>find_upper = true</code> ищет верхнюю границу. В Python показаны две отдельные функции. Обе границы находятся за <code>O(log n)</code> времени с <code>O(1)</code> дополнительной памяти.</p>
-<p><strong>C++17</strong></p>
+<p><strong>C++</strong></p>
 <pre><code class="language-cpp">#include &lt;cstddef&gt;
 #include &lt;vector&gt;
 
@@ -210,22 +210,22 @@ size_t first_boundary(const Numbers&amp; values, Int target, bool find_upper = f
 <details>
 <summary>Тот же алгоритм на Python</summary>
 
-<pre><code class="language-python">def lower_bound(a, target):
-    left, right = 0, len(a)
+<pre><code class="language-python">def lower_bound(values, target):
+    left, right = 0, len(values)
     while left &lt; right:
         middle = left + (right - left) // 2
-        if a[middle] &lt; target:
+        if values[middle] &lt; target:
             left = middle + 1
         else:
             right = middle
     return left
 
 
-def upper_bound(a, target):
-    left, right = 0, len(a)
+def upper_bound(values, target):
+    left, right = 0, len(values)
     while left &lt; right:
         middle = left + (right - left) // 2
-        if a[middle] &lt;= target:
+        if values[middle] &lt;= target:
             left = middle + 1
         else:
             right = middle
@@ -238,15 +238,15 @@ def upper_bound(a, target):
 <p>Нужно перевезти 11 одинаковых деталей не более чем за 3 рейса. Машина вместимостью 3 детали сделает четыре рейса. Машине вместимостью 4 хватит трёх. Ответ равен 4.</p>
 <p>Двоичным поиском можно найти эту границу даже без готового массива. Если вместимости хватает, любая большая вместимость тоже подойдёт. Такое свойство называется <strong>монотонностью</strong>. Для кандидата <code>c</code> делим число деталей на вместимость и добавляем один рейс, если остался ненулевой остаток.</p>
 <p>Функция ищет ответ среди целых чисел от 1 до <code>n</code>. Вместимость <code>n</code> заведомо подходит при хотя бы одном разрешённом рейсе. На каждом шаге мы уменьшаем диапазон примерно вдвое. Для <code>1 ≤ n ≤ 10¹⁸</code> время составляет <code>O(log n)</code>, дополнительная память — <code>O(1)</code>.</p>
-<p><strong>C++17</strong></p>
+<p><strong>C++</strong></p>
 <pre><code class="language-cpp">using Int = long long;
 
-Int min_batch_size(Int n, Int batches) {
-    Int left = 1, right = n;
+Int min_batch_size(Int item_count, Int batch_limit) {
+    Int left = 1, right = item_count;
     while (left &lt; right) {
         Int middle = left + (right - left) / 2;
-        Int needed = n / middle + (n % middle != 0);
-        if (needed &lt;= batches) right = middle;
+        Int batches_needed = item_count / middle + (item_count % middle != 0);
+        if (batches_needed &lt;= batch_limit) right = middle;
         else left = middle + 1;
     }
     return left;
@@ -255,12 +255,12 @@ Int min_batch_size(Int n, Int batches) {
 <details>
 <summary>Тот же алгоритм на Python</summary>
 
-<pre><code class="language-python">def min_batch_size(n, batches):
-    left, right = 1, n
+<pre><code class="language-python">def min_batch_size(item_count, batch_limit):
+    left, right = 1, item_count
     while left &lt; right:
         middle = left + (right - left) // 2
-        needed = n // middle + (n % middle != 0)
-        if needed &lt;= batches:
+        batches_needed = item_count // middle + (item_count % middle != 0)
+        if batches_needed &lt;= batch_limit:
             right = middle
         else:
             left = middle + 1

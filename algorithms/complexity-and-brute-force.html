@@ -98,7 +98,7 @@
 <p>В коде C++ индексы <code>i</code> и <code>j</code> из схемы называются <code>first_index</code> и <code>second_index</code>. В каждой отмеченной клетке алгоритм читает два числа, складывает их и сравнивает сумму с целью. Процессор может оставить первое число в регистре на весь внутренний цикл. Число проверок пар мы можем вывести точно, а число машинных инструкций зависит от компилятора.</p>
 <p>Для первого индекса есть <code>n − 1</code> возможных партнёров, для второго — <code>n − 2</code>, для последнего — ни одного. Всего это <code>n(n − 1)/2</code> пар. Поэтому время в худшем случае составляет <code>O(n²)</code>, дополнительная память — <code>O(1)</code>. При небольших входных данных такой перебор удобно использовать для проверки более быстрого решения.</p>
 <p>В примерах справочника нумерация начинается с нуля. Запись <code>[l, r)</code> включает индекс <code>l</code> и исключает <code>r</code>. Для сумм в C++ используем <code>long long</code>. При решении задачи проверь по ограничениям, помещаются ли в этот тип промежуточные результаты.</p>
-<p><strong>C++17</strong></p>
+<p><strong>C++</strong></p>
 <pre><code class="language-cpp">#include &lt;cstddef&gt;
 #include &lt;vector&gt;
 
@@ -120,10 +120,10 @@ bool pair_brute(const Numbers&amp; values, Int target) {
 <details>
 <summary>Тот же алгоритм на Python</summary>
 
-<pre><code class="language-python">def pair_brute(a, target):
-    for i in range(len(a)):
-        for j in range(i + 1, len(a)):
-            if a[i] + a[j] == target:
+<pre><code class="language-python">def pair_brute(values, target):
+    for first_index in range(len(values)):
+        for second_index in range(first_index + 1, len(values)):
+            if values[first_index] + values[second_index] == target:
                 return True
     return False
 </code></pre>

@@ -9,7 +9,7 @@
 <p>С этой картой можно задать два разных вопроса. Сколько ходов займёт кратчайший путь от <code>S</code> до <code>F</code>? И сколько всего клеток достижимо из <code>S</code>? В обоих решениях сначала пригодится одна и та же функция поиска соседей.</p>
 <h3>Как найти соседей клетки</h3>
 <p>К номеру строки и столбца прибавляем по очереди четыре пары смещений. Для каждой новой позиции сначала проверяем границы, затем смотрим, свободна ли клетка. Так мы не обратимся за пределы карты. Функции обхода ниже предполагают, что старт и финиш заданы координатами существующих свободных клеток.</p>
-<p><strong>C++17</strong></p>
+<p><strong>C++</strong></p>
 <pre><code class="language-cpp">#include &lt;string&gt;
 #include &lt;utility&gt;
 #include &lt;vector&gt;
@@ -39,10 +39,10 @@ vector&lt;Cell&gt; grid_neighbors(const Grid&amp; grid, Cell cell) {
 <summary>Тот же алгоритм на Python</summary>
 
 <pre><code class="language-python">def grid_neighbors(grid, row, col):
-    for dr, dc in ((-1, 0), (1, 0), (0, -1), (0, 1)):
-        r, c = row + dr, col + dc
-        if 0 &lt;= r &lt; len(grid) and 0 &lt;= c &lt; len(grid[r]) and grid[r][c] != &quot;#&quot;:
-            yield r, c
+    for row_offset, col_offset in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+        next_row, next_col = row + row_offset, col + col_offset
+        if 0 &lt;= next_row &lt; len(grid) and 0 &lt;= next_col &lt; len(grid[next_row]) and grid[next_row][next_col] != &quot;#&quot;:
+            yield next_row, next_col
 </code></pre>
 </details>
 
@@ -115,7 +115,7 @@ vector&lt;Cell&gt; grid_neighbors(const Grid&amp; grid, Cell cell) {
 <p>В коде порядок слоёв поддерживает <strong>очередь</strong>. Клетки добавляются в конец, а обрабатываются с начала. При первом добавлении соседа сразу записываем расстояние до него. Тогда даже клетка, к которой ведут два пути одинаковой длины, попадёт в очередь лишь раз.</p>
 <p>Функция <code>grid_bfs</code> использует <code>grid_neighbors</code> из блока выше. Когда очередь дойдёт до финиша, функция вернёт его расстояние, на этой карте — 6. Если очередь опустела раньше, пути нет и функция вернёт <code>−1</code>. Для восстановления самого маршрута при добавлении клетки можно запомнить, из какой клетки мы пришли.</p>
 <p>В Python очередь реализована с помощью <code>deque</code>. Удаление первого элемента обычного списка через <code>pop(0)</code> потребовало бы каждый раз сдвигать остальные элементы.</p>
-<p><strong>C++17</strong></p>
+<p><strong>C++</strong></p>
 <pre><code class="language-cpp">#include &lt;queue&gt;
 
 using std::queue;
@@ -149,17 +149,17 @@ int grid_bfs(const Grid&amp; grid, Cell start, Cell goal) {
 
 
 def grid_bfs(grid, start, goal):
-    queue = deque([start])
+    frontier = deque([start])
     distance = {start: 0}
-    while queue:
-        cell = queue.popleft()
+    while frontier:
+        cell = frontier.popleft()
         if cell == goal:
             return distance[cell]
         row, col = cell
         for next_cell in grid_neighbors(grid, row, col):
             if next_cell not in distance:
                 distance[next_cell] = distance[cell] + 1
-                queue.append(next_cell)
+                frontier.append(next_cell)
     return -1
 </code></pre>
 </details>
@@ -168,7 +168,7 @@ def grid_bfs(grid, start, goal):
 <p>Теперь нужен только размер достижимой области. Можно идти в любую ещё не посещённую клетку, поэтому вместо очереди подойдёт <strong>стек</strong>. Из стека первой извлекают клетку, добавленную последней. Это обход в глубину. Явный стек позволяет обойти длинный коридор без цепочки рекурсивных вызовов.</p>
 <p>Функция <code>grid_dfs_size</code> тоже использует <code>grid_neighbors</code>. При добавлении клетки помечаем её как посещённую. Когда стек опустеет, каждая достижимая клетка будет учтена ровно один раз. В примере таких клеток семь, включая старт и финиш. При нескольких маршрутах порядок первого посещения в этом обходе может дать длинный путь.</p>
 <p>Оба обхода проверяют не более четырёх соседей каждой обработанной клетки. Для прямоугольной карты высоты <code>h</code> и ширины <code>w</code> время и память составляют <code>O(hw)</code>. Для словарей и множеств Python здесь учтена средняя стоимость обращения.</p>
-<p><strong>C++17</strong></p>
+<p><strong>C++</strong></p>
 <pre><code class="language-cpp">using std::vector;
 
 int grid_dfs_size(const Grid&amp; grid, Cell start) {
@@ -196,14 +196,14 @@ int grid_dfs_size(const Grid&amp; grid, Cell start) {
 
 <pre><code class="language-python">def grid_dfs_size(grid, start):
     stack = [start]
-    seen = {start}
+    visited = {start}
     while stack:
         row, col = stack.pop()
         for next_cell in grid_neighbors(grid, row, col):
-            if next_cell not in seen:
-                seen.add(next_cell)
+            if next_cell not in visited:
+                visited.add(next_cell)
                 stack.append(next_cell)
-    return len(seen)
+    return len(visited)
 </code></pre>
 </details>
 
