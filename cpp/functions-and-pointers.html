@@ -102,6 +102,8 @@ add_bonus(points);  // Теперь points равно 15.
 <h2>Как передача аргумента меняет результат</h2>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
+using std::cout;
+
 // Функции square и add_bonus определены выше.
 
 void swap_scores(int* left, int* right) {
@@ -115,11 +117,11 @@ int main() {
     int first = 10;
     int second = 20;
 
-    std::cout &lt;&lt; square(first) &lt;&lt; &#39; &#39; &lt;&lt; first &lt;&lt; &#39;\n&#39;;  // 100 10
+    cout &lt;&lt; square(first) &lt;&lt; &#39; &#39; &lt;&lt; first &lt;&lt; &#39;\n&#39;;  // 100 10
     add_bonus(first);
-    std::cout &lt;&lt; first &lt;&lt; &#39;\n&#39;;                         // 15
+    cout &lt;&lt; first &lt;&lt; &#39;\n&#39;;                         // 15
     swap_scores(&amp;first, &amp;second);
-    std::cout &lt;&lt; first &lt;&lt; &#39; &#39; &lt;&lt; second &lt;&lt; &#39;\n&#39;;         // 20 15
+    cout &lt;&lt; first &lt;&lt; &#39; &#39; &lt;&lt; second &lt;&lt; &#39;\n&#39;;         // 20 15
 }
 </code></pre>
 <table>

@@ -34,17 +34,17 @@
 </thead>
 <tbody><tr>
 <td><code>[0, 4)</code></td>
-<td><code>a[2] = 3</code></td>
+<td><code>values[2] = 3</code></td>
 <td>Тройка подходит. Ищем, есть ли подходящий элемент левее, <code>right = 2</code></td>
 </tr>
 <tr>
 <td><code>[0, 2)</code></td>
-<td><code>a[1] = 3</code></td>
+<td><code>values[1] = 3</code></td>
 <td>Так же передвигаем <code>right</code> на 1</td>
 </tr>
 <tr>
 <td><code>[0, 1)</code></td>
-<td><code>a[0] = 1</code></td>
+<td><code>values[0] = 1</code></td>
 <td>Единица мала. Переходим к <code>left = 1</code></td>
 </tr>
 </tbody></table>
@@ -183,19 +183,22 @@ restart();
 
 <p>Индекс середины позволяет сразу вычислить адрес элемента в непрерывном массиве C++. Для объекта размером 8 байтов элемент с индексом 2 начинается на 16 байтов дальше первого. В большом массиве последовательные проверки могут попасть в разные <a href="../hardware/memory.html">строки кэша</a>, поэтому длительность одного шага бывает разной.</p>
 <p>Теперь <code>left == right == 1</code>. Это индекс первой тройки. Для верхней границы тройку считаем слишком маленькой и продолжаем поиск справа от неё.</p>
-<p>В C++ функция ниже с параметром <code>upper = true</code> ищет верхнюю границу. В Python показаны две отдельные функции. Обе границы находятся за <code>O(log n)</code> времени с <code>O(1)</code> дополнительной памяти.</p>
+<p>В C++ функция ниже с параметром <code>find_upper = true</code> ищет верхнюю границу. В Python показаны две отдельные функции. Обе границы находятся за <code>O(log n)</code> времени с <code>O(1)</code> дополнительной памяти.</p>
 <p><strong>C++17</strong></p>
 <pre><code class="language-cpp">#include &lt;cstddef&gt;
 #include &lt;vector&gt;
 
-using Int = long long;
-using Numbers = std::vector&lt;Int&gt;;
+using std::size_t;
+using std::vector;
 
-std::size_t first_boundary(const Numbers&amp; a, Int target, bool upper = false) {
-    std::size_t left = 0, right = a.size();
+using Int = long long;
+using Numbers = vector&lt;Int&gt;;
+
+size_t first_boundary(const Numbers&amp; values, Int target, bool find_upper = false) {
+    size_t left = 0, right = values.size();
     while (left &lt; right) {
-        std::size_t middle = left + (right - left) / 2;
-        if (a[middle] &lt; target || (upper &amp;&amp; a[middle] == target)) {
+        size_t middle = left + (right - left) / 2;
+        if (values[middle] &lt; target || (find_upper &amp;&amp; values[middle] == target)) {
             left = middle + 1;
         } else {
             right = middle;
@@ -230,7 +233,7 @@ def upper_bound(a, target):
 </code></pre>
 </details>
 
-<p>В стандартных библиотеках уже есть обе операции. В Python это <code>bisect_left</code> и <code>bisect_right</code> из модуля <code>bisect</code>. В C++ функции <code>std::lower_bound</code> и <code>std::upper_bound</code> возвращают итераторы. Чтобы получить индекс в векторе, вычти <code>a.begin()</code> из итератора. Для проверки наличия числа сначала убедись, что индекс меньше <code>n</code>, и только затем сравни элемент с искомым числом.</p>
+<p>В стандартных библиотеках уже есть обе операции. В Python это <code>bisect_left</code> и <code>bisect_right</code> из модуля <code>bisect</code>. В C++ функции <code>std::lower_bound</code> и <code>std::upper_bound</code> возвращают итераторы. Чтобы получить индекс в векторе, вычти <code>values.begin()</code> из итератора. Для проверки наличия числа сначала убедись, что индекс меньше <code>n</code>, и только затем сравни элемент с искомым числом.</p>
 <h2>Как найти минимальную вместимость</h2>
 <p>Нужно перевезти 11 одинаковых деталей не более чем за 3 рейса. Машина вместимостью 3 детали сделает четыре рейса. Машине вместимостью 4 хватит трёх. Ответ равен 4.</p>
 <p>Двоичным поиском можно найти эту границу даже без готового массива. Если вместимости хватает, любая большая вместимость тоже подойдёт. Такое свойство называется <strong>монотонностью</strong>. Для кандидата <code>c</code> делим число деталей на вместимость и добавляем один рейс, если остался ненулевой остаток.</p>

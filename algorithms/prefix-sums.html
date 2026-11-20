@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Префиксные суммы · Справочник ЦПМ</title><link rel="stylesheet" href="../style.css"></head><body><main class="reader"><nav class="reader-nav"><a href="../index.html">Оглавление</a><span> / </span><a href="../index.html#algorithms">Базовые алгоритмы</a><a class="jump" href="#practice">К опыту</a></nav><article><h1>Префиксные суммы</h1>
 <h2>Как получить сумму участка одним вычитанием</h2>
-<p>Пусть в массиве <code>[2, −5, 4]</code> нужно много раз находить суммы разных участков. Заранее посчитаем сумму первых <code>k</code> элементов для каждого возможного <code>k</code>. Такую сумму называют <strong>префиксной</strong>. Пустой префикс имеет длину 0 и сумму 0.</p>
+<p>Пусть в массиве <code>[2, −5, 4]</code> нужно много раз находить суммы разных участков. Заранее посчитаем сумму первых <code>k</code> элементов для каждого возможного <code>k</code>. Такую сумму называют <strong>префиксной</strong>. В формулах и на схеме обозначим таблицу через <code>p</code>, а в коде C++ назовём её <code>prefix</code>. Пустой префикс имеет длину 0 и сумму 0.</p>
 <table>
 <thead>
 <tr>
@@ -60,17 +60,20 @@
 <pre><code class="language-cpp">#include &lt;cstddef&gt;
 #include &lt;vector&gt;
 
-using Int = long long;
-using Numbers = std::vector&lt;Int&gt;;
+using std::size_t;
+using std::vector;
 
-Numbers prefix_sums(const Numbers&amp; a) {
-    Numbers p{0};
-    for (Int value : a) p.push_back(p.back() + value);
-    return p;
+using Int = long long;
+using Numbers = vector&lt;Int&gt;;
+
+Numbers prefix_sums(const Numbers&amp; values) {
+    Numbers prefix{0};
+    for (Int value : values) prefix.push_back(prefix.back() + value);
+    return prefix;
 }
 
-Int range_sum(const Numbers&amp; p, std::size_t left, std::size_t right) {
-    return p[right] - p[left];
+Int range_sum(const Numbers&amp; prefix, size_t left, size_t right) {
+    return prefix[right] - prefix[left];
 }
 </code></pre>
 <details>
@@ -107,26 +110,29 @@ def range_sum(prefix, left, right):
 <pre><code class="language-cpp">#include &lt;cstddef&gt;
 #include &lt;vector&gt;
 
-using Int = long long;
-using Numbers = std::vector&lt;Int&gt;;
-using Matrix = std::vector&lt;Numbers&gt;;
+using std::size_t;
+using std::vector;
 
-Matrix rectangle_prefix(const Matrix&amp; a) {
-    std::size_t rows = a.size(), cols = a.empty() ? 0 : a[0].size();
-    Matrix p(rows + 1, Numbers(cols + 1));
-    for (std::size_t i = 0; i &lt; rows; ++i) {
+using Int = long long;
+using Numbers = vector&lt;Int&gt;;
+using Matrix = vector&lt;Numbers&gt;;
+
+Matrix rectangle_prefix(const Matrix&amp; values) {
+    size_t rows = values.size(), column_count = values.empty() ? 0 : values[0].size();
+    Matrix prefix(rows + 1, Numbers(column_count + 1));
+    for (size_t row = 0; row &lt; rows; ++row) {
         Int row_sum = 0;
-        for (std::size_t j = 0; j &lt; cols; ++j) {
-            row_sum += a[i][j];
-            p[i + 1][j + 1] = p[i][j + 1] + row_sum;
+        for (size_t col = 0; col &lt; column_count; ++col) {
+            row_sum += values[row][col];
+            prefix[row + 1][col + 1] = prefix[row][col + 1] + row_sum;
         }
     }
-    return p;
+    return prefix;
 }
 
-Int rectangle_sum(const Matrix&amp; p, std::size_t top, std::size_t left,
-                  std::size_t bottom, std::size_t right) {
-    return p[bottom][right] - p[top][right] - p[bottom][left] + p[top][left];
+Int rectangle_sum(const Matrix&amp; prefix, size_t top, size_t left,
+                  size_t bottom, size_t right) {
+    return prefix[bottom][right] - prefix[top][right] - prefix[bottom][left] + prefix[top][left];
 }
 </code></pre>
 <details>

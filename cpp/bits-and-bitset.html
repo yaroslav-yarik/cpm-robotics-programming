@@ -33,27 +33,27 @@
 <tr>
 <th>Выражение</th>
 <th>Когда бит результата равен 1</th>
-<th>Для <code>x = 0b1100</code> и <code>y = 0b1010</code></th>
+<th>Для <code>left_bits = 0b1100</code> и <code>right_bits = 0b1010</code></th>
 </tr>
 </thead>
 <tbody><tr>
-<td><code>x &amp; y</code></td>
+<td><code>left_bits &amp; right_bits</code></td>
 <td>Оба входных бита равны 1</td>
 <td><code>0b1000</code></td>
 </tr>
 <tr>
-<td><code>x | y</code></td>
+<td><code>left_bits | right_bits</code></td>
 <td>Хотя бы один входной бит равен 1</td>
 <td><code>0b1110</code></td>
 </tr>
 <tr>
-<td><code>x ^ y</code></td>
+<td><code>left_bits ^ right_bits</code></td>
 <td>Входные биты различаются</td>
 <td><code>0b0110</code></td>
 </tr>
 <tr>
-<td><code>~x</code></td>
-<td>Бит <code>x</code> равен 0</td>
+<td><code>~left_bits</code></td>
+<td>Бит <code>left_bits</code> равен 0</td>
 <td>Младшие четыре бита равны <code>0011</code>, остальные биты тоже меняются</td>
 </tr>
 </tbody></table>
@@ -171,52 +171,55 @@ render();
 <p>Между соседними столбцами нет переноса. Такую операцию над машинным словом обычно выполняет арифметико-логическое устройство процессора за одну команду AND. Рисунок показывает четыре младших разряда для удобства чтения. <a href="../hardware/cpu.html">Как устроен процессор</a>.</p>
 <p>Операторы <code>&amp;&amp;</code>, <code>||</code> и <code>!</code> определяют истинность целого выражения. Например, <code>2 &amp;&amp; 1</code> даёт <code>true</code>, а <code>2 &amp; 1</code> даёт 0, потому что у этих чисел нет общих установленных битов. Запись <code>^</code> обозначает исключающее ИЛИ. В C++ она не возводит в степень.</p>
 <h2>Сдвиги и отдельные биты</h2>
-<p>Для беззнаковых чисел сдвиги заполняют освободившиеся разряды нулями. Сдвиг <code>x &lt;&lt; k</code> перемещает биты в сторону больших весов и отбрасывает старшие биты, которым не хватило места. Когда потерь нет, это умножение на 2 в степени <code>k</code>. Сдвиг <code>x &gt;&gt; k</code> равен целочисленному делению на ту же степень двойки. Например, <code>13u &lt;&lt; 1</code> равно 26, а <code>13u &gt;&gt; 1</code> равно 6.</p>
+<p>Для беззнаковых чисел сдвиги заполняют освободившиеся разряды нулями. Сдвиг <code>number &lt;&lt; position</code> перемещает биты в сторону больших весов и отбрасывает старшие биты, которым не хватило места. Когда потерь нет, это умножение на 2 в степени <code>position</code>. Сдвиг <code>number &gt;&gt; position</code> равен целочисленному делению на ту же степень двойки. Например, <code>13u &lt;&lt; 1</code> равно 26, а <code>13u &gt;&gt; 1</code> равно 6.</p>
 <p><strong>Маска</strong> — число, у которого единицами отмечены интересующие нас позиции. Если нужен только бит 1, берём число <code>0001</code> и сдвигаем его влево на одну позицию. Получится <code>0010</code>.</p>
-<p>В примерах <code>1ULL</code> имеет тип <code>unsigned long long</code>. Выбирай <code>k</code> от 0 до 63, чтобы сдвиг гарантированно помещался в ширину этого типа на любой реализации.</p>
-<p>Для ширины в конкретном окружении есть <code>std::numeric_limits&lt;unsigned long long&gt;::digits</code> из <code>&lt;limits&gt;</code>. Сдвиг на отрицательное число или на число, равное ширине типа после целочисленных продвижений или больше, недопустим. Тип левого операнда важен. В выражении <code>1 &lt;&lt; k</code> сдвигается <code>int</code>, даже если результат присваивается широкой переменной.</p>
+<p>В примерах <code>1ULL</code> имеет тип <code>unsigned long long</code>. Выбирай <code>position</code> от 0 до 63, чтобы сдвиг гарантированно помещался в ширину этого типа на любой реализации.</p>
+<p>Для ширины в конкретном окружении есть <code>std::numeric_limits&lt;unsigned long long&gt;::digits</code> из <code>&lt;limits&gt;</code>. Сдвиг на отрицательное число или на число, равное ширине типа после целочисленных продвижений или больше, недопустим. Тип левого операнда важен. В выражении <code>1 &lt;&lt; position</code> сдвигается <code>int</code>, даже если результат присваивается широкой переменной.</p>
 <pre><code class="language-cpp">unsigned long long flags = 0b1101;
-unsigned k = 1;
-auto bit = 1ULL &lt;&lt; k;      // Маска из одной единицы: 0010.
+unsigned position = 1;
+auto mask = 1ULL &lt;&lt; position;      // Маска из одной единицы: 0010.
 
-bool was_set = (flags &amp; bit) != 0;  // false: второй справа бит выключен.
-flags |= bit;                       // 1111: включить выбранный бит.
-flags &amp;= ~bit;                      // 1101: выключить только этот бит.
-flags ^= bit;                       // 1111: переключить выбранный бит.
-auto digit = (flags &gt;&gt; k) &amp; 1ULL;   // 1: выбранный бит перемещён на позицию 0.
+bool was_set = (flags &amp; mask) != 0;  // false: второй справа бит выключен.
+flags |= mask;                       // 1111: включить выбранный бит.
+flags &amp;= ~mask;                      // 1101: выключить только этот бит.
+flags ^= mask;                       // 1111: переключить выбранный бит.
+auto selected_bit = (flags &gt;&gt; position) &amp; 1ULL;   // 1: выбранный бит перемещён на позицию 0.
 </code></pre>
-<p>Скобки в <code>(flags &amp; bit) != 0</code> задают нужный порядок: сначала применить маску, затем сравнить с нулём. Если требуется проверить сразу несколько флагов, <code>(flags &amp; mask) != 0</code> означает «установлен хотя бы один», а <code>(flags &amp; mask) == mask</code> — «установлены все». Например, маска <code>0b1010</code> проверяет биты 1 и 3.</p>
+<p>Скобки в <code>(flags &amp; mask) != 0</code> задают нужный порядок: сначала применить маску, затем сравнить с нулём. Если требуется проверить сразу несколько флагов, <code>(flags &amp; mask) != 0</code> означает «установлен хотя бы один», а <code>(flags &amp; mask) == mask</code> — «установлены все». Например, маска <code>0b1010</code> проверяет биты 1 и 3.</p>
 <h2>Подсчёт единиц</h2>
-<p>Для положительного <code>x</code> число <code>x - 1</code> меняет младшую единицу на ноль, а стоящие справа нули — на единицы. Поэтому <code>x &amp; (x - 1)</code> убирает ровно младшую единицу. Например, из <code>0b101100</code> получится <code>0b101000</code>.</p>
-<pre><code class="language-cpp">int count_ones(unsigned long long x) {
+<p>Для положительного <code>number</code> число <code>number - 1</code> меняет младшую единицу на ноль, а стоящие справа нули — на единицы. Поэтому <code>number &amp; (number - 1)</code> убирает ровно младшую единицу. Например, из <code>0b101100</code> получится <code>0b101000</code>.</p>
+<pre><code class="language-cpp">int count_ones(unsigned long long number) {
     int count = 0;
-    while (x != 0) {
-        x &amp;= x - 1;
+    while (number != 0) {
+        number &amp;= number - 1;
         ++count;
     }
     return count;
 }
 // count_ones(0b101100) даёт 3, count_ones(0) даёт 0.
 </code></pre>
-<p>Цикл работает столько итераций, сколько в исходном числе единиц. В C++20 доступен <code>std::popcount(x)</code> из <code>&lt;bit&gt;</code> для беззнаковых типов.</p>
+<p>Цикл работает столько итераций, сколько в исходном числе единиц. В C++20 доступен <code>std::popcount(number)</code> из <code>&lt;bit&gt;</code> для беззнаковых типов.</p>
 <h2>Набор битов фиксированной длины</h2>
 <p>Тип <code>std::bitset&lt;N&gt;</code> из <code>&lt;bitset&gt;</code> хранит ровно <code>N</code> битов. Размер известен при компиляции. Например, <code>std::bitset&lt;8&gt;(13)</code> хранит <code>00001101</code>. Конструирование из целого использует младшие <code>N</code> битов. В записи для человека старший бит слева, а индекс 0 по-прежнему обозначает крайний бит справа.</p>
 <pre><code class="language-cpp">#include &lt;bitset&gt;
 #include &lt;iostream&gt;
 
+using std::bitset;
+using std::cout;
+
 int main() {
-    std::bitset&lt;8&gt; before(0b00001101);
-    std::bitset&lt;8&gt; after(&quot;00000111&quot;);
+    bitset&lt;8&gt; before(0b00001101);
+    bitset&lt;8&gt; after(&quot;00000111&quot;);
     auto changed = before ^ after;  // Единицы в местах изменений.
 
-    std::cout &lt;&lt; changed &lt;&lt; &#39;\n&#39;;          // 00001010
-    std::cout &lt;&lt; changed.count() &lt;&lt; &#39;\n&#39;;  // 2
-    std::cout &lt;&lt; changed.test(3) &lt;&lt; &#39;\n&#39;;  // 1
+    cout &lt;&lt; changed &lt;&lt; &#39;\n&#39;;          // 00001010
+    cout &lt;&lt; changed.count() &lt;&lt; &#39;\n&#39;;  // 2
+    cout &lt;&lt; changed.test(3) &lt;&lt; &#39;\n&#39;;  // 1
 
     changed.reset(3);   // 00000010
     changed.set(0);     // 00000011
     changed.flip(1);    // 00000001
-    std::cout &lt;&lt; changed.to_ullong() &lt;&lt; &#39;\n&#39;;  // 1
+    cout &lt;&lt; changed.to_ullong() &lt;&lt; &#39;\n&#39;;  // 1
 }
 </code></pre>
 <p>В строках <code>00001101</code> и <code>00000111</code> различаются биты 3 и 1. Поэтому результат XOR равен <code>00001010</code>, а <code>count()</code> возвращает 2.</p>

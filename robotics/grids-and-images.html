@@ -91,11 +91,13 @@
 <p><strong>C++17</strong></p>
 <pre><code class="language-cpp">#include &lt;utility&gt;
 
-std::pair&lt;long long, long long&gt; move(long long row, long long col,
+using std::pair;
+
+pair&lt;long long, long long&gt; move(long long row, long long col,
                                      int direction, long long steps) {
-    const int dr[] = {-1, 0, 1, 0};
-    const int dc[] = {0, 1, 0, -1};
-    return {row + steps * dr[direction], col + steps * dc[direction]};
+    const int row_offsets[] = {-1, 0, 1, 0};
+    const int col_offsets[] = {0, 1, 0, -1};
+    return {row + steps * row_offsets[direction], col + steps * col_offsets[direction]};
 }
 </code></pre>
 <details>
@@ -122,16 +124,22 @@ std::pair&lt;long long, long long&gt; move(long long row, long long col,
 #include &lt;utility&gt;
 #include &lt;vector&gt;
 
-std::array&lt;int, 4&gt; bounding_box(const std::vector&lt;std::pair&lt;int, int&gt;&gt;&amp; cells) {
+using std::array;
+using std::max;
+using std::min;
+using std::pair;
+using std::vector;
+
+array&lt;int, 4&gt; bounding_box(const vector&lt;pair&lt;int, int&gt;&gt;&amp; cells) {
     int top = cells.front().first;
     int bottom = top;
     int left = cells.front().second;
     int right = left;
     for (auto [row, col] : cells) {
-        top = std::min(top, row);
-        bottom = std::max(bottom, row);
-        left = std::min(left, col);
-        right = std::max(right, col);
+        top = min(top, row);
+        bottom = max(bottom, row);
+        left = min(left, col);
+        right = max(right, col);
     }
     return {top, left, bottom, right};
 }
@@ -158,9 +166,12 @@ std::array&lt;int, 4&gt; bounding_box(const std::vector&lt;std::pair&lt;int, int
 <pre><code class="language-cpp">#include &lt;cstdint&gt;
 #include &lt;vector&gt;
 
-void record_color(std::vector&lt;std::vector&lt;std::uint32_t&gt;&gt;&amp; grid,
+using std::uint32_t;
+using std::vector;
+
+void record_color(vector&lt;vector&lt;uint32_t&gt;&gt;&amp; grid,
                   int row, int col, unsigned color) {
-    grid[row][col] |= std::uint32_t{1} &lt;&lt; color;
+    grid[row][col] |= uint32_t{1} &lt;&lt; color;
 }
 </code></pre>
 <details>
@@ -173,25 +184,29 @@ void record_color(std::vector&lt;std::vector&lt;std::uint32_t&gt;&gt;&amp; grid,
 
 <p>Координаты должны быть допустимыми, номер цвета в C++ лежит в диапазоне от 0 до 31. Если клетки приходят от лучевого датчика, перечисли клетки вдоль известного луча и для каждой запиши соответствующее свидетельство. Что значит последний отсчёт и могут ли наблюдения противоречить друг другу, зависит от модели датчика. Приведённая функция хранит факт наблюдения. Когда нужно число наблюдений, требуются счётчики.</p>
 <h2>Как совместить два набора точек</h2>
-<p>Поворот квадрата со стороной <code>n</code> на 90° по часовой стрелке переводит клетку <code>(row, col)</code> в <code>(col, n - 1 - row)</code>. Для совмещения двух наборов точек при фиксированном повороте сравни координаты. Если точка <code>(br, bc)</code> второго набора должна перейти в <code>(ar, ac)</code> первого, возможен ровно один сдвиг <code>(ar - br, ac - bc)</code>. Например, в первом наборе отмечены <code>(1, 2)</code> и <code>(1, 3)</code>, а во втором — <code>(0, 0)</code> и <code>(0, 1)</code>. Сдвиг <code>(1, 2)</code> совмещает обе пары точек. Сдвиг <code>(1, 3)</code> совмещает только <code>(0, 0)</code> с <code>(1, 3)</code>.</p>
+<p>Поворот квадрата со стороной <code>side_length</code> на 90° по часовой стрелке переводит клетку <code>(row, col)</code> в <code>(col, side_length - 1 - row)</code>. Для совмещения двух наборов точек при фиксированном повороте сравни координаты. Если точка <code>(second_row, second_col)</code> второго набора должна перейти в <code>(first_row, first_col)</code> первого, возможен ровно один сдвиг <code>(first_row - second_row, first_col - second_col)</code>. Например, в первом наборе отмечены <code>(1, 2)</code> и <code>(1, 3)</code>, а во втором — <code>(0, 0)</code> и <code>(0, 1)</code>. Сдвиг <code>(1, 2)</code> совмещает обе пары точек. Сдвиг <code>(1, 3)</code> совмещает только <code>(0, 0)</code> с <code>(1, 3)</code>.</p>
 <p>Вместо наложения целых карт каждая пара точек отдаёт один «голос» за свой сдвиг. Если точки внутри каждого набора различны, число голосов равно числу совпадений. <code>rotate_point</code> поворачивает точку, а <code>shift_votes</code> считает голоса уже при выбранном повороте.</p>
 <p><strong>C++17</strong></p>
 <pre><code class="language-cpp">#include &lt;map&gt;
 #include &lt;utility&gt;
 #include &lt;vector&gt;
 
-using Point = std::pair&lt;int, int&gt;;
+using std::map;
+using std::pair;
+using std::vector;
 
-Point rotate_point(int row, int col, int n) {
-    return {col, n - 1 - row};
+using Point = pair&lt;int, int&gt;;
+
+Point rotate_point(int row, int col, int side_length) {
+    return {col, side_length - 1 - row};
 }
 
-std::map&lt;Point, long long&gt; shift_votes(const std::vector&lt;Point&gt;&amp; first,
-                                      const std::vector&lt;Point&gt;&amp; second) {
-    std::map&lt;Point, long long&gt; votes;
-    for (auto [ar, ac] : first) {
-        for (auto [br, bc] : second) {
-            ++votes[{ar - br, ac - bc}];
+map&lt;Point, long long&gt; shift_votes(const vector&lt;Point&gt;&amp; first,
+                                      const vector&lt;Point&gt;&amp; second) {
+    map&lt;Point, long long&gt; votes;
+    for (auto [first_row, first_col] : first) {
+        for (auto [second_row, second_col] : second) {
+            ++votes[{first_row - second_row, first_col - second_col}];
         }
     }
     return votes;
@@ -222,13 +237,17 @@ def shift_votes(first, second):
 #include &lt;string&gt;
 #include &lt;vector&gt;
 
-std::vector&lt;std::vector&lt;std::size_t&gt;&gt;
-free_to_right(const std::vector&lt;std::string&gt;&amp; grid) {
-    std::vector&lt;std::vector&lt;std::size_t&gt;&gt; result;
+using std::size_t;
+using std::string;
+using std::vector;
+
+vector&lt;vector&lt;size_t&gt;&gt;
+free_to_right(const vector&lt;string&gt;&amp; grid) {
+    vector&lt;vector&lt;size_t&gt;&gt; result;
     for (const auto&amp; row : grid) {
-        std::vector&lt;std::size_t&gt; distances(row.size(), 0);
-        for (std::size_t next = row.size(); next &gt; 1; --next) {
-            const std::size_t col = next - 2;
+        vector&lt;size_t&gt; distances(row.size(), 0);
+        for (size_t next = row.size(); next &gt; 1; --next) {
+            const size_t col = next - 2;
             if (row[col] == &#39;.&#39; &amp;&amp; row[col + 1] == &#39;.&#39;) {
                 distances[col] = 1 + distances[col + 1];
             }

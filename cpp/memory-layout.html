@@ -2,7 +2,7 @@
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Как устроена память · Справочник ЦПМ</title><link rel="stylesheet" href="../style.css"></head><body><main class="reader"><nav class="reader-nav"><a href="../index.html">Оглавление</a><span> / </span><a href="../index.html#cpp">Язык C++</a><a class="jump" href="#practice">К опыту</a></nav><article><h1>Как устроена память</h1>
 <p>Мы уже умеем читать значение по имени. Теперь посмотрим, как найти его по <strong>адресу</strong>. Для этого удобно взять массив. Его элементы в C++ гарантированно лежат подряд.</p>
 <h2>От индекса к адресу</h2>
-<pre><code class="language-cpp">int a[3] = {10, 20, 30};
+<pre><code class="language-cpp">int values[3] = {10, 20, 30};
 </code></pre>
 <p>У каждого байта памяти есть адрес. Предположим, что массив начинается по адресу <code>0x1000</code>, а один <code>int</code> занимает четыре байта. Тогда весь массив займёт 12 байтов. Префикс <code>0x</code> означает шестнадцатеричную запись числа.</p>
 <table>
@@ -15,10 +15,10 @@
 </tr>
 </thead>
 <tbody><tr>
-<td>Имя в программе</td>
-<td><code>a[0]</code></td>
-<td><code>a[1]</code></td>
-<td><code>a[2]</code></td>
+<td>Элемент массива</td>
+<td><code>values[0]</code></td>
+<td><code>values[1]</code></td>
+<td><code>values[2]</code></td>
 </tr>
 <tr>
 <td>Значение</td>
@@ -43,40 +43,40 @@
 <p>Размер своего типа можно узнать через <code>sizeof(int)</code>. Он зависит от платформы. <code>sizeof(char)</code> всегда равен одному байту. Обычно в байте восемь битов. Точное число даёт <code>CHAR_BIT</code> из <code>&lt;climits&gt;</code>.</p>
 <h2>Как изменить элемент через указатель?</h2>
 <p><strong>Указатель</strong> хранит адрес. Оператор <code>&amp;</code> позволяет получить адрес объекта, а <code>*</code> перед именем указателя даёт доступ к объекту по этому адресу.</p>
-<pre><code class="language-cpp">int a[3] = {10, 20, 30};
-int* p = &amp;a[0];
-p = &amp;a[1];
-*p = 99;
+<pre><code class="language-cpp">int values[3] = {10, 20, 30};
+int* element_ptr = &amp;values[0];
+element_ptr = &amp;values[1];
+*element_ptr = 99;
 </code></pre>
 <table>
 <thead>
 <tr>
 <th>После строки</th>
-<th>Куда указывает <code>p</code></th>
+<th>Куда указывает <code>element_ptr</code></th>
 <th>Содержимое массива</th>
 </tr>
 </thead>
 <tbody><tr>
-<td><code>int* p = &amp;a[0];</code></td>
+<td><code>int* element_ptr = &amp;values[0];</code></td>
 <td>на первый элемент</td>
 <td>10, 20, 30</td>
 </tr>
 <tr>
-<td><code>p = &amp;a[1];</code></td>
+<td><code>element_ptr = &amp;values[1];</code></td>
 <td>на второй элемент</td>
 <td>10, 20, 30</td>
 </tr>
 <tr>
-<td><code>*p = 99;</code></td>
+<td><code>*element_ptr = 99;</code></td>
 <td>на второй элемент</td>
 <td>10, <strong>99</strong>, 30</td>
 </tr>
 </tbody></table>
 <p>Проследи последнюю запись по адресам из таблицы выше.</p>
-<pre><code class="language-text">p хранит 0x1004  ───→  a[1] по адресу 0x1004
-                       было 20, записали 99
+<pre><code class="language-text">element_ptr хранит 0x1004  ───→  values[1] по адресу 0x1004
+                                 было 20, записали 99
 </code></pre>
-<p>Если <code>int</code> занимает четыре восьмибитных байта, то запись в <code>*p</code> задаёт новое значение всех четырёх байтов элемента. На рисунке числа записаны в шестнадцатеричной системе. У 20 младший байт равен <code>14</code>, у 99 он равен <code>63</code>. Три старших байта и до, и после записи нулевые.</p>
+<p>Если <code>int</code> занимает четыре восьмибитных байта, то запись в <code>*element_ptr</code> задаёт новое значение всех четырёх байтов элемента. На рисунке числа записаны в шестнадцатеричной системе. У 20 младший байт равен <code>14</code>, у 99 он равен <code>63</code>. Три старших байта и до, и после записи нулевые.</p>
 <p><img src="../assets/cpp/store-word.svg" alt="На little-endian машине с четырёхбайтовым int байты по адресам 0x1004–0x1007 меняются с 14 00 00 00 на 63 00 00 00."></p>
 <div id="practice"><section class="experiment">
 <style>
@@ -100,13 +100,13 @@ p = &amp;a[1];
     @media(max-width:48rem){.memory-map{grid-template-columns:1fr}.word{max-width:100%}.bytes{margin:.45rem 0}.word button{min-height:2.5rem}}
   </style>
 <h3>Запись по адресу</h3>
-  <p>В массиве три числа. Указатель <code>p</code> хранит адрес одного из них. Выбери элемент, затем попробуй записать в него число через <code>*p</code>.</p>
+  <p>В массиве три числа. Указатель <code>element_ptr</code> хранит адрес одного из них. Выбери элемент, затем попробуй записать в него число через <code>*element_ptr</code>.</p>
   <section aria-labelledby="map-title">
     <h4 id="map-title">Массив в памяти</h4>
     <p>В этой модели <code>int</code> занимает четыре байта. Младший байт идёт первым. Под каждым байтом указан его адрес, оба записаны в шестнадцатеричной системе.</p>
     <div id="memory-map" class="memory-map"></div>
     <form id="write-form" class="write-controls">
-      <label for="new-value">Новое значение <code>*p</code><input id="new-value" type="number" step="1" min="-2147483648" max="2147483647" value="99" required></label>
+      <label for="new-value">Новое значение <code>*element_ptr</code><input id="new-value" type="number" step="1" min="-2147483648" max="2147483647" value="99" required></label>
       <button type="submit">Записать в память</button>
       <button id="reset" type="button">Сбросить</button>
     </form>
@@ -146,7 +146,7 @@ function bytesOf(value) {
 for (let index = 0; index < words.length; index++) {
   const card = document.createElement('div');
   card.className = 'word';
-  card.innerHTML = '<div class="word-head"><code>a[' + index + ']</code><span class="word-value"></span></div><div class="bytes"></div><button type="button"></button>';
+  card.innerHTML = '<div class="word-head"><code>values[' + index + ']</code><span class="word-value"></span></div><div class="bytes"></div><button type="button"></button>';
   const row = card.querySelector('.bytes');
   for (let offset = 0; offset < 4; offset++) {
     const cell = document.createElement('div');
@@ -158,8 +158,8 @@ for (let index = 0; index < words.length; index++) {
     const previous = pointer;
     pointer = index;
     render(words);
-    showCode(words, previous, 'p = &a[' + pointer + '];');
-    status.textContent = 'p хранит ' + address(index) + '. Значения и байты массива остались прежними.';
+    showCode(words, previous, 'element_ptr = &values[' + pointer + '];');
+    status.textContent = 'element_ptr хранит ' + address(index) + '. Значения и байты массива остались прежними.';
   });
   map.append(card);
 }
@@ -170,7 +170,7 @@ function render(before) {
     card.classList.toggle('selected', selected);
     card.querySelector('.word-value').textContent = 'Значение ' + words[index];
     const button = card.querySelector('button');
-    button.textContent = selected ? 'p указывает на a[' + index + ']' : 'Выбрать a[' + index + ']';
+    button.textContent = selected ? 'element_ptr указывает на values[' + index + ']' : 'Выбрать values[' + index + ']';
     button.setAttribute('aria-pressed', String(selected));
     const bytes = bytesOf(words[index]);
     const oldBytes = bytesOf(before[index]);
@@ -182,7 +182,7 @@ function render(before) {
 }
 
 function showCode(before, originalPointer, operation = '') {
-  code.textContent = 'int a[3] = {' + before.join(', ') + '};\nint* p = &a[' + originalPointer + '];';
+  code.textContent = 'int values[3] = {' + before.join(', ') + '};\nint* element_ptr = &values[' + originalPointer + '];';
   if (operation) code.textContent += '\n' + operation;
 }
 
@@ -193,7 +193,7 @@ document.querySelector('#write-form').addEventListener('submit', event => {
   const before = [...words];
   words[pointer] = value;
   render(before);
-  showCode(before, pointer, '*p = ' + value + ';');
+  showCode(before, pointer, '*element_ptr = ' + value + ';');
   const previous = bytesOf(before[pointer]);
   const differences = bytesOf(value).flatMap((byte, i) =>
     previous[i] === byte ? [] : [address(pointer, i) + ' (' + previous[i] + ' → ' + byte + ')']);
@@ -215,7 +215,7 @@ function reset() {
   valueInput.value = 99;
   render(words);
   showCode(words, pointer);
-  status.textContent = 'p хранит 0x1000. По этому адресу начинается число 10.';
+  status.textContent = 'element_ptr хранит 0x1000. По этому адресу начинается число 10.';
   taskStatus.textContent = '';
 }
 document.querySelector('#reset').addEventListener('click', reset);
@@ -230,8 +230,10 @@ reset();
 <p>Вызовы функций на обычной платформе используют <strong>стек</strong>. При каждом вызове появляется место для локальных данных и служебной информации. Часть значений компилятор может держать в регистрах. Для программиста важно время жизни объекта. Обычная локальная переменная существует с момента её создания до выхода из блока.</p>
 <pre><code class="language-cpp">#include &lt;vector&gt;
 
+using std::vector;
+
 void example() {
-    std::vector&lt;int&gt; values(1000, 0);
+    vector&lt;int&gt; values(1000, 0);
     values[0] = 7;
 }
 </code></pre>

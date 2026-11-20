@@ -81,10 +81,14 @@
 #include &lt;string&gt;
 #include &lt;vector&gt;
 
-std::vector&lt;std::string&gt; by_length(std::vector&lt;std::string&gt; words) {
-    std::sort(words.begin(), words.end(), [](const auto&amp; a, const auto&amp; b) {
-        if (a.size() != b.size()) return a.size() &lt; b.size();
-        return a &lt; b;
+using std::sort;
+using std::string;
+using std::vector;
+
+vector&lt;string&gt; by_length(vector&lt;string&gt; words) {
+    sort(words.begin(), words.end(), [](const auto&amp; left_word, const auto&amp; right_word) {
+        if (left_word.size() != right_word.size()) return left_word.size() &lt; right_word.size();
+        return left_word &lt; right_word;
     });
     return words;
 }

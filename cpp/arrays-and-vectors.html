@@ -68,12 +68,18 @@
 <h2>Таблица</h2>
 <p><code>std::vector&lt;std::vector&lt;int&gt;&gt;</code> хранит вектор строк. В записи <code>table[i][j]</code> первый индекс выбирает строку, второй выбирает элемент этой строки. Например, <code>std::vector&lt;std::vector&lt;int&gt;&gt; table(3, std::vector&lt;int&gt;(5, 0));</code> создаёт три строки по пять нулей. Отдельные строки в общем случае могут иметь разные длины, поэтому границу внутреннего цикла надо брать у текущей строки.</p>
 <p>Скопируем числа <code>2, 4, 6</code> в вектор и прибавим к каждому по единице. Первое из получившихся чисел запишем в таблицу.</p>
-<pre><code class="language-cpp">std::array&lt;int, 3&gt; fixed{2, 4, 6};
-std::vector&lt;int&gt; values(fixed.begin(), fixed.end());  // Копия диапазона.
+<pre><code class="language-cpp">#include &lt;array&gt;
+#include &lt;vector&gt;
+
+using std::array;
+using std::vector;
+
+array&lt;int, 3&gt; fixed{2, 4, 6};
+vector&lt;int&gt; values(fixed.begin(), fixed.end());  // Копия диапазона.
 for (int&amp; value : values) {
     ++value;  // Меняем элементы, а не временные копии.
 }
-std::vector&lt;std::vector&lt;int&gt;&gt; table(3, std::vector&lt;int&gt;(5, 0));
+vector&lt;vector&lt;int&gt;&gt; table(3, vector&lt;int&gt;(5, 0));
 table[1][4] = values[0];  // Во второй строке и пятом столбце теперь 3.
 </code></pre>
 <p>После цикла <code>values</code> содержит <code>3, 5, 7</code>. Запись <code>table[1][4]</code> выбирает вторую строку и пятый столбец. Если индексы приходят из входных данных, для каждого проверь обе границы. Индекс строки должен быть неотрицательным и меньше числа строк, индекс столбца — неотрицательным и меньше длины выбранной строки.</p>
@@ -139,6 +145,10 @@ table[1][4] = values[0];  // Во второй строке и пятом сто
 #include &lt;iostream&gt;
 #include &lt;vector&gt;
 
+using std::cout;
+using std::sort;
+using std::vector;
+
 bool odd_first(int left, int right) {
     bool left_is_odd = left % 2 != 0;
     bool right_is_odd = right % 2 != 0;
@@ -148,22 +158,22 @@ bool odd_first(int left, int right) {
     return left &lt; right;
 }
 
-bool by_middle(const std::vector&lt;int&gt;&amp; left, const std::vector&lt;int&gt;&amp; right) {
+bool by_middle(const vector&lt;int&gt;&amp; left, const vector&lt;int&gt;&amp; right) {
     return left[left.size() / 2] &lt; right[right.size() / 2];
 }
 
 int main() {
-    std::vector&lt;std::vector&lt;int&gt;&gt; table{{2, -1, 3, 0}, {4, -5, 1, -2}};
+    vector&lt;vector&lt;int&gt;&gt; table{{2, -1, 3, 0}, {4, -5, 1, -2}};
     for (auto&amp; row : table) {
-        std::sort(row.begin(), row.end(), odd_first);
+        sort(row.begin(), row.end(), odd_first);
     }
-    std::sort(table.begin(), table.end(), by_middle);
+    sort(table.begin(), table.end(), by_middle);
 
     for (const auto&amp; row : table) {
         for (int value : row) {
-            std::cout &lt;&lt; value &lt;&lt; &#39; &#39;;
+            cout &lt;&lt; value &lt;&lt; &#39; &#39;;
         }
-        std::cout &lt;&lt; &#39;\n&#39;;
+        cout &lt;&lt; &#39;\n&#39;;
     }
 }
 </code></pre>

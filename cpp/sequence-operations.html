@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Преобразование и редактирование последовательностей · Справочник ЦПМ</title><link rel="stylesheet" href="../style.css"></head><body><main class="reader"><nav class="reader-nav"><a href="../index.html">Оглавление</a><span> / </span><a href="../index.html#cpp">Язык C++</a><a class="jump" href="#practice">К опыту</a></nav><article><h1>Преобразование и редактирование последовательностей</h1>
-<p>Пусть в векторе стоят числа <code>10, 20, 30</code>. Чтобы поместить <code>99</code> между первым и вторым числами, нужно указать позицию <strong>перед</strong> <code>20</code>. В C++ эту позицию задаёт итератор <code>a.begin() + 1</code>.</p>
+<p>Пусть в векторе стоят числа <code>10, 20, 30</code>. Чтобы поместить <code>99</code> между первым и вторым числами, нужно указать позицию <strong>перед</strong> <code>20</code>. В C++ эту позицию задаёт итератор <code>values.begin() + 1</code>.</p>
 <h2>Вставка и удаление по позиции</h2>
-<p>Пусть <code>a</code> — вектор, а <code>pos</code> — допустимый итератор в нём.</p>
+<p>Пусть <code>values</code> — вектор, а <code>pos</code> — допустимый итератор в нём.</p>
 <table>
 <thead>
 <tr>
@@ -11,34 +11,38 @@
 </tr>
 </thead>
 <tbody><tr>
-<td><code>a.push_back(value)</code></td>
+<td><code>values.push_back(value)</code></td>
 <td>Дописывает значение в конец</td>
 </tr>
 <tr>
-<td><code>a.insert(pos, value)</code></td>
+<td><code>values.insert(pos, value)</code></td>
 <td>Вставляет значение перед позицией <code>pos</code></td>
 </tr>
 <tr>
-<td><code>a.insert(pos, count, value)</code></td>
+<td><code>values.insert(pos, count, value)</code></td>
 <td>Вставляет <code>count</code> копий</td>
 </tr>
 <tr>
-<td><code>a.insert(pos, b.begin(), b.end())</code></td>
+<td><code>values.insert(pos, b.begin(), b.end())</code></td>
 <td>Вставляет все элементы другого вектора <code>b</code></td>
 </tr>
 <tr>
-<td><code>a.erase(pos)</code></td>
+<td><code>values.erase(pos)</code></td>
 <td>Удаляет элемент в позиции <code>pos</code></td>
 </tr>
 <tr>
-<td><code>a.erase(first, last)</code></td>
+<td><code>values.erase(first, last)</code></td>
 <td>Удаляет полуинтервал <code>[first, last)</code></td>
 </tr>
 </tbody></table>
 <p>Вставка перед <code>end()</code> дописывает в конец. Сам <code>end()</code> нельзя удалить как элемент. Посмотрим, как меняются позиции при двух правках подряд.</p>
-<pre><code class="language-cpp">std::vector&lt;int&gt; a{10, 20, 30};
-a.insert(a.begin() + 1, 99);                // 10, 99, 20, 30
-a.erase(a.begin() + 1, a.begin() + 3);      // 10, 30
+<pre><code class="language-cpp">#include &lt;vector&gt;
+
+using std::vector;
+
+vector&lt;int&gt; values{10, 20, 30};
+values.insert(values.begin() + 1, 99);  // 10, 99, 20, 30
+values.erase(values.begin() + 1, values.begin() + 3);  // 10, 30
 </code></pre>
 <p>При удалении левая граница указывает на <code>99</code>, правая — на <code>30</code>. Элемент на правой границе сохраняется.</p>
 <p><strong>Почему вставка в середину требует работы.</strong> Представим, что в буфере вектора есть место для четвёртого числа. На рисунке точка обозначает запас места за последним элементом. Чтобы освободить вторую позицию, достаточно сдвинуть хвост на одну позицию вправо, начиная с конца. Если первым переписать 30 числом 20, прежнее значение 30 будет потеряно.</p>
@@ -79,7 +83,7 @@ a.erase(a.begin() + 1, a.begin() + 3);      // 10, 30
       const index = document.createElement('small'); index.textContent = 'слот ' + i;
       cell.append(index, x === null ? 'запас' : String(x)); cells.append(cell);
     });
-    get('[data-code]').textContent = 'a.insert(a.begin() + ' + pos + ', ' + value + ');';
+    get('[data-code]').textContent = 'values.insert(values.begin() + ' + pos + ', ' + value + ');';
     get('[data-step]').disabled = done;
     get('[data-step]').textContent = done ? 'Вставка завершена' : step === shifts ? 'Записать ' + value : 'Сдвинуть ' + buffer[initial.length - step - 1] + ' вправо';
     status.textContent = done ? 'Получился вектор [' + buffer.join(', ') + ']. Сдвигов: ' + shifts + '. Затем один раз записали ' + value + '.' :
@@ -97,28 +101,36 @@ a.erase(a.begin() + 1, a.begin() + 3);      // 10, 30
 
 <p>На уровне памяти это перенос содержимого соседних ячеек. Для простых типов библиотека может перемещать сразу блок байтов. Если свободной позиции за концом нет, вектор получает более вместительный буфер и размещает элементы уже в нём. <a href="../hardware/memory.html">Как размещаются данные</a>.</p>
 <p>При вставке в середину и удалении могут сдвигаться многие элементы. Если вектор перераспределил память, старые итераторы и ссылки на его элементы недействительны. При <code>erase</code> становятся недействительными итераторы и ссылки на удалённые и последующие позиции. Для учебных примеров безопасное правило простое: после изменения вектора вычисляй позиции заново.</p>
-<p>В цикле, который удаляет по итератору, продолжай с результата <code>it = a.erase(it)</code>, если ты удалил элемент, и делай <code>++it</code> только в ветке, где его сохранил. Для удаления многих элементов по условию эффективнее сделать один проход с <code>remove_if</code>.</p>
+<p>В цикле, который удаляет по итератору, продолжай с результата <code>it = values.erase(it)</code>, если ты удалил элемент, и делай <code>++it</code> только в ветке, где его сохранил. Для удаления многих элементов по условию эффективнее сделать один проход с <code>remove_if</code>.</p>
 <h2>Копирование и преобразование</h2>
 <p><code>std::copy</code> копирует исходный диапазон. <code>std::transform</code> вызывает функцию для каждого элемента и записывает результат. Алгоритмы сами не знают размер вектора назначения. Вызов <code>std::back_inserter(result)</code> из <code>&lt;iterator&gt;</code> создаёт итератор, запись в который вызывает <code>result.push_back(...)</code>.</p>
 <ul>
 <li><code>copy(..., result.begin())</code> требует, чтобы в <code>result</code> уже было достаточно элементов для записи.</li>
 <li><code>copy(..., std::back_inserter(result))</code> дописывает в существующий вектор.</li>
 <li><code>transform(..., std::back_inserter(result), f)</code> дописывает преобразованные значения.</li>
-<li>Конструктор <code>std::vector&lt;int&gt; part(a.begin(), a.begin() + 2);</code> сразу создаёт копию первых двух элементов, если они есть.</li>
+<li>Конструктор <code>std::vector&lt;int&gt; part(values.begin(), values.begin() + 2);</code> сразу создаёт копию первых двух элементов, если они есть.</li>
 </ul>
 <p>Если вызвать <code>copy</code> с <code>back_inserter</code>, а затем <code>transform</code> с тем же выходным вектором, преобразованные значения добавятся после уже скопированных.</p>
 <h2>Как удалить соседние повторы</h2>
 <p><code>std::unique</code> оставляет по одному элементу от каждой <strong>соседней</strong> группы равных. Для <code>{4, 4, 2, 4}</code> полезная часть станет <code>{4, 2, 4}</code>. Длина вектора остаётся прежней. Алгоритм возвращает новый конец полезной части. Поэтому обычно пишут:</p>
-<pre><code class="language-cpp">a.erase(std::unique(a.begin(), a.end()), a.end());
+<pre><code class="language-cpp">#include &lt;algorithm&gt;
+
+using std::unique;
+
+values.erase(unique(values.begin(), values.end()), values.end());
 </code></pre>
 <p>Если нужны все разные числа и изменение порядка допустимо, сначала отсортируй вектор: тогда равные числа окажутся рядом.</p>
 <h2>Как удалить элементы по условию</h2>
 <p>С <code>remove_if</code> похожий принцип. Алгоритм сдвигает вперёд элементы, которые надо сохранить, а хвост удаляет сам вектор:</p>
-<pre><code class="language-cpp">a.erase(std::remove_if(a.begin(), a.end(),
+<pre><code class="language-cpp">#include &lt;algorithm&gt;
+
+using std::remove_if;
+
+values.erase(remove_if(values.begin(), values.end(),
                        [](int value) { return value &lt; 0; }),
-        a.end());
+        values.end());
 </code></pre>
-<p>Чтобы убрать точное значение <code>x</code>, в таком же шаблоне используй <code>std::remove(a.begin(), a.end(), x)</code>. Начиная с <strong>C++20</strong>, для вектора можно написать <code>std::erase(a, x)</code> или <code>std::erase_if(a, pred)</code>. Это свободные функции, а <code>a.erase(pos)</code> — метод вектора. Для решения под C++17 используй два предыдущих шаблона.</p>
+<p>Чтобы убрать точное значение <code>x</code>, в таком же шаблоне используй <code>std::remove(values.begin(), values.end(), x)</code>. Начиная с <strong>C++20</strong>, для вектора можно написать <code>std::erase(values, x)</code> или <code>std::erase_if(values, pred)</code>. Это свободные функции, а <code>values.erase(pos)</code> — метод вектора. Для решения под C++17 используй два предыдущих шаблона.</p>
 <h2>Как сложить элементы</h2>
 <p><code>std::accumulate(first, last, initial)</code> из <code>&lt;numeric&gt;</code> последовательно прибавляет элементы к начальному значению. Тип начального значения задаёт тип суммы. Для суммы больших <code>int</code> пиши <code>0LL</code>, если сумма помещается в <code>long long</code>. Запись <code>long long sum = std::accumulate(..., 0);</code> сначала считает в <code>int</code>, и позднее преобразование не защищает от переполнения.</p>
 <h2>Преобразование измерений и сумма</h2>
@@ -129,22 +141,31 @@ a.erase(a.begin() + 1, a.begin() + 3);      // 10, 30
 #include &lt;numeric&gt;
 #include &lt;vector&gt;
 
+using std::accumulate;
+using std::back_inserter;
+using std::copy;
+using std::cout;
+using std::remove_if;
+using std::transform;
+using std::unique;
+using std::vector;
+
 int main() {
-    std::vector&lt;int&gt; values{2, 2, -5, 3, 3, 2};
-    values.erase(std::unique(values.begin(), values.end()), values.end());
-    values.erase(std::remove_if(values.begin(), values.end(),
+    vector&lt;int&gt; values{2, 2, -5, 3, 3, 2};
+    values.erase(unique(values.begin(), values.end()), values.end());
+    values.erase(remove_if(values.begin(), values.end(),
                                 [](int value) { return value &lt; 0; }),
                  values.end());
 
-    std::vector&lt;long long&gt; result;
-    std::copy(values.begin(), values.end(), std::back_inserter(result));
-    std::transform(values.begin(), values.end(), std::back_inserter(result),
+    vector&lt;long long&gt; result;
+    copy(values.begin(), values.end(), back_inserter(result));
+    transform(values.begin(), values.end(), back_inserter(result),
                    [](int value) { return 1LL * value * value; });
 
     for (long long value : result) {
-        std::cout &lt;&lt; value &lt;&lt; &#39; &#39;;
+        cout &lt;&lt; value &lt;&lt; &#39; &#39;;
     }
-    std::cout &lt;&lt; &#39;\n&#39; &lt;&lt; std::accumulate(result.begin(), result.end(), 0LL) &lt;&lt; &#39;\n&#39;;
+    cout &lt;&lt; &#39;\n&#39; &lt;&lt; accumulate(result.begin(), result.end(), 0LL) &lt;&lt; &#39;\n&#39;;
 }
 </code></pre>
 <table>

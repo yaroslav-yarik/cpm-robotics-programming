@@ -134,26 +134,34 @@
 #include &lt;iostream&gt;
 #include &lt;vector&gt;
 
+using std::all_of;
+using std::count_if;
+using std::cout;
+using std::find_if;
+using std::minmax_element;
+using std::replace_if;
+using std::vector;
+
 bool is_negative(int value) {
     return value &lt; 0;
 }
 
 int main() {
-    std::vector&lt;int&gt; readings{5, -3, 8, -1, 6};
-    auto first = std::find_if(readings.begin(), readings.end(), is_negative);
-    if (first != readings.end()) {
-        std::cout &lt;&lt; first - readings.begin() &lt;&lt; &#39; &#39; &lt;&lt; *first &lt;&lt; &#39;\n&#39;;
+    vector&lt;int&gt; readings{5, -3, 8, -1, 6};
+    auto first_negative = find_if(readings.begin(), readings.end(), is_negative);
+    if (first_negative != readings.end()) {
+        cout &lt;&lt; first_negative - readings.begin() &lt;&lt; &#39; &#39; &lt;&lt; *first_negative &lt;&lt; &#39;\n&#39;;
     }
 
-    std::cout &lt;&lt; std::count_if(readings.begin(), readings.end(), is_negative) &lt;&lt; &#39;\n&#39;;
+    cout &lt;&lt; count_if(readings.begin(), readings.end(), is_negative) &lt;&lt; &#39;\n&#39;;
 
     if (!readings.empty()) {
-        auto [smallest, largest] = std::minmax_element(readings.begin(), readings.end());
-        std::cout &lt;&lt; *smallest &lt;&lt; &#39; &#39; &lt;&lt; *largest &lt;&lt; &#39;\n&#39;;
+        auto [smallest, largest] = minmax_element(readings.begin(), readings.end());
+        cout &lt;&lt; *smallest &lt;&lt; &#39; &#39; &lt;&lt; *largest &lt;&lt; &#39;\n&#39;;
     }
 
-    std::replace_if(readings.begin(), readings.end(), is_negative, 0);
-    std::cout &lt;&lt; std::all_of(readings.begin(), readings.end(),
+    replace_if(readings.begin(), readings.end(), is_negative, 0);
+    cout &lt;&lt; all_of(readings.begin(), readings.end(),
                              [](int value) { return value &gt;= 0; }) &lt;&lt; &#39;\n&#39;;
 }
 </code></pre>
