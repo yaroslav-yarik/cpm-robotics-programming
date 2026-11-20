@@ -34,7 +34,7 @@
       const index = document.createElement('small'); index.textContent = 'слот ' + i;
       cell.append(index, x === null ? 'запас' : String(x)); cells.append(cell);
     });
-    get('[data-code]').textContent = 'a.insert(a.begin() + ' + pos + ', ' + value + ');';
+    get('[data-code]').textContent = 'values.insert(values.begin() + ' + pos + ', ' + value + ');';
     get('[data-step]').disabled = done;
     get('[data-step]').textContent = done ? 'Вставка завершена' : step === shifts ? 'Записать ' + value : 'Сдвинуть ' + buffer[initial.length - step - 1] + ' вправо';
     status.textContent = done ? 'Получился вектор [' + buffer.join(', ') + ']. Сдвигов: ' + shifts + '. Затем один раз записали ' + value + '.' :

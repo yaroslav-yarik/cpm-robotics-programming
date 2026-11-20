@@ -39,12 +39,16 @@
 #include &lt;tuple&gt;
 #include &lt;vector&gt;
 
-using Run = std::tuple&lt;std::size_t, std::size_t, int&gt;;
+using std::size_t;
+using std::tuple;
+using std::vector;
 
-std::vector&lt;Run&gt; runs(const std::vector&lt;int&gt;&amp; values) {
-    std::vector&lt;Run&gt; result;
-    std::size_t start = 0;
-    for (std::size_t end = 1; end &lt;= values.size(); ++end) {
+using Run = tuple&lt;size_t, size_t, int&gt;;
+
+vector&lt;Run&gt; runs(const vector&lt;int&gt;&amp; values) {
+    vector&lt;Run&gt; result;
+    size_t start = 0;
+    for (size_t end = 1; end &lt;= values.size(); ++end) {
         if (end == values.size() || values[end] != values[start]) {
             result.emplace_back(start, end, values[start]);
             start = end;
@@ -75,12 +79,15 @@ std::vector&lt;Run&gt; runs(const std::vector&lt;int&gt;&amp; values) {
 <pre><code class="language-cpp">#include &lt;cstddef&gt;
 #include &lt;vector&gt;
 
-std::vector&lt;int&gt; stable_levels(const std::vector&lt;int&gt;&amp; samples,
-                               std::size_t needed) {
+using std::size_t;
+using std::vector;
+
+vector&lt;int&gt; stable_levels(const vector&lt;int&gt;&amp; samples,
+                               size_t needed) {
     int confirmed = 0;
     int candidate = 0;
-    std::size_t length = 0;
-    std::vector&lt;int&gt; result;
+    size_t length = 0;
+    vector&lt;int&gt; result;
     for (int value : samples) {
         if (value != candidate) {
             candidate = value;
@@ -237,13 +244,18 @@ std::vector&lt;int&gt; stable_levels(const std::vector&lt;int&gt;&amp; samples,
 #include &lt;utility&gt;
 #include &lt;vector&gt;
 
-std::vector&lt;std::pair&lt;long long, std::size_t&gt;&gt;
-threshold_counts(std::vector&lt;long long&gt; ordered) {
-    std::sort(ordered.begin(), ordered.end());
-    std::vector&lt;std::pair&lt;long long, std::size_t&gt;&gt; result;
-    for (std::size_t i = 0; i &lt; ordered.size(); ++i) {
-        if (i == 0 || ordered[i] != ordered[i - 1]) {
-            result.emplace_back(ordered[i], ordered.size() - i);
+using std::pair;
+using std::size_t;
+using std::sort;
+using std::vector;
+
+vector&lt;pair&lt;long long, size_t&gt;&gt;
+threshold_counts(vector&lt;long long&gt; ordered) {
+    sort(ordered.begin(), ordered.end());
+    vector&lt;pair&lt;long long, size_t&gt;&gt; result;
+    for (size_t index = 0; index &lt; ordered.size(); ++index) {
+        if (index == 0 || ordered[index] != ordered[index - 1]) {
+            result.emplace_back(ordered[index], ordered.size() - index);
         }
     }
     if (!ordered.empty()) {

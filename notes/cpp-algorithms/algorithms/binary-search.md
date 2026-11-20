@@ -21,9 +21,9 @@
 
 | Проверяемый участок | Середина | Решение |
 |---|---|---|
-| `[0, 4)` | `a[2] = 3` | Тройка подходит. Ищем, есть ли подходящий элемент левее, `right = 2` |
-| `[0, 2)` | `a[1] = 3` | Так же передвигаем `right` на 1 |
-| `[0, 1)` | `a[0] = 1` | Единица мала. Переходим к `left = 1` |
+| `[0, 4)` | `values[2] = 3` | Тройка подходит. Ищем, есть ли подходящий элемент левее, `right = 2` |
+| `[0, 2)` | `values[1] = 3` | Так же передвигаем `right` на 1 |
+| `[0, 1)` | `values[0] = 1` | Единица мала. Переходим к `left = 1` |
 
 ![Поиск проверяет позиции 2, 1 и 0. Ответом становится индекс 1.](../assets/algorithms/binary-search.svg)
 
@@ -33,7 +33,7 @@
 
 Теперь `left == right == 1`. Это индекс первой тройки. Для верхней границы тройку считаем слишком маленькой и продолжаем поиск справа от неё.
 
-В C++ функция ниже с параметром `upper = true` ищет верхнюю границу. В Python показаны две отдельные функции. Обе границы находятся за `O(log n)` времени с `O(1)` дополнительной памяти.
+В C++ функция ниже с параметром `find_upper = true` ищет верхнюю границу. В Python показаны две отдельные функции. Обе границы находятся за `O(log n)` времени с `O(1)` дополнительной памяти.
 
 **C++17**
 
@@ -41,14 +41,17 @@
 #include <cstddef>
 #include <vector>
 
-using Int = long long;
-using Numbers = std::vector<Int>;
+using std::size_t;
+using std::vector;
 
-std::size_t first_boundary(const Numbers& a, Int target, bool upper = false) {
-    std::size_t left = 0, right = a.size();
+using Int = long long;
+using Numbers = vector<Int>;
+
+size_t first_boundary(const Numbers& values, Int target, bool find_upper = false) {
+    size_t left = 0, right = values.size();
     while (left < right) {
-        std::size_t middle = left + (right - left) / 2;
-        if (a[middle] < target || (upper && a[middle] == target)) {
+        size_t middle = left + (right - left) / 2;
+        if (values[middle] < target || (find_upper && values[middle] == target)) {
             left = middle + 1;
         } else {
             right = middle;
@@ -86,7 +89,7 @@ def upper_bound(a, target):
 
 </details>
 
-В стандартных библиотеках уже есть обе операции. В Python это `bisect_left` и `bisect_right` из модуля `bisect`. В C++ функции `std::lower_bound` и `std::upper_bound` возвращают итераторы. Чтобы получить индекс в векторе, вычти `a.begin()` из итератора. Для проверки наличия числа сначала убедись, что индекс меньше `n`, и только затем сравни элемент с искомым числом.
+В стандартных библиотеках уже есть обе операции. В Python это `bisect_left` и `bisect_right` из модуля `bisect`. В C++ функции `std::lower_bound` и `std::upper_bound` возвращают итераторы. Чтобы получить индекс в векторе, вычти `values.begin()` из итератора. Для проверки наличия числа сначала убедись, что индекс меньше `n`, и только затем сравни элемент с искомым числом.
 
 ## Как найти минимальную вместимость
 

@@ -14,18 +14,22 @@
 #include &lt;utility&gt;
 #include &lt;vector&gt;
 
-using Grid = std::vector&lt;std::string&gt;;
-using Cell = std::pair&lt;int, int&gt;;
+using std::pair;
+using std::string;
+using std::vector;
 
-std::vector&lt;Cell&gt; grid_neighbors(const Grid&amp; grid, Cell cell) {
-    std::vector&lt;Cell&gt; neighbors;
+using Grid = vector&lt;string&gt;;
+using Cell = pair&lt;int, int&gt;;
+
+vector&lt;Cell&gt; grid_neighbors(const Grid&amp; grid, Cell cell) {
+    vector&lt;Cell&gt; neighbors;
     const Cell shifts[] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-    for (auto [dr, dc] : shifts) {
+    for (auto [row_offset, col_offset] : shifts) {
         auto [row, col] = cell;
-        int r = row + dr, c = col + dc;
-        if (r &gt;= 0 &amp;&amp; r &lt; static_cast&lt;int&gt;(grid.size()) &amp;&amp;
-            c &gt;= 0 &amp;&amp; c &lt; static_cast&lt;int&gt;(grid[r].size()) &amp;&amp; grid[r][c] != &#39;#&#39;) {
-            neighbors.emplace_back(r, c);
+        int next_row = row + row_offset, next_col = col + col_offset;
+        if (next_row &gt;= 0 &amp;&amp; next_row &lt; static_cast&lt;int&gt;(grid.size()) &amp;&amp;
+            next_col &gt;= 0 &amp;&amp; next_col &lt; static_cast&lt;int&gt;(grid[next_row].size()) &amp;&amp; grid[next_row][next_col] != &#39;#&#39;) {
+            neighbors.emplace_back(next_row, next_col);
         }
     }
     return neighbors;
@@ -114,21 +118,24 @@ std::vector&lt;Cell&gt; grid_neighbors(const Grid&amp; grid, Cell cell) {
 <p><strong>C++17</strong></p>
 <pre><code class="language-cpp">#include &lt;queue&gt;
 
+using std::queue;
+using std::vector;
+
 int grid_bfs(const Grid&amp; grid, Cell start, Cell goal) {
-    std::vector&lt;std::vector&lt;int&gt;&gt; distance;
+    vector&lt;vector&lt;int&gt;&gt; distance;
     for (const auto&amp; row : grid) distance.emplace_back(row.size(), -1);
-    std::queue&lt;Cell&gt; queue;
-    queue.push(start);
+    queue&lt;Cell&gt; frontier;
+    frontier.push(start);
     distance[start.first][start.second] = 0;
-    while (!queue.empty()) {
-        auto cell = queue.front();
-        queue.pop();
+    while (!frontier.empty()) {
+        auto cell = frontier.front();
+        frontier.pop();
         int steps = distance[cell.first][cell.second];
         if (cell == goal) return steps;
         for (auto [row, col] : grid_neighbors(grid, cell)) {
             if (distance[row][col] == -1) {
                 distance[row][col] = steps + 1;
-                queue.emplace(row, col);
+                frontier.emplace(row, col);
             }
         }
     }
@@ -162,19 +169,21 @@ def grid_bfs(grid, start, goal):
 <p>Функция <code>grid_dfs_size</code> тоже использует <code>grid_neighbors</code>. При добавлении клетки помечаем её как посещённую. Когда стек опустеет, каждая достижимая клетка будет учтена ровно один раз. В примере таких клеток семь, включая старт и финиш. При нескольких маршрутах порядок первого посещения в этом обходе может дать длинный путь.</p>
 <p>Оба обхода проверяют не более четырёх соседей каждой обработанной клетки. Для прямоугольной карты высоты <code>h</code> и ширины <code>w</code> время и память составляют <code>O(hw)</code>. Для словарей и множеств Python здесь учтена средняя стоимость обращения.</p>
 <p><strong>C++17</strong></p>
-<pre><code class="language-cpp">int grid_dfs_size(const Grid&amp; grid, Cell start) {
-    std::vector&lt;std::vector&lt;bool&gt;&gt; seen;
-    for (const auto&amp; row : grid) seen.emplace_back(row.size(), false);
-    std::vector&lt;Cell&gt; stack{start};
-    seen[start.first][start.second] = true;
+<pre><code class="language-cpp">using std::vector;
+
+int grid_dfs_size(const Grid&amp; grid, Cell start) {
+    vector&lt;vector&lt;bool&gt;&gt; visited;
+    for (const auto&amp; row : grid) visited.emplace_back(row.size(), false);
+    vector&lt;Cell&gt; stack{start};
+    visited[start.first][start.second] = true;
     int count = 0;
     while (!stack.empty()) {
         auto cell = stack.back();
         stack.pop_back();
         ++count;
         for (auto [row, col] : grid_neighbors(grid, cell)) {
-            if (!seen[row][col]) {
-                seen[row][col] = true;
+            if (!visited[row][col]) {
+                visited[row][col] = true;
                 stack.emplace_back(row, col);
             }
         }

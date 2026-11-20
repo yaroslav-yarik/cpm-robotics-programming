@@ -1,5 +1,5 @@
 <section class="experiment" id="lab-strings">
-  <h3>Что лежит в s[i]?</h3>
+  <h3>Что лежит в text[i]?</h3>
   <p>Введи короткий текст, затем выбери любой байт. Для кириллицы и эмодзи сравни индекс байта с порядковым номером кодовой точки Unicode.</p>
   <div class="lab-controls"><label>Текст в UTF-8 <input type="text" data-text value="Я!" maxlength="24"></label></div>
   <div class="lab-cells" data-bytes aria-label="Байты строки"></div><pre><code data-code></code></pre>
@@ -34,7 +34,7 @@
             item.classList.toggle('active', item === button);
             item.setAttribute('aria-pressed', String(item === button));
           });
-          get('[data-code]').textContent = 's.size() = ' + encoder.encode(text).length + '  ·  static_cast<unsigned char>(s[' + index + ']) = 0x' + hex;
+          get('[data-code]').textContent = 'text.size() = ' + encoder.encode(text).length + '  ·  static_cast<unsigned char>(text[' + index + ']) = 0x' + hex;
           const codePoint = character.codePointAt(0).toString(16).toUpperCase().padStart(4, '0');
           status.textContent = 'Символ «' + character + '» (U+' + codePoint + ') занимает ' + bytes.length + ' байт. Здесь выбран байт ' + (within + 1) + ' из ' + bytes.length + '. Кодовых точек в строке: ' + Array.from(text).length + '.';
         };
@@ -45,7 +45,7 @@
     }
     if (firstButton) firstButton.onclick();
     else {
-      get('[data-code]').textContent = 's.size() = 0';
+      get('[data-code]').textContent = 'text.size() = 0';
       status.textContent = 'Строка пуста. Байт текста выбрать пока нельзя.';
     }
   }

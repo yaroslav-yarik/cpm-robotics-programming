@@ -28,12 +28,16 @@
 #include <tuple>
 #include <vector>
 
-using Run = std::tuple<std::size_t, std::size_t, int>;
+using std::size_t;
+using std::tuple;
+using std::vector;
 
-std::vector<Run> runs(const std::vector<int>& values) {
-    std::vector<Run> result;
-    std::size_t start = 0;
-    for (std::size_t end = 1; end <= values.size(); ++end) {
+using Run = tuple<size_t, size_t, int>;
+
+vector<Run> runs(const vector<int>& values) {
+    vector<Run> result;
+    size_t start = 0;
+    for (size_t end = 1; end <= values.size(); ++end) {
         if (end == values.size() || values[end] != values[start]) {
             result.emplace_back(start, end, values[start]);
             start = end;
@@ -73,12 +77,15 @@ def runs(values):
 #include <cstddef>
 #include <vector>
 
-std::vector<int> stable_levels(const std::vector<int>& samples,
-                               std::size_t needed) {
+using std::size_t;
+using std::vector;
+
+vector<int> stable_levels(const vector<int>& samples,
+                               size_t needed) {
     int confirmed = 0;
     int candidate = 0;
-    std::size_t length = 0;
-    std::vector<int> result;
+    size_t length = 0;
+    vector<int> result;
     for (int value : samples) {
         if (value != candidate) {
             candidate = value;
@@ -153,13 +160,18 @@ def stable_levels(samples, needed):
 #include <utility>
 #include <vector>
 
-std::vector<std::pair<long long, std::size_t>>
-threshold_counts(std::vector<long long> ordered) {
-    std::sort(ordered.begin(), ordered.end());
-    std::vector<std::pair<long long, std::size_t>> result;
-    for (std::size_t i = 0; i < ordered.size(); ++i) {
-        if (i == 0 || ordered[i] != ordered[i - 1]) {
-            result.emplace_back(ordered[i], ordered.size() - i);
+using std::pair;
+using std::size_t;
+using std::sort;
+using std::vector;
+
+vector<pair<long long, size_t>>
+threshold_counts(vector<long long> ordered) {
+    sort(ordered.begin(), ordered.end());
+    vector<pair<long long, size_t>> result;
+    for (size_t index = 0; index < ordered.size(); ++index) {
+        if (index == 0 || ordered[index] != ordered[index - 1]) {
+            result.emplace_back(ordered[index], ordered.size() - index);
         }
     }
     if (!ordered.empty()) {

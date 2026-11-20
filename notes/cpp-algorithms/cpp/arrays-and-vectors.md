@@ -54,12 +54,18 @@
 Скопируем числа `2, 4, 6` в вектор и прибавим к каждому по единице. Первое из получившихся чисел запишем в таблицу.
 
 ```cpp
-std::array<int, 3> fixed{2, 4, 6};
-std::vector<int> values(fixed.begin(), fixed.end());  // Копия диапазона.
+#include <array>
+#include <vector>
+
+using std::array;
+using std::vector;
+
+array<int, 3> fixed{2, 4, 6};
+vector<int> values(fixed.begin(), fixed.end());  // Копия диапазона.
 for (int& value : values) {
     ++value;  // Меняем элементы, а не временные копии.
 }
-std::vector<std::vector<int>> table(3, std::vector<int>(5, 0));
+vector<vector<int>> table(3, vector<int>(5, 0));
 table[1][4] = values[0];  // Во второй строке и пятом столбце теперь 3.
 ```
 
@@ -86,6 +92,10 @@ table[1][4] = values[0];  // Во второй строке и пятом сто
 #include <iostream>
 #include <vector>
 
+using std::cout;
+using std::sort;
+using std::vector;
+
 bool odd_first(int left, int right) {
     bool left_is_odd = left % 2 != 0;
     bool right_is_odd = right % 2 != 0;
@@ -95,22 +105,22 @@ bool odd_first(int left, int right) {
     return left < right;
 }
 
-bool by_middle(const std::vector<int>& left, const std::vector<int>& right) {
+bool by_middle(const vector<int>& left, const vector<int>& right) {
     return left[left.size() / 2] < right[right.size() / 2];
 }
 
 int main() {
-    std::vector<std::vector<int>> table{{2, -1, 3, 0}, {4, -5, 1, -2}};
+    vector<vector<int>> table{{2, -1, 3, 0}, {4, -5, 1, -2}};
     for (auto& row : table) {
-        std::sort(row.begin(), row.end(), odd_first);
+        sort(row.begin(), row.end(), odd_first);
     }
-    std::sort(table.begin(), table.end(), by_middle);
+    sort(table.begin(), table.end(), by_middle);
 
     for (const auto& row : table) {
         for (int value : row) {
-            std::cout << value << ' ';
+            cout << value << ' ';
         }
-        std::cout << '\n';
+        cout << '\n';
     }
 }
 ```

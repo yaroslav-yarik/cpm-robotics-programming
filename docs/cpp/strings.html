@@ -23,24 +23,38 @@
 </tbody></table>
 <h2>Создание и ввод строки</h2>
 <p>Для <code>std::string</code> нужен заголовок <code>&lt;string&gt;</code>. Одинарные кавычки обозначают символ: <code>&#39;a&#39;</code>. Двойные — строковый литерал: <code>&quot;abc&quot;</code>.</p>
-<pre><code class="language-cpp">std::string word = &quot;robot&quot;;
-std::string line;
-std::cin &gt;&gt; word;                // Одно слово до пробела.
-std::getline(std::cin, line);     // Остаток текущей строки.
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+using std::cin;
+using std::getline;
+using std::string;
+
+string word = &quot;robot&quot;;
+string line;
+cin &gt;&gt; word;                // Одно слово до пробела.
+getline(cin, line);     // Остаток текущей строки.
 </code></pre>
 <p>Если ввести <code>blue sky</code>, то <code>word</code> получит <code>&quot;blue&quot;</code>, а <code>line</code> — <code>&quot; sky&quot;</code> с пробелом в начале. Если сразу после слова нажать Enter, <code>line</code> будет пустой.</p>
 <p>После <code>std::cin &gt;&gt; number</code> символ конца строки остаётся во входном потоке. Если нужно читать <strong>следующую</strong> строку, сначала убери остаток текущей. Например, если число стоит отдельно на своей строке:</p>
 <pre><code class="language-cpp">// Заголовки &lt;iostream&gt;, &lt;limits&gt; и &lt;string&gt;.
+
+using std::cin;
+using std::getline;
+using std::numeric_limits;
+using std::streamsize;
+using std::string;
+
 int number;
-std::string line;
-if (std::cin &gt;&gt; number) {
-    std::cin.ignore(std::numeric_limits&lt;std::streamsize&gt;::max(), &#39;\n&#39;);
-    std::getline(std::cin, line);
+string line;
+if (cin &gt;&gt; number) {
+    cin.ignore(numeric_limits&lt;streamsize&gt;::max(), &#39;\n&#39;);
+    getline(cin, line);
 }
 </code></pre>
 <p>Такой вариант сохраняет начальные пробелы и пустую следующую строку. Если остаток строки после числа тоже нужен, не отбрасывай его.</p>
 <h2>Чтение и изменение символов</h2>
-<p>Разберём операции на строке <code>s = &quot;robot&quot;</code>. Каждая строка таблицы начинается с этого исходного значения.</p>
+<p>Разберём операции на строке <code>text = &quot;robot&quot;</code>. Каждая строка таблицы начинается с этого исходного значения.</p>
 <table>
 <thead>
 <tr>
@@ -49,56 +63,56 @@ if (std::cin &gt;&gt; number) {
 </tr>
 </thead>
 <tbody><tr>
-<td><code>s.size()</code></td>
+<td><code>text.size()</code></td>
 <td>5</td>
 </tr>
 <tr>
-<td><code>s[0]</code></td>
+<td><code>text[0]</code></td>
 <td>Символ <code>&#39;r&#39;</code></td>
 </tr>
 <tr>
-<td><code>s.at(1) = &#39;u&#39;;</code></td>
+<td><code>text.at(1) = &#39;u&#39;;</code></td>
 <td><code>&quot;rubot&quot;</code></td>
 </tr>
 <tr>
-<td><code>s + &quot; arm&quot;</code></td>
-<td>Строка <code>&quot;robot arm&quot;</code>. Сама <code>s</code> сохраняет своё значение</td>
+<td><code>text + &quot; arm&quot;</code></td>
+<td>Строка <code>&quot;robot arm&quot;</code>. Сама <code>text</code> сохраняет своё значение</td>
 </tr>
 <tr>
-<td><code>s.append(&quot; arm&quot;);</code></td>
-<td><code>s</code> становится <code>&quot;robot arm&quot;</code></td>
+<td><code>text.append(&quot; arm&quot;);</code></td>
+<td><code>text</code> становится <code>&quot;robot arm&quot;</code></td>
 </tr>
 <tr>
-<td><code>s.push_back(&#39;!&#39;);</code></td>
+<td><code>text.push_back(&#39;!&#39;);</code></td>
 <td><code>&quot;robot!&quot;</code></td>
 </tr>
 <tr>
-<td><code>s.pop_back();</code></td>
+<td><code>text.pop_back();</code></td>
 <td><code>&quot;robo&quot;</code></td>
 </tr>
 <tr>
-<td><code>s.substr(1, 3)</code></td>
+<td><code>text.substr(1, 3)</code></td>
 <td>Копия участка <code>&quot;obo&quot;</code></td>
 </tr>
 <tr>
-<td><code>s.insert(2, &quot;X&quot;);</code></td>
+<td><code>text.insert(2, &quot;X&quot;);</code></td>
 <td><code>&quot;roXbot&quot;</code></td>
 </tr>
 <tr>
-<td><code>s.erase(1, 2);</code></td>
+<td><code>text.erase(1, 2);</code></td>
 <td><code>&quot;rot&quot;</code></td>
 </tr>
 <tr>
-<td><code>s.replace(1, 2, &quot;AA&quot;);</code></td>
+<td><code>text.replace(1, 2, &quot;AA&quot;);</code></td>
 <td><code>&quot;rAAot&quot;</code></td>
 </tr>
 </tbody></table>
-<p>В <code>substr(pos, count)</code>, <code>erase(pos, count)</code> и <code>replace(pos, count, text)</code> второй аргумент — число символов. Если нужна подстрока с индексами от <code>left</code> до <code>right</code> включительно, количество символов равно <code>right - left + 1</code>. Обращайся к символам только при индексе меньше <code>s.size()</code>, а <code>pop_back()</code> вызывай для непустой строки. После правок строки проще получить итераторы заново.</p>
+<p>В <code>substr(match_index, count)</code>, <code>erase(match_index, count)</code> и <code>replace(match_index, count, replacement)</code> второй аргумент — число символов. Если нужна подстрока с индексами от <code>left</code> до <code>right</code> включительно, количество символов равно <code>right - left + 1</code>. Обращайся к символам только при индексе меньше <code>text.size()</code>, а <code>pop_back()</code> вызывай для непустой строки. После правок строки проще получить итераторы заново.</p>
 <p>У обычной <code>std::string</code> индекс обозначает элемент типа <code>char</code>. Для ASCII-строки это отдельный символ. В UTF-8 одна русская буква может занимать несколько элементов, поэтому посимвольные примеры здесь используют ASCII.</p>
-<p><strong>Что именно читает процессор.</strong> Возьмём строку <code>u8&quot;Я!&quot;</code> в C++17 на компьютере с восьмибитным байтом. Текст содержит два символа, а <code>std::string s = u8&quot;Я!&quot;;</code> сохраняет три байта текста. Буква «Я» записана двумя байтами UTF-8, затем идёт байт восклицательного знака. В схеме значения байтов указаны в шестнадцатеричной системе.</p>
+<p><strong>Что именно читает процессор.</strong> Возьмём строку <code>u8&quot;Я!&quot;</code> в C++17 на компьютере с восьмибитным байтом. Текст содержит два символа, а <code>std::string text = u8&quot;Я!&quot;;</code> сохраняет три байта текста. Буква «Я» записана двумя байтами UTF-8, затем идёт байт восклицательного знака. В схеме значения байтов указаны в шестнадцатеричной системе.</p>
 <p><img src="../assets/cpp/utf8-bytes.svg" alt="В UTF-8 буква Я занимает D0 AF, а восклицательный знак начинается с индекса 2."></p>
 <div id="practice"><section class="experiment" id="lab-strings">
-  <h3>Что лежит в s[i]?</h3>
+  <h3>Что лежит в text[i]?</h3>
   <p>Введи короткий текст, затем выбери любой байт. Для кириллицы и эмодзи сравни индекс байта с порядковым номером кодовой точки Unicode.</p>
   <div class="lab-controls"><label>Текст в UTF-8 <input type="text" data-text value="Я!" maxlength="24"></label></div>
   <div class="lab-cells" data-bytes aria-label="Байты строки"></div><pre><code data-code></code></pre>
@@ -133,7 +147,7 @@ if (std::cin &gt;&gt; number) {
             item.classList.toggle('active', item === button);
             item.setAttribute('aria-pressed', String(item === button));
           });
-          get('[data-code]').textContent = 's.size() = ' + encoder.encode(text).length + '  ·  static_cast<unsigned char>(s[' + index + ']) = 0x' + hex;
+          get('[data-code]').textContent = 'text.size() = ' + encoder.encode(text).length + '  ·  static_cast<unsigned char>(text[' + index + ']) = 0x' + hex;
           const codePoint = character.codePointAt(0).toString(16).toUpperCase().padStart(4, '0');
           status.textContent = 'Символ «' + character + '» (U+' + codePoint + ') занимает ' + bytes.length + ' байт. Здесь выбран байт ' + (within + 1) + ' из ' + bytes.length + '. Кодовых точек в строке: ' + Array.from(text).length + '.';
         };
@@ -144,7 +158,7 @@ if (std::cin &gt;&gt; number) {
     }
     if (firstButton) firstButton.onclick();
     else {
-      get('[data-code]').textContent = 's.size() = 0';
+      get('[data-code]').textContent = 'text.size() = 0';
       status.textContent = 'Строка пуста. Байт текста выбрать пока нельзя.';
     }
   }
@@ -155,37 +169,48 @@ if (std::cin &gt;&gt; number) {
 </section>
 </div>
 
-<p>Команда чтения <code>s[1]</code> обращается ко второму байту буквы «Я». Чтобы найти начало следующего символа, программе нужно учесть правила UTF-8. При чтении байта процессор сам буквы не распознаёт.</p>
+<p>Команда чтения <code>text[1]</code> обращается ко второму байту буквы «Я». Чтобы найти начало следующего символа, программе нужно учесть правила UTF-8. При чтении байта процессор сам буквы не распознаёт.</p>
 <h2>Поиск подстроки</h2>
-<p><code>s.find(&quot;ab&quot;)</code> возвращает индекс начала первого совпадения. <code>s.rfind(&quot;ab&quot;)</code> при вызове без начальной позиции ищет последнее совпадение. Если соответствующего участка нет, возвращается <code>std::string::npos</code>.</p>
-<pre><code class="language-cpp">auto pos = s.find(&quot;ab&quot;, 2);  // Искать начиная с индекса 2.
-if (pos != std::string::npos) {
-    std::cout &lt;&lt; pos &lt;&lt; &#39;\n&#39;;
+<p><code>text.find(&quot;ab&quot;)</code> возвращает индекс начала первого совпадения. <code>text.rfind(&quot;ab&quot;)</code> при вызове без начальной позиции ищет последнее совпадение. Если соответствующего участка нет, возвращается <code>std::string::npos</code>.</p>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+using std::cout;
+using std::string;
+
+auto match_index = text.find(&quot;ab&quot;, 2);  // Искать начиная с индекса 2.
+if (match_index != string::npos) {
+    cout &lt;&lt; match_index &lt;&lt; &#39;\n&#39;;
 }
 </code></pre>
 <p>Используй <code>auto</code> или <code>std::string::size_type</code> для позиции и сравнивай с <code>npos</code> до обращения к строке. В двухаргументном вызове второй аргумент — начальная позиция поиска.</p>
-<p>В перегрузке с символьным массивом <code>s.find(&quot;abcd&quot;, 1, 2)</code> поиск стартует с индекса 1, а третий аргумент говорит взять первые два символа <strong>образца</strong>. То есть здесь ищем <code>&quot;ab&quot;</code>.</p>
+<p>В перегрузке с символьным массивом <code>text.find(&quot;abcd&quot;, 1, 2)</code> поиск стартует с индекса 1, а третий аргумент говорит взять первые два символа <strong>образца</strong>. То есть здесь ищем <code>&quot;ab&quot;</code>.</p>
 <h3>Число и его десятичная запись</h3>
 <p><code>std::to_string(42)</code> возвращает <code>&quot;42&quot;</code>. <code>std::stoi(&quot;42&quot;)</code> возвращает целое 42. <code>stoi</code> умеет прочитать начальную числовую часть: для <code>&quot;42cm&quot;</code> результат тоже будет 42. Если нужен контроль, передай адрес переменной <code>std::size_t used</code> вторым аргументом и проверь, что <code>used == text.size()</code> для непустой входной строки. При отсутствии читаемого числа или выходе за границы <code>int</code> функция выбрасывает исключение.</p>
 <h3>Сортировка</h3>
-<p>По итераторам строки работают <code>sort</code>, <code>count</code>, <code>find</code>, <code>reverse</code> и другие знакомые алгоритмы. <code>std::sort(s.begin(), s.end())</code> сортирует символы внутри строки, а <code>std::sort(words.begin(), words.end())</code> для вектора строк сортирует целые строки лексикографически. При одинаковом начале более короткая строка идёт раньше.</p>
+<p>По итераторам строки работают <code>sort</code>, <code>count</code>, <code>find</code>, <code>reverse</code> и другие знакомые алгоритмы. <code>std::sort(text.begin(), text.end())</code> сортирует символы внутри строки, а <code>std::sort(words.begin(), words.end())</code> для вектора строк сортирует целые строки лексикографически. При одинаковом начале более короткая строка идёт раньше.</p>
 <h2>Замена и сортировка символов</h2>
 <pre><code class="language-cpp">#include &lt;algorithm&gt;
 #include &lt;iostream&gt;
 #include &lt;string&gt;
 
+using std::count;
+using std::cout;
+using std::sort;
+using std::string;
+
 int main() {
-    std::string route = &quot;BABA&quot;;
-    auto first = route.find(&quot;BA&quot;);
-    auto last = route.rfind(&quot;BA&quot;);
-    if (first == std::string::npos || last == std::string::npos) {
+    string route = &quot;BABA&quot;;
+    auto first_match = route.find(&quot;BA&quot;);
+    auto last_match = route.rfind(&quot;BA&quot;);
+    if (first_match == string::npos || last_match == string::npos) {
         return 1;
     }
-    std::cout &lt;&lt; first &lt;&lt; &#39; &#39; &lt;&lt; last &lt;&lt; &#39;\n&#39;;
-    route.replace(last, 2, &quot;AZ&quot;);
-    std::sort(route.begin(), route.end());
-    std::cout &lt;&lt; route &lt;&lt; &#39;\n&#39;;
-    std::cout &lt;&lt; std::count(route.begin(), route.end(), &#39;A&#39;) &lt;&lt; &#39;\n&#39;;
+    cout &lt;&lt; first_match &lt;&lt; &#39; &#39; &lt;&lt; last_match &lt;&lt; &#39;\n&#39;;
+    route.replace(last_match, 2, &quot;AZ&quot;);
+    sort(route.begin(), route.end());
+    cout &lt;&lt; route &lt;&lt; &#39;\n&#39;;
+    cout &lt;&lt; count(route.begin(), route.end(), &#39;A&#39;) &lt;&lt; &#39;\n&#39;;
 }
 </code></pre>
 <p>У <code>BABA</code> два вхождения <code>BA</code>, в позициях 0 и 2. Замена второго на <code>AZ</code> даёт <code>BAAZ</code>. После сортировки буквы стоят в порядке <code>AABZ</code>, из них две — <code>A</code>.</p>

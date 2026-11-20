@@ -92,17 +92,20 @@
 <pre><code class="language-cpp">#include &lt;unordered_map&gt;
 #include &lt;vector&gt;
 
-using Int = long long;
-using Numbers = std::vector&lt;Int&gt;;
+using std::unordered_map;
+using std::vector;
 
-Int equal_pairs(const Numbers&amp; a) {
-    std::unordered_map&lt;Int, Int&gt; seen;
-    Int result = 0;
-    for (Int value : a) {
-        result += seen[value];
+using Int = long long;
+using Numbers = vector&lt;Int&gt;;
+
+Int equal_pairs(const Numbers&amp; values) {
+    unordered_map&lt;Int, Int&gt; seen;
+    Int pair_count = 0;
+    for (Int value : values) {
+        pair_count += seen[value];
         ++seen[value];
     }
-    return result;
+    return pair_count;
 }
 </code></pre>
 <details>

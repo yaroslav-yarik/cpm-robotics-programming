@@ -27,18 +27,22 @@
 #include <utility>
 #include <vector>
 
-using Grid = std::vector<std::string>;
-using Cell = std::pair<int, int>;
+using std::pair;
+using std::string;
+using std::vector;
 
-std::vector<Cell> grid_neighbors(const Grid& grid, Cell cell) {
-    std::vector<Cell> neighbors;
+using Grid = vector<string>;
+using Cell = pair<int, int>;
+
+vector<Cell> grid_neighbors(const Grid& grid, Cell cell) {
+    vector<Cell> neighbors;
     const Cell shifts[] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-    for (auto [dr, dc] : shifts) {
+    for (auto [row_offset, col_offset] : shifts) {
         auto [row, col] = cell;
-        int r = row + dr, c = col + dc;
-        if (r >= 0 && r < static_cast<int>(grid.size()) &&
-            c >= 0 && c < static_cast<int>(grid[r].size()) && grid[r][c] != '#') {
-            neighbors.emplace_back(r, c);
+        int next_row = row + row_offset, next_col = col + col_offset;
+        if (next_row >= 0 && next_row < static_cast<int>(grid.size()) &&
+            next_col >= 0 && next_col < static_cast<int>(grid[next_row].size()) && grid[next_row][next_col] != '#') {
+            neighbors.emplace_back(next_row, next_col);
         }
     }
     return neighbors;
@@ -85,21 +89,24 @@ def grid_neighbors(grid, row, col):
 ```cpp
 #include <queue>
 
+using std::queue;
+using std::vector;
+
 int grid_bfs(const Grid& grid, Cell start, Cell goal) {
-    std::vector<std::vector<int>> distance;
+    vector<vector<int>> distance;
     for (const auto& row : grid) distance.emplace_back(row.size(), -1);
-    std::queue<Cell> queue;
-    queue.push(start);
+    queue<Cell> frontier;
+    frontier.push(start);
     distance[start.first][start.second] = 0;
-    while (!queue.empty()) {
-        auto cell = queue.front();
-        queue.pop();
+    while (!frontier.empty()) {
+        auto cell = frontier.front();
+        frontier.pop();
         int steps = distance[cell.first][cell.second];
         if (cell == goal) return steps;
         for (auto [row, col] : grid_neighbors(grid, cell)) {
             if (distance[row][col] == -1) {
                 distance[row][col] = steps + 1;
-                queue.emplace(row, col);
+                frontier.emplace(row, col);
             }
         }
     }
@@ -142,19 +149,21 @@ def grid_bfs(grid, start, goal):
 **C++17**
 
 ```cpp
+using std::vector;
+
 int grid_dfs_size(const Grid& grid, Cell start) {
-    std::vector<std::vector<bool>> seen;
-    for (const auto& row : grid) seen.emplace_back(row.size(), false);
-    std::vector<Cell> stack{start};
-    seen[start.first][start.second] = true;
+    vector<vector<bool>> visited;
+    for (const auto& row : grid) visited.emplace_back(row.size(), false);
+    vector<Cell> stack{start};
+    visited[start.first][start.second] = true;
     int count = 0;
     while (!stack.empty()) {
         auto cell = stack.back();
         stack.pop_back();
         ++count;
         for (auto [row, col] : grid_neighbors(grid, cell)) {
-            if (!seen[row][col]) {
-                seen[row][col] = true;
+            if (!visited[row][col]) {
+                visited[row][col] = true;
                 stack.emplace_back(row, col);
             }
         }

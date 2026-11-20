@@ -34,11 +34,13 @@
 ```cpp
 #include <utility>
 
-std::pair<long long, long long> move(long long row, long long col,
+using std::pair;
+
+pair<long long, long long> move(long long row, long long col,
                                      int direction, long long steps) {
-    const int dr[] = {-1, 0, 1, 0};
-    const int dc[] = {0, 1, 0, -1};
-    return {row + steps * dr[direction], col + steps * dc[direction]};
+    const int row_offsets[] = {-1, 0, 1, 0};
+    const int col_offsets[] = {0, 1, 0, -1};
+    return {row + steps * row_offsets[direction], col + steps * col_offsets[direction]};
 }
 ```
 
@@ -76,16 +78,22 @@ def move(row, col, direction, steps):
 #include <utility>
 #include <vector>
 
-std::array<int, 4> bounding_box(const std::vector<std::pair<int, int>>& cells) {
+using std::array;
+using std::max;
+using std::min;
+using std::pair;
+using std::vector;
+
+array<int, 4> bounding_box(const vector<pair<int, int>>& cells) {
     int top = cells.front().first;
     int bottom = top;
     int left = cells.front().second;
     int right = left;
     for (auto [row, col] : cells) {
-        top = std::min(top, row);
-        bottom = std::max(bottom, row);
-        left = std::min(left, col);
-        right = std::max(right, col);
+        top = min(top, row);
+        bottom = max(bottom, row);
+        left = min(left, col);
+        right = max(right, col);
     }
     return {top, left, bottom, right};
 }
@@ -120,9 +128,12 @@ def bounding_box(cells):
 #include <cstdint>
 #include <vector>
 
-void record_color(std::vector<std::vector<std::uint32_t>>& grid,
+using std::uint32_t;
+using std::vector;
+
+void record_color(vector<vector<uint32_t>>& grid,
                   int row, int col, unsigned color) {
-    grid[row][col] |= std::uint32_t{1} << color;
+    grid[row][col] |= uint32_t{1} << color;
 }
 ```
 
@@ -140,7 +151,7 @@ def record_color(grid, row, col, color):
 
 ## Как совместить два набора точек
 
-Поворот квадрата со стороной `n` на 90° по часовой стрелке переводит клетку `(row, col)` в `(col, n - 1 - row)`. Для совмещения двух наборов точек при фиксированном повороте сравни координаты. Если точка `(br, bc)` второго набора должна перейти в `(ar, ac)` первого, возможен ровно один сдвиг `(ar - br, ac - bc)`. Например, в первом наборе отмечены `(1, 2)` и `(1, 3)`, а во втором — `(0, 0)` и `(0, 1)`. Сдвиг `(1, 2)` совмещает обе пары точек. Сдвиг `(1, 3)` совмещает только `(0, 0)` с `(1, 3)`.
+Поворот квадрата со стороной `side_length` на 90° по часовой стрелке переводит клетку `(row, col)` в `(col, side_length - 1 - row)`. Для совмещения двух наборов точек при фиксированном повороте сравни координаты. Если точка `(second_row, second_col)` второго набора должна перейти в `(first_row, first_col)` первого, возможен ровно один сдвиг `(first_row - second_row, first_col - second_col)`. Например, в первом наборе отмечены `(1, 2)` и `(1, 3)`, а во втором — `(0, 0)` и `(0, 1)`. Сдвиг `(1, 2)` совмещает обе пары точек. Сдвиг `(1, 3)` совмещает только `(0, 0)` с `(1, 3)`.
 
 Вместо наложения целых карт каждая пара точек отдаёт один «голос» за свой сдвиг. Если точки внутри каждого набора различны, число голосов равно числу совпадений. `rotate_point` поворачивает точку, а `shift_votes` считает голоса уже при выбранном повороте.
 
@@ -151,18 +162,22 @@ def record_color(grid, row, col, color):
 #include <utility>
 #include <vector>
 
-using Point = std::pair<int, int>;
+using std::map;
+using std::pair;
+using std::vector;
 
-Point rotate_point(int row, int col, int n) {
-    return {col, n - 1 - row};
+using Point = pair<int, int>;
+
+Point rotate_point(int row, int col, int side_length) {
+    return {col, side_length - 1 - row};
 }
 
-std::map<Point, long long> shift_votes(const std::vector<Point>& first,
-                                      const std::vector<Point>& second) {
-    std::map<Point, long long> votes;
-    for (auto [ar, ac] : first) {
-        for (auto [br, bc] : second) {
-            ++votes[{ar - br, ac - bc}];
+map<Point, long long> shift_votes(const vector<Point>& first,
+                                      const vector<Point>& second) {
+    map<Point, long long> votes;
+    for (auto [first_row, first_col] : first) {
+        for (auto [second_row, second_col] : second) {
+            ++votes[{first_row - second_row, first_col - second_col}];
         }
     }
     return votes;
@@ -201,13 +216,17 @@ def shift_votes(first, second):
 #include <string>
 #include <vector>
 
-std::vector<std::vector<std::size_t>>
-free_to_right(const std::vector<std::string>& grid) {
-    std::vector<std::vector<std::size_t>> result;
+using std::size_t;
+using std::string;
+using std::vector;
+
+vector<vector<size_t>>
+free_to_right(const vector<string>& grid) {
+    vector<vector<size_t>> result;
     for (const auto& row : grid) {
-        std::vector<std::size_t> distances(row.size(), 0);
-        for (std::size_t next = row.size(); next > 1; --next) {
-            const std::size_t col = next - 2;
+        vector<size_t> distances(row.size(), 0);
+        for (size_t next = row.size(); next > 1; --next) {
+            const size_t col = next - 2;
             if (row[col] == '.' && row[col + 1] == '.') {
                 distances[col] = 1 + distances[col + 1];
             }

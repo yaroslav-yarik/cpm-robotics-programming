@@ -72,6 +72,8 @@ add_bonus(points);  // Теперь points равно 15.
 ```cpp
 #include <iostream>
 
+using std::cout;
+
 // Функции square и add_bonus определены выше.
 
 void swap_scores(int* left, int* right) {
@@ -85,11 +87,11 @@ int main() {
     int first = 10;
     int second = 20;
 
-    std::cout << square(first) << ' ' << first << '\n';  // 100 10
+    cout << square(first) << ' ' << first << '\n';  // 100 10
     add_bonus(first);
-    std::cout << first << '\n';                         // 15
+    cout << first << '\n';                         // 15
     swap_scores(&first, &second);
-    std::cout << first << ' ' << second << '\n';         // 20 15
+    cout << first << ' ' << second << '\n';         // 20 15
 }
 ```
 

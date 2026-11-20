@@ -4,27 +4,31 @@
 
 [Оглавление](../README.md) · Язык C++
 
-Пусть в векторе стоят числа `10, 20, 30`. Чтобы поместить `99` между первым и вторым числами, нужно указать позицию **перед** `20`. В C++ эту позицию задаёт итератор `a.begin() + 1`.
+Пусть в векторе стоят числа `10, 20, 30`. Чтобы поместить `99` между первым и вторым числами, нужно указать позицию **перед** `20`. В C++ эту позицию задаёт итератор `values.begin() + 1`.
 
 ## Вставка и удаление по позиции
 
-Пусть `a` — вектор, а `pos` — допустимый итератор в нём.
+Пусть `values` — вектор, а `pos` — допустимый итератор в нём.
 
 | Запись | Результат |
 |---|---|
-| `a.push_back(value)` | Дописывает значение в конец |
-| `a.insert(pos, value)` | Вставляет значение перед позицией `pos` |
-| `a.insert(pos, count, value)` | Вставляет `count` копий |
-| `a.insert(pos, b.begin(), b.end())` | Вставляет все элементы другого вектора `b` |
-| `a.erase(pos)` | Удаляет элемент в позиции `pos` |
-| `a.erase(first, last)` | Удаляет полуинтервал `[first, last)` |
+| `values.push_back(value)` | Дописывает значение в конец |
+| `values.insert(pos, value)` | Вставляет значение перед позицией `pos` |
+| `values.insert(pos, count, value)` | Вставляет `count` копий |
+| `values.insert(pos, b.begin(), b.end())` | Вставляет все элементы другого вектора `b` |
+| `values.erase(pos)` | Удаляет элемент в позиции `pos` |
+| `values.erase(first, last)` | Удаляет полуинтервал `[first, last)` |
 
 Вставка перед `end()` дописывает в конец. Сам `end()` нельзя удалить как элемент. Посмотрим, как меняются позиции при двух правках подряд.
 
 ```cpp
-std::vector<int> a{10, 20, 30};
-a.insert(a.begin() + 1, 99);                // 10, 99, 20, 30
-a.erase(a.begin() + 1, a.begin() + 3);      // 10, 30
+#include <vector>
+
+using std::vector;
+
+vector<int> values{10, 20, 30};
+values.insert(values.begin() + 1, 99);  // 10, 99, 20, 30
+values.erase(values.begin() + 1, values.begin() + 3);  // 10, 30
 ```
 
 При удалении левая граница указывает на `99`, правая — на `30`. Элемент на правой границе сохраняется.
@@ -39,7 +43,7 @@ a.erase(a.begin() + 1, a.begin() + 3);      // 10, 30
 
 При вставке в середину и удалении могут сдвигаться многие элементы. Если вектор перераспределил память, старые итераторы и ссылки на его элементы недействительны. При `erase` становятся недействительными итераторы и ссылки на удалённые и последующие позиции. Для учебных примеров безопасное правило простое: после изменения вектора вычисляй позиции заново.
 
-В цикле, который удаляет по итератору, продолжай с результата `it = a.erase(it)`, если ты удалил элемент, и делай `++it` только в ветке, где его сохранил. Для удаления многих элементов по условию эффективнее сделать один проход с `remove_if`.
+В цикле, который удаляет по итератору, продолжай с результата `it = values.erase(it)`, если ты удалил элемент, и делай `++it` только в ветке, где его сохранил. Для удаления многих элементов по условию эффективнее сделать один проход с `remove_if`.
 
 ## Копирование и преобразование
 
@@ -48,7 +52,7 @@ a.erase(a.begin() + 1, a.begin() + 3);      // 10, 30
 - `copy(..., result.begin())` требует, чтобы в `result` уже было достаточно элементов для записи.
 - `copy(..., std::back_inserter(result))` дописывает в существующий вектор.
 - `transform(..., std::back_inserter(result), f)` дописывает преобразованные значения.
-- Конструктор `std::vector<int> part(a.begin(), a.begin() + 2);` сразу создаёт копию первых двух элементов, если они есть.
+- Конструктор `std::vector<int> part(values.begin(), values.begin() + 2);` сразу создаёт копию первых двух элементов, если они есть.
 
 Если вызвать `copy` с `back_inserter`, а затем `transform` с тем же выходным вектором, преобразованные значения добавятся после уже скопированных.
 
@@ -57,7 +61,11 @@ a.erase(a.begin() + 1, a.begin() + 3);      // 10, 30
 `std::unique` оставляет по одному элементу от каждой **соседней** группы равных. Для `{4, 4, 2, 4}` полезная часть станет `{4, 2, 4}`. Длина вектора остаётся прежней. Алгоритм возвращает новый конец полезной части. Поэтому обычно пишут:
 
 ```cpp
-a.erase(std::unique(a.begin(), a.end()), a.end());
+#include <algorithm>
+
+using std::unique;
+
+values.erase(unique(values.begin(), values.end()), values.end());
 ```
 
 Если нужны все разные числа и изменение порядка допустимо, сначала отсортируй вектор: тогда равные числа окажутся рядом.
@@ -67,12 +75,16 @@ a.erase(std::unique(a.begin(), a.end()), a.end());
 С `remove_if` похожий принцип. Алгоритм сдвигает вперёд элементы, которые надо сохранить, а хвост удаляет сам вектор:
 
 ```cpp
-a.erase(std::remove_if(a.begin(), a.end(),
+#include <algorithm>
+
+using std::remove_if;
+
+values.erase(remove_if(values.begin(), values.end(),
                        [](int value) { return value < 0; }),
-        a.end());
+        values.end());
 ```
 
-Чтобы убрать точное значение `x`, в таком же шаблоне используй `std::remove(a.begin(), a.end(), x)`. Начиная с **C++20**, для вектора можно написать `std::erase(a, x)` или `std::erase_if(a, pred)`. Это свободные функции, а `a.erase(pos)` — метод вектора. Для решения под C++17 используй два предыдущих шаблона.
+Чтобы убрать точное значение `x`, в таком же шаблоне используй `std::remove(values.begin(), values.end(), x)`. Начиная с **C++20**, для вектора можно написать `std::erase(values, x)` или `std::erase_if(values, pred)`. Это свободные функции, а `values.erase(pos)` — метод вектора. Для решения под C++17 используй два предыдущих шаблона.
 
 ## Как сложить элементы
 
@@ -89,22 +101,31 @@ a.erase(std::remove_if(a.begin(), a.end(),
 #include <numeric>
 #include <vector>
 
+using std::accumulate;
+using std::back_inserter;
+using std::copy;
+using std::cout;
+using std::remove_if;
+using std::transform;
+using std::unique;
+using std::vector;
+
 int main() {
-    std::vector<int> values{2, 2, -5, 3, 3, 2};
-    values.erase(std::unique(values.begin(), values.end()), values.end());
-    values.erase(std::remove_if(values.begin(), values.end(),
+    vector<int> values{2, 2, -5, 3, 3, 2};
+    values.erase(unique(values.begin(), values.end()), values.end());
+    values.erase(remove_if(values.begin(), values.end(),
                                 [](int value) { return value < 0; }),
                  values.end());
 
-    std::vector<long long> result;
-    std::copy(values.begin(), values.end(), std::back_inserter(result));
-    std::transform(values.begin(), values.end(), std::back_inserter(result),
+    vector<long long> result;
+    copy(values.begin(), values.end(), back_inserter(result));
+    transform(values.begin(), values.end(), back_inserter(result),
                    [](int value) { return 1LL * value * value; });
 
     for (long long value : result) {
-        std::cout << value << ' ';
+        cout << value << ' ';
     }
-    std::cout << '\n' << std::accumulate(result.begin(), result.end(), 0LL) << '\n';
+    cout << '\n' << accumulate(result.begin(), result.end(), 0LL) << '\n';
 }
 ```
 

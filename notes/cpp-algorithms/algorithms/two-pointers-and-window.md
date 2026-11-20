@@ -28,16 +28,19 @@
 #include <cstddef>
 #include <vector>
 
-using Int = long long;
-using Numbers = std::vector<Int>;
+using std::size_t;
+using std::vector;
 
-bool pair_sorted(const Numbers& a, Int target) {
-    if (a.size() < 2) return false;
-    std::size_t left = 0, right = a.size() - 1;
+using Int = long long;
+using Numbers = vector<Int>;
+
+bool pair_sorted(const Numbers& values, Int target) {
+    if (values.size() < 2) return false;
+    size_t left = 0, right = values.size() - 1;
     while (left < right) {
-        Int total = a[left] + a[right];
-        if (total == target) return true;
-        if (total < target) ++left;
+        Int current_sum = values[left] + values[right];
+        if (current_sum == target) return true;
+        if (current_sum < target) ++left;
         else --right;
     }
     return false;
@@ -90,21 +93,25 @@ def pair_sorted(a, target):
 #include <cstddef>
 #include <vector>
 
-using Int = long long;
-using Numbers = std::vector<Int>;
+using std::max;
+using std::size_t;
+using std::vector;
 
-std::size_t longest_at_most(const Numbers& a, Int limit) {
-    std::size_t left = 0, best = 0;
-    Int total = 0;
-    for (std::size_t right = 0; right < a.size(); ++right) {
-        total += a[right];
-        while (total > limit) {
-            total -= a[left];
+using Int = long long;
+using Numbers = vector<Int>;
+
+size_t longest_at_most(const Numbers& values, Int limit) {
+    size_t left = 0, best_length = 0;
+    Int current_sum = 0;
+    for (size_t right = 0; right < values.size(); ++right) {
+        current_sum += values[right];
+        while (current_sum > limit) {
+            current_sum -= values[left];
             ++left;
         }
-        best = std::max(best, (right + 1) - left);
+        best_length = max(best_length, (right + 1) - left);
     }
-    return best;
+    return best_length;
 }
 ```
 

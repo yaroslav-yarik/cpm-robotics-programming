@@ -40,17 +40,20 @@
 #include <unordered_map>
 #include <vector>
 
-using Int = long long;
-using Numbers = std::vector<Int>;
+using std::unordered_map;
+using std::vector;
 
-Int equal_pairs(const Numbers& a) {
-    std::unordered_map<Int, Int> seen;
-    Int result = 0;
-    for (Int value : a) {
-        result += seen[value];
+using Int = long long;
+using Numbers = vector<Int>;
+
+Int equal_pairs(const Numbers& values) {
+    unordered_map<Int, Int> seen;
+    Int pair_count = 0;
+    for (Int value : values) {
+        pair_count += seen[value];
         ++seen[value];
     }
-    return result;
+    return pair_count;
 }
 ```
 

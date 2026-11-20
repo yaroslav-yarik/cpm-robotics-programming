@@ -24,7 +24,9 @@
 ```cpp
 #include <cstdint>
 
-bool has_all_flags(std::uint64_t state, std::uint64_t required) {
+using std::uint64_t;
+
+bool has_all_flags(uint64_t state, uint64_t required) {
     return (state & required) == required;
 }
 ```
@@ -98,7 +100,9 @@ def counter_gap(previous, current, modulus):
 ```cpp
 #include <optional>
 
-bool read_indicator(std::optional<long long>& off_at, long long now) {
+using std::optional;
+
+bool read_indicator(optional<long long>& off_at, long long now) {
     if (off_at && *off_at <= now) {
         off_at.reset();
     }

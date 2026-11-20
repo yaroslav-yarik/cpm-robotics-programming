@@ -21,7 +21,7 @@
 
 На рисунке видно всё дерево, но программа проходит только одну ветвь за раз. При обычной реализации рекурсивного вызова в стеке остаётся информация, чтобы вернуться к предыдущему выбору. Поэтому одновременно хранится цепочка глубины `n + 1`, хотя листьев в дереве `2ⁿ`.
 
-Каждый вызов помнит две величины. Индекс показывает, какой элемент рассматриваем, а `total` хранит сумму уже взятых элементов. В первой ветви увеличиваем только индекс. Во второй прибавляем к сумме значение взятого элемента.
+Каждый вызов помнит две величины. Индекс показывает, какой элемент рассматриваем, а `subset_sum` хранит сумму уже взятых элементов. В первой ветви увеличиваем только индекс. Во второй прибавляем к сумме значение взятого элемента.
 
 Когда индекс равен длине массива, выбора больше нет. Это **базовый случай**. Записываем сумму и завершаем вызов. Для пустого массива сразу запишем 0. Разные подмножества могут давать одинаковые суммы, поэтому в ответе возможны повторы.
 
@@ -33,21 +33,24 @@
 #include <cstddef>
 #include <vector>
 
-using Int = long long;
-using Numbers = std::vector<Int>;
+using std::size_t;
+using std::vector;
 
-void visit_subsets(const Numbers& a, std::size_t i, Int total, Numbers& result) {
-    if (i == a.size()) {
-        result.push_back(total);
+using Int = long long;
+using Numbers = vector<Int>;
+
+void visit_subsets(const Numbers& values, size_t index, Int subset_sum, Numbers& result) {
+    if (index == values.size()) {
+        result.push_back(subset_sum);
         return;
     }
-    visit_subsets(a, i + 1, total, result);
-    visit_subsets(a, i + 1, total + a[i], result);
+    visit_subsets(values, index + 1, subset_sum, result);
+    visit_subsets(values, index + 1, subset_sum + values[index], result);
 }
 
-Numbers subset_sums(const Numbers& a) {
+Numbers subset_sums(const Numbers& values) {
     Numbers result;
-    visit_subsets(a, 0, 0, result);
+    visit_subsets(values, 0, 0, result);
     return result;
 }
 ```
@@ -74,7 +77,7 @@ def subset_sums(a):
 
 ## Динамическое программирование. Как выбрать самый дешёвый путь
 
-Перед лестницей стоит человек. За шаг он поднимается на одну или две ступеньки. Попадание на ступеньку `i` стоит `cost[i]`. Нужно оказаться на последней ступеньке и заплатить как можно меньше.
+Перед лестницей стоит человек. За шаг он поднимается на одну или две ступеньки. Попадание на ступеньку `index` стоит `cost[index]`. Нужно оказаться на последней ступеньке и заплатить как можно меньше.
 
 На каждую ступеньку ведут всего два последних шага. Зная наименьшую цену достижения двух предшествующих позиций, можно сразу вычислить лучшую цену для текущей. Такой способ получить ответ из ответов для меньших задач называется **динамическим программированием**.
 
@@ -87,7 +90,7 @@ def subset_sums(a):
 
 Например, на ступеньку 2 можно попасть со ступеньки 0 или 1. Выбираем меньшую из сумм 5 и 2, прибавляем цену посещения 10 и получаем 12. На последнюю ступеньку выгоднее перейти сразу со ступеньки 1. Весь путь стоит `2 + 1 = 3`.
 
-Для ступеньки 0 ответ равен её цене. Дальше работает правило **`dp[i] = cost[i] + min(dp[i − 1], dp[i − 2])`**. При `i = 1` позиция перед лестницей имеет цену 0. В коде её хранит отдельная переменная. Индекс `−1` в Python означал бы последний элемент списка.
+Для ступеньки 0 ответ равен её цене. Дальше работает правило **`dp[index] = cost[index] + min(dp[index − 1], dp[index − 2])`**. При `index = 1` позиция перед лестницей имеет цену 0. В коде её хранит отдельная переменная. Индекс `−1` в Python означал бы последний элемент списка.
 
 Для следующего расчёта нужны лишь две предыдущие суммы — `two_ago` и `previous`. После каждого шага сдвигаем обе на одну позицию. Время работы составляет `O(n)`, дополнительная память — `O(1)`. Если лестница пуста, функция возвращает 0.
 
@@ -98,14 +101,18 @@ def subset_sums(a):
 #include <cstddef>
 #include <vector>
 
+using std::min;
+using std::size_t;
+using std::vector;
+
 using Int = long long;
-using Numbers = std::vector<Int>;
+using Numbers = vector<Int>;
 
 Int min_stair_cost(const Numbers& cost) {
     if (cost.empty()) return 0;
     Int two_ago = 0, previous = cost[0];
-    for (std::size_t i = 1; i < cost.size(); ++i) {
-        Int current = cost[i] + std::min(two_ago, previous);
+    for (size_t index = 1; index < cost.size(); ++index) {
+        Int current = cost[index] + min(two_ago, previous);
         two_ago = previous;
         previous = current;
     }

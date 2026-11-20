@@ -31,7 +31,7 @@
 
 <!-- interactive -->
 
-В каждой отмеченной клетке алгоритм читает два числа, складывает их и сравнивает сумму с целью. Процессор может оставить первое число в регистре на весь внутренний цикл. Число проверок пар мы можем вывести точно, а число машинных инструкций зависит от компилятора.
+В коде C++ индексы `i` и `j` из схемы называются `first_index` и `second_index`. В каждой отмеченной клетке алгоритм читает два числа, складывает их и сравнивает сумму с целью. Процессор может оставить первое число в регистре на весь внутренний цикл. Число проверок пар мы можем вывести точно, а число машинных инструкций зависит от компилятора.
 
 Для первого индекса есть `n − 1` возможных партнёров, для второго — `n − 2`, для последнего — ни одного. Всего это `n(n − 1)/2` пар. Поэтому время в худшем случае составляет `O(n²)`, дополнительная память — `O(1)`. При небольших входных данных такой перебор удобно использовать для проверки более быстрого решения.
 
@@ -43,13 +43,16 @@
 #include <cstddef>
 #include <vector>
 
-using Int = long long;
-using Numbers = std::vector<Int>;
+using std::size_t;
+using std::vector;
 
-bool pair_brute(const Numbers& a, Int target) {
-    for (std::size_t i = 0; i < a.size(); ++i) {
-        for (std::size_t j = i + 1; j < a.size(); ++j) {
-            if (a[i] + a[j] == target) return true;
+using Int = long long;
+using Numbers = vector<Int>;
+
+bool pair_brute(const Numbers& values, Int target) {
+    for (size_t first_index = 0; first_index < values.size(); ++first_index) {
+        for (size_t second_index = first_index + 1; second_index < values.size(); ++second_index) {
+            if (values[first_index] + values[second_index] == target) return true;
         }
     }
     return false;

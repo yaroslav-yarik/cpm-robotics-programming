@@ -68,16 +68,19 @@
 <pre><code class="language-cpp">#include &lt;cstddef&gt;
 #include &lt;vector&gt;
 
-using Int = long long;
-using Numbers = std::vector&lt;Int&gt;;
+using std::size_t;
+using std::vector;
 
-bool pair_sorted(const Numbers&amp; a, Int target) {
-    if (a.size() &lt; 2) return false;
-    std::size_t left = 0, right = a.size() - 1;
+using Int = long long;
+using Numbers = vector&lt;Int&gt;;
+
+bool pair_sorted(const Numbers&amp; values, Int target) {
+    if (values.size() &lt; 2) return false;
+    size_t left = 0, right = values.size() - 1;
     while (left &lt; right) {
-        Int total = a[left] + a[right];
-        if (total == target) return true;
-        if (total &lt; target) ++left;
+        Int current_sum = values[left] + values[right];
+        if (current_sum == target) return true;
+        if (current_sum &lt; target) ++left;
         else --right;
     }
     return false;
@@ -151,21 +154,25 @@ bool pair_sorted(const Numbers&amp; a, Int target) {
 #include &lt;cstddef&gt;
 #include &lt;vector&gt;
 
-using Int = long long;
-using Numbers = std::vector&lt;Int&gt;;
+using std::max;
+using std::size_t;
+using std::vector;
 
-std::size_t longest_at_most(const Numbers&amp; a, Int limit) {
-    std::size_t left = 0, best = 0;
-    Int total = 0;
-    for (std::size_t right = 0; right &lt; a.size(); ++right) {
-        total += a[right];
-        while (total &gt; limit) {
-            total -= a[left];
+using Int = long long;
+using Numbers = vector&lt;Int&gt;;
+
+size_t longest_at_most(const Numbers&amp; values, Int limit) {
+    size_t left = 0, best_length = 0;
+    Int current_sum = 0;
+    for (size_t right = 0; right &lt; values.size(); ++right) {
+        current_sum += values[right];
+        while (current_sum &gt; limit) {
+            current_sum -= values[left];
             ++left;
         }
-        best = std::max(best, (right + 1) - left);
+        best_length = max(best_length, (right + 1) - left);
     }
-    return best;
+    return best_length;
 }
 </code></pre>
 <details>

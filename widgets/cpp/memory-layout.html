@@ -20,13 +20,13 @@
     @media(max-width:48rem){.memory-map{grid-template-columns:1fr}.word{max-width:100%}.bytes{margin:.45rem 0}.word button{min-height:2.5rem}}
   </style>
 <h3>Запись по адресу</h3>
-  <p>В массиве три числа. Указатель <code>p</code> хранит адрес одного из них. Выбери элемент, затем попробуй записать в него число через <code>*p</code>.</p>
+  <p>В массиве три числа. Указатель <code>element_ptr</code> хранит адрес одного из них. Выбери элемент, затем попробуй записать в него число через <code>*element_ptr</code>.</p>
   <section aria-labelledby="map-title">
     <h4 id="map-title">Массив в памяти</h4>
     <p>В этой модели <code>int</code> занимает четыре байта. Младший байт идёт первым. Под каждым байтом указан его адрес, оба записаны в шестнадцатеричной системе.</p>
     <div id="memory-map" class="memory-map"></div>
     <form id="write-form" class="write-controls">
-      <label for="new-value">Новое значение <code>*p</code><input id="new-value" type="number" step="1" min="-2147483648" max="2147483647" value="99" required></label>
+      <label for="new-value">Новое значение <code>*element_ptr</code><input id="new-value" type="number" step="1" min="-2147483648" max="2147483647" value="99" required></label>
       <button type="submit">Записать в память</button>
       <button id="reset" type="button">Сбросить</button>
     </form>
@@ -66,7 +66,7 @@ function bytesOf(value) {
 for (let index = 0; index < words.length; index++) {
   const card = document.createElement('div');
   card.className = 'word';
-  card.innerHTML = '<div class="word-head"><code>a[' + index + ']</code><span class="word-value"></span></div><div class="bytes"></div><button type="button"></button>';
+  card.innerHTML = '<div class="word-head"><code>values[' + index + ']</code><span class="word-value"></span></div><div class="bytes"></div><button type="button"></button>';
   const row = card.querySelector('.bytes');
   for (let offset = 0; offset < 4; offset++) {
     const cell = document.createElement('div');
@@ -78,8 +78,8 @@ for (let index = 0; index < words.length; index++) {
     const previous = pointer;
     pointer = index;
     render(words);
-    showCode(words, previous, 'p = &a[' + pointer + '];');
-    status.textContent = 'p хранит ' + address(index) + '. Значения и байты массива остались прежними.';
+    showCode(words, previous, 'element_ptr = &values[' + pointer + '];');
+    status.textContent = 'element_ptr хранит ' + address(index) + '. Значения и байты массива остались прежними.';
   });
   map.append(card);
 }
@@ -90,7 +90,7 @@ function render(before) {
     card.classList.toggle('selected', selected);
     card.querySelector('.word-value').textContent = 'Значение ' + words[index];
     const button = card.querySelector('button');
-    button.textContent = selected ? 'p указывает на a[' + index + ']' : 'Выбрать a[' + index + ']';
+    button.textContent = selected ? 'element_ptr указывает на values[' + index + ']' : 'Выбрать values[' + index + ']';
     button.setAttribute('aria-pressed', String(selected));
     const bytes = bytesOf(words[index]);
     const oldBytes = bytesOf(before[index]);
@@ -102,7 +102,7 @@ function render(before) {
 }
 
 function showCode(before, originalPointer, operation = '') {
-  code.textContent = 'int a[3] = {' + before.join(', ') + '};\nint* p = &a[' + originalPointer + '];';
+  code.textContent = 'int values[3] = {' + before.join(', ') + '};\nint* element_ptr = &values[' + originalPointer + '];';
   if (operation) code.textContent += '\n' + operation;
 }
 
@@ -113,7 +113,7 @@ document.querySelector('#write-form').addEventListener('submit', event => {
   const before = [...words];
   words[pointer] = value;
   render(before);
-  showCode(before, pointer, '*p = ' + value + ';');
+  showCode(before, pointer, '*element_ptr = ' + value + ';');
   const previous = bytesOf(before[pointer]);
   const differences = bytesOf(value).flatMap((byte, i) =>
     previous[i] === byte ? [] : [address(pointer, i) + ' (' + previous[i] + ' → ' + byte + ')']);
@@ -135,7 +135,7 @@ function reset() {
   valueInput.value = 99;
   render(words);
   showCode(words, pointer);
-  status.textContent = 'p хранит 0x1000. По этому адресу начинается число 10.';
+  status.textContent = 'element_ptr хранит 0x1000. По этому адресу начинается число 10.';
   taskStatus.textContent = '';
 }
 document.querySelector('#reset').addEventListener('click', reset);

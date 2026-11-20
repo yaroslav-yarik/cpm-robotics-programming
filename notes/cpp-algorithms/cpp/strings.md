@@ -15,10 +15,17 @@
 Для `std::string` нужен заголовок `<string>`. Одинарные кавычки обозначают символ: `'a'`. Двойные — строковый литерал: `"abc"`.
 
 ```cpp
-std::string word = "robot";
-std::string line;
-std::cin >> word;                // Одно слово до пробела.
-std::getline(std::cin, line);     // Остаток текущей строки.
+#include <iostream>
+#include <string>
+
+using std::cin;
+using std::getline;
+using std::string;
+
+string word = "robot";
+string line;
+cin >> word;                // Одно слово до пробела.
+getline(cin, line);     // Остаток текущей строки.
 ```
 
 Если ввести `blue sky`, то `word` получит `"blue"`, а `line` — `" sky"` с пробелом в начале. Если сразу после слова нажать Enter, `line` будет пустой.
@@ -27,11 +34,18 @@ std::getline(std::cin, line);     // Остаток текущей строки.
 
 ```cpp
 // Заголовки <iostream>, <limits> и <string>.
+
+using std::cin;
+using std::getline;
+using std::numeric_limits;
+using std::streamsize;
+using std::string;
+
 int number;
-std::string line;
-if (std::cin >> number) {
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    std::getline(std::cin, line);
+string line;
+if (cin >> number) {
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    getline(cin, line);
 }
 ```
 
@@ -39,48 +53,54 @@ if (std::cin >> number) {
 
 ## Чтение и изменение символов
 
-Разберём операции на строке `s = "robot"`. Каждая строка таблицы начинается с этого исходного значения.
+Разберём операции на строке `text = "robot"`. Каждая строка таблицы начинается с этого исходного значения.
 
 | Запись | Результат |
 |---|---|
-| `s.size()` | 5 |
-| `s[0]` | Символ `'r'` |
-| `s.at(1) = 'u';` | `"rubot"` |
-| `s + " arm"` | Строка `"robot arm"`. Сама `s` сохраняет своё значение |
-| `s.append(" arm");` | `s` становится `"robot arm"` |
-| `s.push_back('!');` | `"robot!"` |
-| `s.pop_back();` | `"robo"` |
-| `s.substr(1, 3)` | Копия участка `"obo"` |
-| `s.insert(2, "X");` | `"roXbot"` |
-| `s.erase(1, 2);` | `"rot"` |
-| `s.replace(1, 2, "AA");` | `"rAAot"` |
+| `text.size()` | 5 |
+| `text[0]` | Символ `'r'` |
+| `text.at(1) = 'u';` | `"rubot"` |
+| `text + " arm"` | Строка `"robot arm"`. Сама `text` сохраняет своё значение |
+| `text.append(" arm");` | `text` становится `"robot arm"` |
+| `text.push_back('!');` | `"robot!"` |
+| `text.pop_back();` | `"robo"` |
+| `text.substr(1, 3)` | Копия участка `"obo"` |
+| `text.insert(2, "X");` | `"roXbot"` |
+| `text.erase(1, 2);` | `"rot"` |
+| `text.replace(1, 2, "AA");` | `"rAAot"` |
 
-В `substr(pos, count)`, `erase(pos, count)` и `replace(pos, count, text)` второй аргумент — число символов. Если нужна подстрока с индексами от `left` до `right` включительно, количество символов равно `right - left + 1`. Обращайся к символам только при индексе меньше `s.size()`, а `pop_back()` вызывай для непустой строки. После правок строки проще получить итераторы заново.
+В `substr(match_index, count)`, `erase(match_index, count)` и `replace(match_index, count, replacement)` второй аргумент — число символов. Если нужна подстрока с индексами от `left` до `right` включительно, количество символов равно `right - left + 1`. Обращайся к символам только при индексе меньше `text.size()`, а `pop_back()` вызывай для непустой строки. После правок строки проще получить итераторы заново.
 
 У обычной `std::string` индекс обозначает элемент типа `char`. Для ASCII-строки это отдельный символ. В UTF-8 одна русская буква может занимать несколько элементов, поэтому посимвольные примеры здесь используют ASCII.
 
-**Что именно читает процессор.** Возьмём строку `u8"Я!"` в C++17 на компьютере с восьмибитным байтом. Текст содержит два символа, а `std::string s = u8"Я!";` сохраняет три байта текста. Буква «Я» записана двумя байтами UTF-8, затем идёт байт восклицательного знака. В схеме значения байтов указаны в шестнадцатеричной системе.
+**Что именно читает процессор.** Возьмём строку `u8"Я!"` в C++17 на компьютере с восьмибитным байтом. Текст содержит два символа, а `std::string text = u8"Я!";` сохраняет три байта текста. Буква «Я» записана двумя байтами UTF-8, затем идёт байт восклицательного знака. В схеме значения байтов указаны в шестнадцатеричной системе.
 
 ![В UTF-8 буква Я занимает D0 AF, а восклицательный знак начинается с индекса 2.](../assets/cpp/utf8-bytes.svg)
 
 <!-- interactive -->
 
-Команда чтения `s[1]` обращается ко второму байту буквы «Я». Чтобы найти начало следующего символа, программе нужно учесть правила UTF-8. При чтении байта процессор сам буквы не распознаёт.
+Команда чтения `text[1]` обращается ко второму байту буквы «Я». Чтобы найти начало следующего символа, программе нужно учесть правила UTF-8. При чтении байта процессор сам буквы не распознаёт.
 
 ## Поиск подстроки
 
-`s.find("ab")` возвращает индекс начала первого совпадения. `s.rfind("ab")` при вызове без начальной позиции ищет последнее совпадение. Если соответствующего участка нет, возвращается `std::string::npos`.
+`text.find("ab")` возвращает индекс начала первого совпадения. `text.rfind("ab")` при вызове без начальной позиции ищет последнее совпадение. Если соответствующего участка нет, возвращается `std::string::npos`.
 
 ```cpp
-auto pos = s.find("ab", 2);  // Искать начиная с индекса 2.
-if (pos != std::string::npos) {
-    std::cout << pos << '\n';
+#include <iostream>
+#include <string>
+
+using std::cout;
+using std::string;
+
+auto match_index = text.find("ab", 2);  // Искать начиная с индекса 2.
+if (match_index != string::npos) {
+    cout << match_index << '\n';
 }
 ```
 
 Используй `auto` или `std::string::size_type` для позиции и сравнивай с `npos` до обращения к строке. В двухаргументном вызове второй аргумент — начальная позиция поиска.
 
-В перегрузке с символьным массивом `s.find("abcd", 1, 2)` поиск стартует с индекса 1, а третий аргумент говорит взять первые два символа **образца**. То есть здесь ищем `"ab"`.
+В перегрузке с символьным массивом `text.find("abcd", 1, 2)` поиск стартует с индекса 1, а третий аргумент говорит взять первые два символа **образца**. То есть здесь ищем `"ab"`.
 
 ### Число и его десятичная запись
 
@@ -88,7 +108,7 @@ if (pos != std::string::npos) {
 
 ### Сортировка
 
-По итераторам строки работают `sort`, `count`, `find`, `reverse` и другие знакомые алгоритмы. `std::sort(s.begin(), s.end())` сортирует символы внутри строки, а `std::sort(words.begin(), words.end())` для вектора строк сортирует целые строки лексикографически. При одинаковом начале более короткая строка идёт раньше.
+По итераторам строки работают `sort`, `count`, `find`, `reverse` и другие знакомые алгоритмы. `std::sort(text.begin(), text.end())` сортирует символы внутри строки, а `std::sort(words.begin(), words.end())` для вектора строк сортирует целые строки лексикографически. При одинаковом начале более короткая строка идёт раньше.
 
 ## Замена и сортировка символов
 
@@ -97,18 +117,23 @@ if (pos != std::string::npos) {
 #include <iostream>
 #include <string>
 
+using std::count;
+using std::cout;
+using std::sort;
+using std::string;
+
 int main() {
-    std::string route = "BABA";
-    auto first = route.find("BA");
-    auto last = route.rfind("BA");
-    if (first == std::string::npos || last == std::string::npos) {
+    string route = "BABA";
+    auto first_match = route.find("BA");
+    auto last_match = route.rfind("BA");
+    if (first_match == string::npos || last_match == string::npos) {
         return 1;
     }
-    std::cout << first << ' ' << last << '\n';
-    route.replace(last, 2, "AZ");
-    std::sort(route.begin(), route.end());
-    std::cout << route << '\n';
-    std::cout << std::count(route.begin(), route.end(), 'A') << '\n';
+    cout << first_match << ' ' << last_match << '\n';
+    route.replace(last_match, 2, "AZ");
+    sort(route.begin(), route.end());
+    cout << route << '\n';
+    cout << count(route.begin(), route.end(), 'A') << '\n';
 }
 ```
 

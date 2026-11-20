@@ -6,7 +6,7 @@
 
 ## Как получить сумму участка одним вычитанием
 
-Пусть в массиве `[2, −5, 4]` нужно много раз находить суммы разных участков. Заранее посчитаем сумму первых `k` элементов для каждого возможного `k`. Такую сумму называют **префиксной**. Пустой префикс имеет длину 0 и сумму 0.
+Пусть в массиве `[2, −5, 4]` нужно много раз находить суммы разных участков. Заранее посчитаем сумму первых `k` элементов для каждого возможного `k`. Такую сумму называют **префиксной**. В формулах и на схеме обозначим таблицу через `p`, а в коде C++ назовём её `prefix`. Пустой префикс имеет длину 0 и сумму 0.
 
 | Сколько взяли элементов, `k` | 0 | 1 | 2 | 3 |
 |---|---:|---:|---:|---:|
@@ -30,17 +30,20 @@
 #include <cstddef>
 #include <vector>
 
-using Int = long long;
-using Numbers = std::vector<Int>;
+using std::size_t;
+using std::vector;
 
-Numbers prefix_sums(const Numbers& a) {
-    Numbers p{0};
-    for (Int value : a) p.push_back(p.back() + value);
-    return p;
+using Int = long long;
+using Numbers = vector<Int>;
+
+Numbers prefix_sums(const Numbers& values) {
+    Numbers prefix{0};
+    for (Int value : values) prefix.push_back(prefix.back() + value);
+    return prefix;
 }
 
-Int range_sum(const Numbers& p, std::size_t left, std::size_t right) {
-    return p[right] - p[left];
+Int range_sum(const Numbers& prefix, size_t left, size_t right) {
+    return prefix[right] - prefix[left];
 }
 ```
 
@@ -88,26 +91,29 @@ def range_sum(prefix, left, right):
 #include <cstddef>
 #include <vector>
 
-using Int = long long;
-using Numbers = std::vector<Int>;
-using Matrix = std::vector<Numbers>;
+using std::size_t;
+using std::vector;
 
-Matrix rectangle_prefix(const Matrix& a) {
-    std::size_t rows = a.size(), cols = a.empty() ? 0 : a[0].size();
-    Matrix p(rows + 1, Numbers(cols + 1));
-    for (std::size_t i = 0; i < rows; ++i) {
+using Int = long long;
+using Numbers = vector<Int>;
+using Matrix = vector<Numbers>;
+
+Matrix rectangle_prefix(const Matrix& values) {
+    size_t rows = values.size(), column_count = values.empty() ? 0 : values[0].size();
+    Matrix prefix(rows + 1, Numbers(column_count + 1));
+    for (size_t row = 0; row < rows; ++row) {
         Int row_sum = 0;
-        for (std::size_t j = 0; j < cols; ++j) {
-            row_sum += a[i][j];
-            p[i + 1][j + 1] = p[i][j + 1] + row_sum;
+        for (size_t col = 0; col < column_count; ++col) {
+            row_sum += values[row][col];
+            prefix[row + 1][col + 1] = prefix[row][col + 1] + row_sum;
         }
     }
-    return p;
+    return prefix;
 }
 
-Int rectangle_sum(const Matrix& p, std::size_t top, std::size_t left,
-                  std::size_t bottom, std::size_t right) {
-    return p[bottom][right] - p[top][right] - p[bottom][left] + p[top][left];
+Int rectangle_sum(const Matrix& prefix, size_t top, size_t left,
+                  size_t bottom, size_t right) {
+    return prefix[bottom][right] - prefix[top][right] - prefix[bottom][left] + prefix[top][left];
 }
 ```
 

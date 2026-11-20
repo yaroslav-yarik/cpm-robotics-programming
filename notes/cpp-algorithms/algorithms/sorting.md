@@ -36,10 +36,14 @@
 #include <string>
 #include <vector>
 
-std::vector<std::string> by_length(std::vector<std::string> words) {
-    std::sort(words.begin(), words.end(), [](const auto& a, const auto& b) {
-        if (a.size() != b.size()) return a.size() < b.size();
-        return a < b;
+using std::sort;
+using std::string;
+using std::vector;
+
+vector<string> by_length(vector<string> words) {
+    sort(words.begin(), words.end(), [](const auto& left_word, const auto& right_word) {
+        if (left_word.size() != right_word.size()) return left_word.size() < right_word.size();
+        return left_word < right_word;
     });
     return words;
 }
