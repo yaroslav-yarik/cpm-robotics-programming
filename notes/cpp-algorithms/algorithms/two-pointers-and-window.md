@@ -22,7 +22,7 @@
 
 Если индексы встретились, осталась одна позиция и составить пару уже нельзя. Каждый шаг сдвигает одну границу внутрь, поэтому время поиска составляет `O(n)`, дополнительная память — `O(1)`. Если массив сначала приходится сортировать, общее время возрастает до `O(n log n)`.
 
-**C++17**
+**C++**
 
 ```cpp
 #include <cstddef>
@@ -51,13 +51,13 @@ bool pair_sorted(const Numbers& values, Int target) {
 <summary>Тот же алгоритм на Python</summary>
 
 ```python
-def pair_sorted(a, target):
-    left, right = 0, len(a) - 1
+def pair_sorted(values, target):
+    left, right = 0, len(values) - 1
     while left < right:
-        total = a[left] + a[right]
-        if total == target:
+        current_sum = values[left] + values[right]
+        if current_sum == target:
             return True
-        if total < target:
+        if current_sum < target:
             left += 1
         else:
             right -= 1
@@ -86,7 +86,7 @@ def pair_sorted(a, target):
 
 С отрицательными числами это рассуждение перестаёт работать. В массиве `[4, −2]` при пределе 3 алгоритм сразу удалил бы четвёрку, хотя сумма всего массива равна 2.
 
-**C++17**
+**C++**
 
 ```cpp
 #include <algorithm>
@@ -119,15 +119,15 @@ size_t longest_at_most(const Numbers& values, Int limit) {
 <summary>Тот же алгоритм на Python</summary>
 
 ```python
-def longest_at_most(a, limit):
-    left = total = best = 0
-    for right, value in enumerate(a):
-        total += value
-        while total > limit:
-            total -= a[left]
+def longest_at_most(values, limit):
+    left = current_sum = best_length = 0
+    for right, value in enumerate(values):
+        current_sum += value
+        while current_sum > limit:
+            current_sum -= values[left]
             left += 1
-        best = max(best, right - left + 1)
-    return best
+        best_length = max(best_length, right - left + 1)
+    return best_length
 ```
 
 </details>

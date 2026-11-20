@@ -85,10 +85,10 @@
 </section>
 </div>
 
-<p>Для подсчёта пар сначала прибавляем <code>seen[value]</code> к ответу, а затем увеличиваем счётчик. Поменяв эти действия местами, мы засчитали бы пару элемента с самим собой.</p>
+<p>Для подсчёта пар сначала прибавляем <code>frequencies[value]</code> к ответу, а затем увеличиваем счётчик. Поменяв эти действия местами, мы засчитали бы пару элемента с самим собой.</p>
 <p>Если частоты лежат в массиве, индекс сразу задаёт смещение нужного счётчика в памяти. Для хеш-таблицы сначала вычисляют хеш ключа, затем ищут запись в выбранной группе. Если несколько ключей попали в одну группу, их приходится различать сравнением.</p>
 <p>В Python используем <code>Counter</code>, в C++ — <code>std::unordered_map</code>. Обращение к счётчику в хеш-таблице в среднем занимает <code>O(1)</code>. Для <code>n</code> чисел время в среднем составляет <code>O(n)</code>, память — <code>O(u)</code>, где <code>u</code> — количество различных чисел. Если нужен порядок по ключам, в C++ подойдёт <code>std::map</code>. Для него весь проход занимает <code>O(n log(u + 1))</code>.</p>
-<p><strong>C++17</strong></p>
+<p><strong>C++</strong></p>
 <pre><code class="language-cpp">#include &lt;unordered_map&gt;
 #include &lt;vector&gt;
 
@@ -99,11 +99,11 @@ using Int = long long;
 using Numbers = vector&lt;Int&gt;;
 
 Int equal_pairs(const Numbers&amp; values) {
-    unordered_map&lt;Int, Int&gt; seen;
+    unordered_map&lt;Int, Int&gt; frequencies;
     Int pair_count = 0;
     for (Int value : values) {
-        pair_count += seen[value];
-        ++seen[value];
+        pair_count += frequencies[value];
+        ++frequencies[value];
     }
     return pair_count;
 }
@@ -114,13 +114,13 @@ Int equal_pairs(const Numbers&amp; values) {
 <pre><code class="language-python">from collections import Counter
 
 
-def equal_pairs(a):
-    seen = Counter()
-    result = 0
-    for value in a:
-        result += seen[value]
-        seen[value] += 1
-    return result
+def equal_pairs(values):
+    frequencies = Counter()
+    pair_count = 0
+    for value in values:
+        pair_count += frequencies[value]
+        frequencies[value] += 1
+    return pair_count
 </code></pre>
 </details>
 

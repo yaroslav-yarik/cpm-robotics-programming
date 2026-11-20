@@ -20,7 +20,7 @@
 
 К номеру строки и столбца прибавляем по очереди четыре пары смещений. Для каждой новой позиции сначала проверяем границы, затем смотрим, свободна ли клетка. Так мы не обратимся за пределы карты. Функции обхода ниже предполагают, что старт и финиш заданы координатами существующих свободных клеток.
 
-**C++17**
+**C++**
 
 ```cpp
 #include <string>
@@ -54,10 +54,10 @@ vector<Cell> grid_neighbors(const Grid& grid, Cell cell) {
 
 ```python
 def grid_neighbors(grid, row, col):
-    for dr, dc in ((-1, 0), (1, 0), (0, -1), (0, 1)):
-        r, c = row + dr, col + dc
-        if 0 <= r < len(grid) and 0 <= c < len(grid[r]) and grid[r][c] != "#":
-            yield r, c
+    for row_offset, col_offset in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+        next_row, next_col = row + row_offset, col + col_offset
+        if 0 <= next_row < len(grid) and 0 <= next_col < len(grid[next_row]) and grid[next_row][next_col] != "#":
+            yield next_row, next_col
 ```
 
 </details>
@@ -84,7 +84,7 @@ def grid_neighbors(grid, row, col):
 
 В Python очередь реализована с помощью `deque`. Удаление первого элемента обычного списка через `pop(0)` потребовало бы каждый раз сдвигать остальные элементы.
 
-**C++17**
+**C++**
 
 ```cpp
 #include <queue>
@@ -122,17 +122,17 @@ from collections import deque
 
 
 def grid_bfs(grid, start, goal):
-    queue = deque([start])
+    frontier = deque([start])
     distance = {start: 0}
-    while queue:
-        cell = queue.popleft()
+    while frontier:
+        cell = frontier.popleft()
         if cell == goal:
             return distance[cell]
         row, col = cell
         for next_cell in grid_neighbors(grid, row, col):
             if next_cell not in distance:
                 distance[next_cell] = distance[cell] + 1
-                queue.append(next_cell)
+                frontier.append(next_cell)
     return -1
 ```
 
@@ -146,7 +146,7 @@ def grid_bfs(grid, start, goal):
 
 Оба обхода проверяют не более четырёх соседей каждой обработанной клетки. Для прямоугольной карты высоты `h` и ширины `w` время и память составляют `O(hw)`. Для словарей и множеств Python здесь учтена средняя стоимость обращения.
 
-**C++17**
+**C++**
 
 ```cpp
 using std::vector;
@@ -178,14 +178,14 @@ int grid_dfs_size(const Grid& grid, Cell start) {
 ```python
 def grid_dfs_size(grid, start):
     stack = [start]
-    seen = {start}
+    visited = {start}
     while stack:
         row, col = stack.pop()
         for next_cell in grid_neighbors(grid, row, col):
-            if next_cell not in seen:
-                seen.add(next_cell)
+            if next_cell not in visited:
+                visited.add(next_cell)
                 stack.append(next_cell)
-    return len(seen)
+    return len(visited)
 ```
 
 </details>

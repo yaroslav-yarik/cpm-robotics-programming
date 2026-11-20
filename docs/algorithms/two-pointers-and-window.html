@@ -64,7 +64,7 @@
 
 <p>В векторе C++ элементы расположены подряд. Оба края последовательно читают соседние адреса. Когда несколько соседних чисел попадают в одну строку кэша, после первого чтения следующие числа могут уже находиться рядом с процессором.</p>
 <p>Если индексы встретились, осталась одна позиция и составить пару уже нельзя. Каждый шаг сдвигает одну границу внутрь, поэтому время поиска составляет <code>O(n)</code>, дополнительная память — <code>O(1)</code>. Если массив сначала приходится сортировать, общее время возрастает до <code>O(n log n)</code>.</p>
-<p><strong>C++17</strong></p>
+<p><strong>C++</strong></p>
 <pre><code class="language-cpp">#include &lt;cstddef&gt;
 #include &lt;vector&gt;
 
@@ -89,13 +89,13 @@ bool pair_sorted(const Numbers&amp; values, Int target) {
 <details>
 <summary>Тот же алгоритм на Python</summary>
 
-<pre><code class="language-python">def pair_sorted(a, target):
-    left, right = 0, len(a) - 1
+<pre><code class="language-python">def pair_sorted(values, target):
+    left, right = 0, len(values) - 1
     while left &lt; right:
-        total = a[left] + a[right]
-        if total == target:
+        current_sum = values[left] + values[right]
+        if current_sum == target:
             return True
-        if total &lt; target:
+        if current_sum &lt; target:
             left += 1
         else:
             right -= 1
@@ -149,7 +149,7 @@ bool pair_sorted(const Numbers&amp; values, Int target) {
 <p>Самое длинное допустимое окно — <code>[2, 1, 0]</code>, его длина равна 3. Удалённые элементы можно больше не рассматривать. Если с некоторым началом сумма уже велика, то добавление неотрицательных чисел справа её только сохранит или увеличит.</p>
 <p>Каждый элемент добавляем один раз и удаляем не более одного раза. Поэтому два вложенных цикла вместе занимают <code>O(n)</code> времени и используют <code>O(1)</code> дополнительной памяти.</p>
 <p>С отрицательными числами это рассуждение перестаёт работать. В массиве <code>[4, −2]</code> при пределе 3 алгоритм сразу удалил бы четвёрку, хотя сумма всего массива равна 2.</p>
-<p><strong>C++17</strong></p>
+<p><strong>C++</strong></p>
 <pre><code class="language-cpp">#include &lt;algorithm&gt;
 #include &lt;cstddef&gt;
 #include &lt;vector&gt;
@@ -178,15 +178,15 @@ size_t longest_at_most(const Numbers&amp; values, Int limit) {
 <details>
 <summary>Тот же алгоритм на Python</summary>
 
-<pre><code class="language-python">def longest_at_most(a, limit):
-    left = total = best = 0
-    for right, value in enumerate(a):
-        total += value
-        while total &gt; limit:
-            total -= a[left]
+<pre><code class="language-python">def longest_at_most(values, limit):
+    left = current_sum = best_length = 0
+    for right, value in enumerate(values):
+        current_sum += value
+        while current_sum &gt; limit:
+            current_sum -= values[left]
             left += 1
-        best = max(best, right - left + 1)
-    return best
+        best_length = max(best_length, right - left + 1)
+    return best_length
 </code></pre>
 </details>
 

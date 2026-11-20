@@ -35,7 +35,7 @@
 
 В C++ функция ниже с параметром `find_upper = true` ищет верхнюю границу. В Python показаны две отдельные функции. Обе границы находятся за `O(log n)` времени с `O(1)` дополнительной памяти.
 
-**C++17**
+**C++**
 
 ```cpp
 #include <cstddef>
@@ -65,22 +65,22 @@ size_t first_boundary(const Numbers& values, Int target, bool find_upper = false
 <summary>Тот же алгоритм на Python</summary>
 
 ```python
-def lower_bound(a, target):
-    left, right = 0, len(a)
+def lower_bound(values, target):
+    left, right = 0, len(values)
     while left < right:
         middle = left + (right - left) // 2
-        if a[middle] < target:
+        if values[middle] < target:
             left = middle + 1
         else:
             right = middle
     return left
 
 
-def upper_bound(a, target):
-    left, right = 0, len(a)
+def upper_bound(values, target):
+    left, right = 0, len(values)
     while left < right:
         middle = left + (right - left) // 2
-        if a[middle] <= target:
+        if values[middle] <= target:
             left = middle + 1
         else:
             right = middle
@@ -99,17 +99,17 @@ def upper_bound(a, target):
 
 Функция ищет ответ среди целых чисел от 1 до `n`. Вместимость `n` заведомо подходит при хотя бы одном разрешённом рейсе. На каждом шаге мы уменьшаем диапазон примерно вдвое. Для `1 ≤ n ≤ 10¹⁸` время составляет `O(log n)`, дополнительная память — `O(1)`.
 
-**C++17**
+**C++**
 
 ```cpp
 using Int = long long;
 
-Int min_batch_size(Int n, Int batches) {
-    Int left = 1, right = n;
+Int min_batch_size(Int item_count, Int batch_limit) {
+    Int left = 1, right = item_count;
     while (left < right) {
         Int middle = left + (right - left) / 2;
-        Int needed = n / middle + (n % middle != 0);
-        if (needed <= batches) right = middle;
+        Int batches_needed = item_count / middle + (item_count % middle != 0);
+        if (batches_needed <= batch_limit) right = middle;
         else left = middle + 1;
     }
     return left;
@@ -120,12 +120,12 @@ Int min_batch_size(Int n, Int batches) {
 <summary>Тот же алгоритм на Python</summary>
 
 ```python
-def min_batch_size(n, batches):
-    left, right = 1, n
+def min_batch_size(item_count, batch_limit):
+    left, right = 1, item_count
     while left < right:
         middle = left + (right - left) // 2
-        needed = n // middle + (n % middle != 0)
-        if needed <= batches:
+        batches_needed = item_count // middle + (item_count % middle != 0)
+        if batches_needed <= batch_limit:
             right = middle
         else:
             left = middle + 1

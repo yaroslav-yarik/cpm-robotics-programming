@@ -21,7 +21,7 @@
 
 Индекс `start` отмечает начало текущей серии. Как только значение изменилось, записываем готовую серию и переносим `start`. Последнюю серию записываем, когда `end` доходит до длины массива. Условие проверяет конец первым, и тогда `or` в Python и `||` в C++ пропускают чтение `values[end]`.
 
-**C++17**
+**C++**
 
 ```cpp
 #include <cstddef>
@@ -69,9 +69,9 @@ def runs(values):
 
 ## Подтверждение устойчивого сигнала
 
-При дребезге механической кнопки короткие смены уровня пропускают, а новый уровень принимают после непрерывного интервала устойчивости. В дискретной модели ниже новый уровень подтверждается после `needed` одинаковых отсчётов подряд. Счётчик сбрасывается при каждой смене сырого уровня. Начальное подтверждённое состояние равно 0, а `needed > 0`.
+При дребезге механической кнопки короткие смены уровня пропускают, а новый уровень принимают после непрерывного интервала устойчивости. В дискретной модели ниже новый уровень подтверждается после `required_samples` одинаковых отсчётов подряд. Счётчик сбрасывается при каждой смене сырого уровня. Начальное подтверждённое состояние равно 0, а `required_samples > 0`.
 
-**C++17**
+**C++**
 
 ```cpp
 #include <cstddef>
@@ -81,21 +81,21 @@ using std::size_t;
 using std::vector;
 
 vector<int> stable_levels(const vector<int>& samples,
-                               size_t needed) {
-    int confirmed = 0;
-    int candidate = 0;
-    size_t length = 0;
+                               size_t required_samples) {
+    int confirmed_level = 0;
+    int candidate_level = 0;
+    size_t streak_length = 0;
     vector<int> result;
     for (int value : samples) {
-        if (value != candidate) {
-            candidate = value;
-            length = 0;
+        if (value != candidate_level) {
+            candidate_level = value;
+            streak_length = 0;
         }
-        ++length;
-        if (length == needed) {
-            confirmed = candidate;
+        ++streak_length;
+        if (streak_length == required_samples) {
+            confirmed_level = candidate_level;
         }
-        result.push_back(confirmed);
+        result.push_back(confirmed_level);
     }
     return result;
 }
@@ -105,17 +105,17 @@ vector<int> stable_levels(const vector<int>& samples,
 <summary>Тот же алгоритм на Python</summary>
 
 ```python
-def stable_levels(samples, needed):
-    confirmed = candidate = 0
-    length = 0
+def stable_levels(samples, required_samples):
+    confirmed_level = candidate_level = 0
+    streak_length = 0
     result = []
     for value in samples:
-        if value != candidate:
-            candidate, length = value, 0
-        length += 1
-        if length == needed:
-            confirmed = candidate
-        result.append(confirmed)
+        if value != candidate_level:
+            candidate_level, streak_length = value, 0
+        streak_length += 1
+        if streak_length == required_samples:
+            confirmed_level = candidate_level
+        result.append(confirmed_level)
     return result
 ```
 
@@ -127,7 +127,7 @@ def stable_levels(samples, needed):
 
 При нажатии металлические контакты могут несколько раз разомкнуться и снова коснуться друг друга. Вход микроконтроллера при этом успевает прочитать разные уровни. На рисунке показаны именно моменты чтения. Между ними вход мог переключаться ещё раз. В примере Arduino момент последней смены уровня запоминают и принимают новое состояние после заданной задержки. [Пример Debounce, 2006–2016](https://github.com/arduino/Arduino/blob/1.8.13/build/shared/examples/02.Digital/Debounce/Debounce.ino) · [Откуда берутся отсчёты](../hardware/io.md)
 
-При `needed = 2` одиночная единица пропадает после следующего чтения. Разберём четыре отсчёта с начальным подтверждённым уровнем `0`.
+При `required_samples = 2` одиночная единица пропадает после следующего чтения. Разберём четыре отсчёта с начальным подтверждённым уровнем `0`.
 
 | Отсчёт | Кандидат | Длина серии | Подтверждённый уровень |
 |---|---|---|---|
@@ -152,7 +152,7 @@ def stable_levels(samples, needed):
 
 Функции возвращают пары `(порог, количество)`. Сортируем вход. При встрече новой группы одинаковых значений все элементы от начала группы до конца массива проходят порог. Из этих сведений можно построить оценку по своему критерию. Предполагаем, что `max(values) + 1` помещается в знаковый 64-битный тип.
 
-**C++17**
+**C++**
 
 ```cpp
 #include <algorithm>
@@ -188,9 +188,9 @@ threshold_counts(vector<long long> ordered) {
 def threshold_counts(values):
     ordered = sorted(values)
     result = []
-    for i, threshold in enumerate(ordered):
-        if i == 0 or threshold != ordered[i - 1]:
-            result.append((threshold, len(ordered) - i))
+    for index, threshold in enumerate(ordered):
+        if index == 0 or threshold != ordered[index - 1]:
+            result.append((threshold, len(ordered) - index))
     if ordered:
         result.append((ordered[-1] + 1, 0))
     return result

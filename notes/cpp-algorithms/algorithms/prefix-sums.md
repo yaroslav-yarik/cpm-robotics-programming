@@ -24,7 +24,7 @@
 
 Функция `prefix_sums` за один проход строит таблицу длины `n + 1`. Построение занимает `O(n)` времени и памяти. Затем каждый вызов `range_sum` занимает `O(1)`. Для `q` запросов получаем `O(n + q)` времени вместо `O(nq)` при повторном подсчёте. Если изменить элемент массива, придётся обновить затронутые префиксы.
 
-**C++17**
+**C++**
 
 ```cpp
 #include <cstddef>
@@ -51,9 +51,9 @@ Int range_sum(const Numbers& prefix, size_t left, size_t right) {
 <summary>Тот же алгоритм на Python</summary>
 
 ```python
-def prefix_sums(a):
+def prefix_sums(values):
     prefix = [0]
-    for value in a:
+    for value in values:
         prefix.append(prefix[-1] + value)
     return prefix
 
@@ -85,7 +85,7 @@ def range_sum(prefix, left, right):
 
 Например, выберем обе строки и два правых столбца. В них лежат 2, 3, −5 и 6. По таблице получаем `11 − 0 − 5 + 0 = 6`. Для таблицы `h × w` построение занимает `O(hw)` времени при положительных размерах. Таблица префиксов занимает `(h + 1)(w + 1)` ячеек, запрос — `O(1)` времени.
 
-**C++17**
+**C++**
 
 ```cpp
 #include <cstddef>
@@ -121,19 +121,19 @@ Int rectangle_sum(const Matrix& prefix, size_t top, size_t left,
 <summary>Тот же алгоритм на Python</summary>
 
 ```python
-def rectangle_prefix(a):
-    rows, cols = len(a), len(a[0]) if a else 0
-    p = [[0] * (cols + 1) for _ in range(rows + 1)]
-    for i in range(rows):
+def rectangle_prefix(values):
+    rows, column_count = len(values), len(values[0]) if values else 0
+    prefix = [[0] * (column_count + 1) for _ in range(rows + 1)]
+    for row in range(rows):
         row_sum = 0
-        for j in range(cols):
-            row_sum += a[i][j]
-            p[i + 1][j + 1] = p[i][j + 1] + row_sum
-    return p
+        for col in range(column_count):
+            row_sum += values[row][col]
+            prefix[row + 1][col + 1] = prefix[row][col + 1] + row_sum
+    return prefix
 
 
-def rectangle_sum(p, top, left, bottom, right):
-    return p[bottom][right] - p[top][right] - p[bottom][left] + p[top][left]
+def rectangle_sum(prefix, top, left, bottom, right):
+    return prefix[bottom][right] - prefix[top][right] - prefix[bottom][left] + prefix[top][left]
 ```
 
 </details>

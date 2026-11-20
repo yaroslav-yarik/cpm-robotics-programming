@@ -27,7 +27,7 @@
 
 Вариантов `2ⁿ`, поэтому время перебора составляет `O(2ⁿ)`. При `n = 30` это уже больше миллиарда вариантов. Для цепочки вызовов нужно `O(n)` памяти, для списка ответов — `O(2ⁿ)`. Если требуется только количество подходящих подмножеств, можно вместо списка накапливать счётчик.
 
-**C++17**
+**C++**
 
 ```cpp
 #include <cstddef>
@@ -59,18 +59,18 @@ Numbers subset_sums(const Numbers& values) {
 <summary>Тот же алгоритм на Python</summary>
 
 ```python
-def subset_sums(a):
-    answer = []
+def subset_sums(values):
+    result = []
 
-    def visit(index, total):
-        if index == len(a):
-            answer.append(total)
+    def visit(index, subset_sum):
+        if index == len(values):
+            result.append(subset_sum)
             return
-        visit(index + 1, total)
-        visit(index + 1, total + a[index])
+        visit(index + 1, subset_sum)
+        visit(index + 1, subset_sum + values[index])
 
     visit(0, 0)
-    return answer
+    return result
 ```
 
 </details>
@@ -92,9 +92,9 @@ def subset_sums(a):
 
 Для ступеньки 0 ответ равен её цене. Дальше работает правило **`dp[index] = cost[index] + min(dp[index − 1], dp[index − 2])`**. При `index = 1` позиция перед лестницей имеет цену 0. В коде её хранит отдельная переменная. Индекс `−1` в Python означал бы последний элемент списка.
 
-Для следующего расчёта нужны лишь две предыдущие суммы — `two_ago` и `previous`. После каждого шага сдвигаем обе на одну позицию. Время работы составляет `O(n)`, дополнительная память — `O(1)`. Если лестница пуста, функция возвращает 0.
+Для следующего расчёта нужны лишь две предыдущие суммы — `cost_two_steps_back` и `previous_cost`. После каждого шага сдвигаем обе на одну позицию. Время работы составляет `O(n)`, дополнительная память — `O(1)`. Если лестница пуста, функция возвращает 0.
 
-**C++17**
+**C++**
 
 ```cpp
 #include <algorithm>
@@ -110,13 +110,13 @@ using Numbers = vector<Int>;
 
 Int min_stair_cost(const Numbers& cost) {
     if (cost.empty()) return 0;
-    Int two_ago = 0, previous = cost[0];
+    Int cost_two_steps_back = 0, previous_cost = cost[0];
     for (size_t index = 1; index < cost.size(); ++index) {
-        Int current = cost[index] + min(two_ago, previous);
-        two_ago = previous;
-        previous = current;
+        Int current_cost = cost[index] + min(cost_two_steps_back, previous_cost);
+        cost_two_steps_back = previous_cost;
+        previous_cost = current_cost;
     }
-    return previous;
+    return previous_cost;
 }
 ```
 
@@ -127,11 +127,11 @@ Int min_stair_cost(const Numbers& cost) {
 def min_stair_cost(cost):
     if not cost:
         return 0
-    two_ago, previous = 0, cost[0]
-    for i in range(1, len(cost)):
-        current = cost[i] + min(two_ago, previous)
-        two_ago, previous = previous, current
-    return previous
+    cost_two_steps_back, previous_cost = 0, cost[0]
+    for index in range(1, len(cost)):
+        current_cost = cost[index] + min(cost_two_steps_back, previous_cost)
+        cost_two_steps_back, previous_cost = previous_cost, current_cost
+    return previous_cost
 ```
 
 </details>

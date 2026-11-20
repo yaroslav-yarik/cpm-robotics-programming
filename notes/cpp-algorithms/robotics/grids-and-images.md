@@ -29,7 +29,7 @@
 
 Координаты и направление вместе образуют **позу**. При повороте направо новый номер направления равен `(direction + 1) % 4`. При движении прямо умножаем сдвиг из таблицы на число шагов. Например, два шага на север из `(3, 2)` ведут через `(2, 2)` в `(1, 2)`.
 
-**C++17**
+**C++**
 
 ```cpp
 #include <utility>
@@ -50,8 +50,8 @@ pair<long long, long long> move(long long row, long long col,
 ```python
 def move(row, col, direction, steps):
     offsets = [(-1, 0), (0, 1), (1, 0), (0, -1)]
-    dr, dc = offsets[direction]
-    return row + steps * dr, col + steps * dc
+    row_offset, col_offset = offsets[direction]
+    return row + steps * row_offset, col + steps * col_offset
 ```
 
 </details>
@@ -70,7 +70,7 @@ def move(row, col, direction, steps):
 
 Самая верхняя строка области — `1`, самая нижняя — `2`. По столбцам границы тоже `1` и `2`. Чтобы найти такую рамку у любой непустой области, начинаем с первой клетки и расширяем границы после чтения каждой следующей.
 
-**C++17**
+**C++**
 
 ```cpp
 #include <algorithm>
@@ -122,7 +122,7 @@ def bounding_box(cells):
 
 Состояние клетки может учитывать сразу несколько источников. Например, если один датчик обнаруживает синий цвет, а другой жёлтый, по одному биту на каждый цвет сохраняет оба свидетельства. Начнём с маски `00`. Синий цвет (бит 0) даёт `01`. После жёлтого (бит 1) получим `01 | 10 = 11`. Повторное наблюдение синего оставит `11 | 01 = 11`. Так [побитовое ИЛИ](../cpp/bits-and-bitset.md) сохраняет оба признака в любом порядке. Перед первым наблюдением все маски в `grid` равны нулю.
 
-**C++17**
+**C++**
 
 ```cpp
 #include <cstdint>
@@ -155,7 +155,7 @@ def record_color(grid, row, col, color):
 
 Вместо наложения целых карт каждая пара точек отдаёт один «голос» за свой сдвиг. Если точки внутри каждого набора различны, число голосов равно числу совпадений. `rotate_point` поворачивает точку, а `shift_votes` считает голоса уже при выбранном повороте.
 
-**C++17**
+**C++**
 
 ```cpp
 #include <map>
@@ -190,14 +190,14 @@ map<Point, long long> shift_votes(const vector<Point>& first,
 ```python
 from collections import Counter
 
-def rotate_point(row, col, n):
-    return col, n - 1 - row
+def rotate_point(row, col, side_length):
+    return col, side_length - 1 - row
 
 def shift_votes(first, second):
     votes = Counter()
-    for ar, ac in first:
-        for br, bc in second:
-            votes[ar - br, ac - bc] += 1
+    for first_row, first_col in first:
+        for second_row, second_col in second:
+            votes[first_row - second_row, first_col - second_col] += 1
     return votes
 ```
 
@@ -209,7 +209,7 @@ def shift_votes(first, second):
 
 Если на прямоугольной карте много запросов «сколько свободных клеток подряд справа», можно заполнить таблицу одним проходом. Для свободной клетки ответ равен 1 плюс ответ её правого соседа, если сосед тоже свободен. Если справа стена или край, ответ 0. Поэтому обходи строку справа налево. В примере свободная клетка обозначена точкой, стена — решёткой.
 
-**C++17**
+**C++**
 
 ```cpp
 #include <cstddef>

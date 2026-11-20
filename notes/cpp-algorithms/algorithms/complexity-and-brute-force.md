@@ -37,7 +37,7 @@
 
 В примерах справочника нумерация начинается с нуля. Запись `[l, r)` включает индекс `l` и исключает `r`. Для сумм в C++ используем `long long`. При решении задачи проверь по ограничениям, помещаются ли в этот тип промежуточные результаты.
 
-**C++17**
+**C++**
 
 ```cpp
 #include <cstddef>
@@ -63,10 +63,10 @@ bool pair_brute(const Numbers& values, Int target) {
 <summary>Тот же алгоритм на Python</summary>
 
 ```python
-def pair_brute(a, target):
-    for i in range(len(a)):
-        for j in range(i + 1, len(a)):
-            if a[i] + a[j] == target:
+def pair_brute(values, target):
+    for first_index in range(len(values)):
+        for second_index in range(first_index + 1, len(values)):
+            if values[first_index] + values[second_index] == target:
                 return True
     return False
 ```

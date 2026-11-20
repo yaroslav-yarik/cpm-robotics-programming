@@ -28,13 +28,13 @@
 
 <!-- interactive -->
 
-Для подсчёта пар сначала прибавляем `seen[value]` к ответу, а затем увеличиваем счётчик. Поменяв эти действия местами, мы засчитали бы пару элемента с самим собой.
+Для подсчёта пар сначала прибавляем `frequencies[value]` к ответу, а затем увеличиваем счётчик. Поменяв эти действия местами, мы засчитали бы пару элемента с самим собой.
 
 Если частоты лежат в массиве, индекс сразу задаёт смещение нужного счётчика в памяти. Для хеш-таблицы сначала вычисляют хеш ключа, затем ищут запись в выбранной группе. Если несколько ключей попали в одну группу, их приходится различать сравнением.
 
 В Python используем `Counter`, в C++ — `std::unordered_map`. Обращение к счётчику в хеш-таблице в среднем занимает `O(1)`. Для `n` чисел время в среднем составляет `O(n)`, память — `O(u)`, где `u` — количество различных чисел. Если нужен порядок по ключам, в C++ подойдёт `std::map`. Для него весь проход занимает `O(n log(u + 1))`.
 
-**C++17**
+**C++**
 
 ```cpp
 #include <unordered_map>
@@ -47,11 +47,11 @@ using Int = long long;
 using Numbers = vector<Int>;
 
 Int equal_pairs(const Numbers& values) {
-    unordered_map<Int, Int> seen;
+    unordered_map<Int, Int> frequencies;
     Int pair_count = 0;
     for (Int value : values) {
-        pair_count += seen[value];
-        ++seen[value];
+        pair_count += frequencies[value];
+        ++frequencies[value];
     }
     return pair_count;
 }
@@ -64,13 +64,13 @@ Int equal_pairs(const Numbers& values) {
 from collections import Counter
 
 
-def equal_pairs(a):
-    seen = Counter()
-    result = 0
-    for value in a:
-        result += seen[value]
-        seen[value] += 1
-    return result
+def equal_pairs(values):
+    frequencies = Counter()
+    pair_count = 0
+    for value in values:
+        pair_count += frequencies[value]
+        frequencies[value] += 1
+    return pair_count
 ```
 
 </details>

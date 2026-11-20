@@ -27,7 +27,7 @@
 </tr>
 </tbody></table>
 <p>Побитовое И (<code>&amp;</code>) оставляет единицы, общие для состояния и маски. Если результат равен всей маске, выполнены все требования. Если достаточно одного из запрошенных признаков, проверяют <code>(state &amp; required) != 0</code>. <a href="../cpp/bits-and-bitset.html">Подробнее о битовых операциях</a>.</p>
-<p><strong>C++17</strong></p>
+<p><strong>C++</strong></p>
 <pre><code class="language-cpp">#include &lt;cstdint&gt;
 
 using std::uint64_t;
@@ -51,7 +51,7 @@ bool has_all_flags(uint64_t state, uint64_t required) {
 </code></pre>
 <p>Прошло как минимум четыре шага. Тот же результат дали бы 14 или 24 шага. Поэтому точно восстановить разность по двум показаниям можно, если счётчик движется только вперёд и между чтениями проходит меньше <code>m</code> шагов, где <code>m</code> — число разных показаний.</p>
 <p>Входные показания лежат в диапазоне <code>[0, m)</code>, а <code>m &gt; 0</code>. В Python остаток при положительном делителе неотрицателен. В C++ можно взять разность и при необходимости прибавить модуль.</p>
-<p><strong>C++17</strong></p>
+<p><strong>C++</strong></p>
 <pre><code class="language-cpp">long long counter_gap(long long previous, long long current,
                       long long modulus) {
     const long long difference = current - previous;
@@ -143,7 +143,7 @@ bool has_all_flags(uint64_t state, uint64_t required) {
 </tr>
 </tbody></table>
 <p>При чтении сначала сравниваем <code>off_at</code> с <code>now</code>. Если срок уже наступил, убираем его. Отсутствие срока обозначает погасший индикатор.</p>
-<p><strong>C++17</strong></p>
+<p><strong>C++</strong></p>
 <pre><code class="language-cpp">#include &lt;optional&gt;
 
 using std::optional;
