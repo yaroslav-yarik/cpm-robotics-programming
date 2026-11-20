@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Алгоритмы стандартной библиотеки и лямбды · Справочник ЦПМ</title><link rel="stylesheet" href="../style.css"></head><body><main class="reader"><nav class="reader-nav"><a href="../index.html">Оглавление</a><span> / </span><a href="../index.html#cpp">Язык C++</a><a class="jump" href="#practice">К опыту</a></nav><article><h1>Алгоритмы стандартной библиотеки и лямбды</h1>
+<p>Чтобы найти первое отрицательное число в векторе <code>{5, -3, 8, -1, 6}</code>, нужны две вещи. Сначала указываем, где искать, затем — какой элемент нам подходит. Алгоритм <code>std::find_if</code> из <code>&lt;algorithm&gt;</code> переберёт числа по порядку и остановится на <code>-3</code>. Для вектора диапазон задаётся двумя итераторами. Например, <code>[a.begin(), a.end())</code> охватывает весь вектор, а <code>[a.begin() + 1, a.end())</code> пропускает первый элемент непустого вектора.</p>
+<h2>Поиск и подсчёт</h2>
+<table>
+<thead>
+<tr>
+<th>Алгоритм</th>
+<th>Что возвращает</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>std::find(first, last, value)</code></td>
+<td>Итератор первого элемента, равного <code>value</code>, или <code>last</code></td>
+</tr>
+<tr>
+<td><code>std::find_if(first, last, pred)</code></td>
+<td>Итератор первого элемента, для которого <code>pred</code> вернул <code>true</code>, или <code>last</code></td>
+</tr>
+<tr>
+<td><code>std::count(first, last, value)</code></td>
+<td>Число элементов, равных <code>value</code></td>
+</tr>
+<tr>
+<td><code>std::count_if(first, last, pred)</code></td>
+<td>Число элементов, прошедших проверку <code>pred</code></td>
+</tr>
+</tbody></table>
+<p>В таблице <code>first</code> и <code>last</code> — границы поиска. <strong>Предикат</strong> <code>pred</code> — функция, которая отвечает «да» или «нет». Например, <code>bool is_even(int value) { return value % 2 == 0; }</code>. Алгоритм сам вызывает её для элементов диапазона. Поиск может закончиться раньше конца, а подсчёт проходит весь диапазон. В худшем случае оба требуют линейного времени.</p>
+<p>Убедись, что итератор отличается от правой границы, прежде чем читать элемент через <code>*it</code>. У вектора индекс найденного элемента можно получить как <code>it - a.begin()</code>. Если поиск выполнялся на участке, сравнивай итератор именно с правой границей этого участка.</p>
+<p><strong>Какие данные нужны поиску и подсчёту.</strong> Возьмём те же показания, что и в примере внизу. При обычном последовательном проходе процессор загружает очередное число и сравнивает его с нулём. Для поиска первого совпадения ответ известен уже на втором числе. Чтобы получить точное количество, нужно учесть и оставшиеся значения.</p>
+<p><img src="../assets/cpp/predicate-scan.svg" alt="find_if находит −3 на позиции 1, а count_if проверяет все пять элементов и находит ещё −1."></p>
+<div id="practice"><section class="experiment" id="lab-stl-and-lambdas">
+  <h3>В каком месте алгоритм остановит поиск?</h3>
+  <p>Сравни <code>find_if</code> и <code>count_if</code> на пяти показаниях. Выбери порог и открывай по одной проверке предиката.</p>
+  <div class="lab-controls"><label>Алгоритм <select data-op><option>find_if</option><option>count_if</option></select></label>
+  <label>Порог <select data-limit><option>−4</option><option selected>0</option><option>5</option><option>9</option></select></label>
+  <button type="button" data-step>Проверить число</button><button type="button" data-reset>Сначала</button></div>
+  <pre><code data-code></code></pre><div class="lab-cells" data-values></div>
+  <p data-status role="status"></p>
+<style>
+#lab-stl-and-lambdas .lab-controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin:.8rem 0} #lab-stl-and-lambdas .lab-cells{display:flex;flex-wrap:wrap;gap:.4rem;margin:.8rem 0} #lab-stl-and-lambdas .lab-cell{display:grid;justify-items:center;min-width:3rem;padding:.35rem .55rem;border:1px solid #96acb7;border-radius:.4rem;background:#eef3f5;color:#172f45} #lab-stl-and-lambdas .lab-cell.active{background:#ffe8a8;color:#473105;border-color:#8f6916} #lab-stl-and-lambdas .lab-cell small{font-size:.82rem} #lab-stl-and-lambdas pre{white-space:pre-wrap;overflow-wrap:anywhere}
+</style>
+<script>
+(() => {
+  const root = document.getElementById('lab-stl-and-lambdas');
+  const get = selector => root.querySelector(selector);
+  const status = get('[data-status]');
+  const values = [5, -3, 8, -1, 6];
+  let count = 0;
+  function render() {
+    const find = get('[data-op]').value === 'find_if';
+    const limit = Number(get('[data-limit]').value.replace('−', '-'));
+    const tested = values.slice(0, count);
+    const first = tested.findIndex(x => x < limit);
+    const matches = tested.filter(x => x < limit).length;
+    const done = count === values.length || (find && first >= 0);
+    get('[data-code]').textContent = '[limit](int value) { return value < limit; }   // limit = ' + limit;
+    get('[data-step]').disabled = done;
+    const cells = get('[data-values]');
+    cells.replaceChildren();
+    values.forEach((v, i) => {
+      const cell = document.createElement('span');
+      cell.className = 'lab-cell' + (i === count - 1 ? ' active' : '');
+      const label = document.createElement('small');
+      label.textContent = i < count ? (v < limit ? 'да' : 'нет') : 'ожидает';
+      cell.append('[' + i + '] ' + v, label); cells.append(cell);
+    });
+    if (done && find) status.textContent = first < 0 ? 'Все пять значений проверены. Совпадений нет, результат — end().' : 'Первое совпадение на позиции ' + first + '. Для ответа достаточно ' + count + ' проверок.';
+    else if (done) status.textContent = 'Все пять значений проверены. Число совпадений: ' + matches + '.';
+    else status.textContent = 'Проверено ' + count + ' из 5. Совпадений пока ' + matches + '. Следующая позиция: ' + count + '.';
+  }
+  const reset = () => { count = 0; render(); };
+  get('[data-op]').onchange = get('[data-limit]').onchange = reset;
+  get('[data-reset]').onclick = reset;
+  get('[data-step]').onclick = () => { if (!get('[data-step]').disabled) count++; render(); };
+  render();
+})();
+</script>
+</section>
+</div>
+
+<p>Компилятор может встроить короткую проверку <code>value &lt; 0</code> в цикл. В таком случае для каждого элемента достаточно выполнить сравнение и обработать его результат, отдельный вызов функции не нужен. Схема показывает, из каких сравнений получается ответ, а набор команд зависит от компилятора.</p>
+<h2>Экстремумы и логические проверки</h2>
+<p><code>std::min_element</code> и <code>std::max_element</code> возвращают итераторы минимума и максимума. Для пустого диапазона результат совпадает с его концом. <code>std::minmax_element</code> находит обе позиции за один проход и возвращает их парой. Эти операции требуют линейного времени.</p>
+<ul>
+<li><code>std::any_of(first, last, pred)</code> — хотя бы один элемент подходит.</li>
+<li><code>std::all_of(first, last, pred)</code> — все элементы подходят.</li>
+<li><code>std::none_of(first, last, pred)</code> — подходящих элементов нет.</li>
+</ul>
+<p>На пустом диапазоне результаты соответственно <code>false</code>, <code>true</code> и <code>true</code>. Например, у утверждения «все элементы чётные» нет ни одного контрпримера в пустом диапазоне.</p>
+<h2>Изменение диапазона</h2>
+<table>
+<thead>
+<tr>
+<th>Выражение</th>
+<th>Пример от исходного диапазона <code>{1, 2, 3, 4}</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>std::reverse(first, last)</code></td>
+<td><code>{4, 3, 2, 1}</code></td>
+</tr>
+<tr>
+<td><code>std::rotate(first, first + 1, last)</code></td>
+<td><code>{2, 3, 4, 1}</code>. Элемент с позиции <code>first + 1</code> становится первым</td>
+</tr>
+<tr>
+<td><code>std::fill(first, last, 7)</code></td>
+<td><code>{7, 7, 7, 7}</code></td>
+</tr>
+<tr>
+<td><code>std::replace(first, last, 2, 9)</code></td>
+<td><code>{1, 9, 3, 4}</code></td>
+</tr>
+<tr>
+<td><code>std::replace_if(first, last, is_even, 0)</code></td>
+<td><code>{1, 0, 3, 0}</code></td>
+</tr>
+</tbody></table>
+<p><code>reverse</code> переворачивает порядок, а <code>rotate</code> меняет местами два смежных участка с сохранением порядка внутри каждого. Все перечисленные операции сохраняют длину диапазона.</p>
+<h2>Лямбда и захват переменной</h2>
+<p>Лямбда позволяет записать короткую функцию прямо в месте использования. Например, <code>[](int value) { return value &lt; 0; }</code>. Пустые квадратные скобки означают, что лямбда не берёт переменные из окружающего блока. Чтобы использовать находящийся рядом порог <code>threshold</code>, напиши <code>[threshold](int value) { return value &gt; threshold; }</code>. При таком захвате лямбда хранит копию порога.</p>
+<h3>Как задать порядок сортировки</h3>
+<p>Компаратор для <code>sort</code> получает два аргумента и отвечает, должен ли первый идти раньше второго. Это отличается от предиката <code>find_if</code>, который проверяет один элемент. Для сортировки по убыванию модуля можно сравнивать <code>std::llabs(static_cast&lt;long long&gt;(left)) &gt; std::llabs(static_cast&lt;long long&gt;(right))</code>.</p>
+<p>Приведение к более широкому типу перед вычислением модуля защищает от переполнения на минимальном значении 32-битного <code>int</code>.</p>
+<h3>Как получить сразу две позиции</h3>
+<p><code>std::pair&lt;int, int&gt;</code> хранит два значения. Обращайся к ним через <code>first</code> и <code>second</code> или распакуй структурной привязкой C++17. Например, <code>auto [smallest, largest] = std::minmax_element(a.begin(), a.end());</code> создаёт два итератора. Если вектор непустой, <code>*smallest</code> и <code>*largest</code> дадут значения.</p>
+<h3>Как передать именованную функцию</h3>
+<p>Именованную функцию тоже можно передать как аргумент. Запись <code>bool (*predicate)(int)</code> задаёт указатель на функцию, принимающую <code>int</code> и возвращающую <code>bool</code>. Его вызывают привычным <code>predicate(value)</code>. В параметре <code>find_if</code> прямо пишут имя функции <code>is_even</code> или саму лямбду. Для лямбды с захватом лучше использовать стандартный алгоритм напрямую. В обычный указатель на функцию она не преобразуется.</p>
+<h2>Поиск показаний и замена значений</h2>
+<p>В массиве показаний найдём первое отрицательное, посчитаем все отрицательные, найдём минимум и максимум и заменим отрицательные нулями.</p>
+<pre><code class="language-cpp">#include &lt;algorithm&gt;
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+
+bool is_negative(int value) {
+    return value &lt; 0;
+}
+
+int main() {
+    std::vector&lt;int&gt; readings{5, -3, 8, -1, 6};
+    auto first = std::find_if(readings.begin(), readings.end(), is_negative);
+    if (first != readings.end()) {
+        std::cout &lt;&lt; first - readings.begin() &lt;&lt; &#39; &#39; &lt;&lt; *first &lt;&lt; &#39;\n&#39;;
+    }
+
+    std::cout &lt;&lt; std::count_if(readings.begin(), readings.end(), is_negative) &lt;&lt; &#39;\n&#39;;
+
+    if (!readings.empty()) {
+        auto [smallest, largest] = std::minmax_element(readings.begin(), readings.end());
+        std::cout &lt;&lt; *smallest &lt;&lt; &#39; &#39; &lt;&lt; *largest &lt;&lt; &#39;\n&#39;;
+    }
+
+    std::replace_if(readings.begin(), readings.end(), is_negative, 0);
+    std::cout &lt;&lt; std::all_of(readings.begin(), readings.end(),
+                             [](int value) { return value &gt;= 0; }) &lt;&lt; &#39;\n&#39;;
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Строка вывода</th>
+<th>Откуда берётся результат</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>1 -3</code></td>
+<td>Первое отрицательное число <code>-3</code> стоит на позиции 1</td>
+</tr>
+<tr>
+<td><code>2</code></td>
+<td>Условие <code>value &lt; 0</code> выполнилось для <code>-3</code> и <code>-1</code></td>
+</tr>
+<tr>
+<td><code>-3 8</code></td>
+<td>Минимальное и максимальное значения до замены</td>
+</tr>
+<tr>
+<td><code>1</code></td>
+<td>После замены ряд равен <code>5, 0, 8, 0, 6</code>. Все числа удовлетворяют условию <code>value &gt;= 0</code></td>
+</tr>
+</tbody></table>
+<hr>
+<p><a href="strings.html">← Строки</a> · <a href="sequence-operations.html">→ Преобразование и редактирование последовательностей</a></p>
+</article></main></body></html>

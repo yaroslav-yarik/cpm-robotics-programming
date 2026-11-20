@@ -1,0 +1,45 @@
+<section class="experiment" id="lab-variables-and-memory">
+  <h3>Когда копия перестаёт совпадать с оригиналом?</h3>
+  <p>Сохрани текущее значение <code>sum</code> в <code>saved</code>, затем прибавь число к сумме. Предскажи, что покажет каждая переменная.</p>
+  <div class="lab-cells"><span class="lab-cell"><small>sum</small><strong data-sum>7</strong></span><span class="lab-cell"><small>saved</small><strong data-saved>—</strong></span></div>
+  <div class="lab-controls"><button type="button" data-copy>Сохранить копию</button><label>Прибавить <select data-delta><option>1</option><option selected>5</option><option>−3</option></select></label><button type="button" data-add>Изменить sum</button><button type="button" data-reset>Сначала</button></div>
+  <pre><code data-line>int sum = 7;</code></pre>
+  <p data-status role="status"></p>
+<style>
+#lab-variables-and-memory .lab-controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin:.8rem 0} #lab-variables-and-memory .lab-cells{display:flex;flex-wrap:wrap;gap:.4rem;margin:.8rem 0} #lab-variables-and-memory .lab-cell{display:grid;justify-items:center;min-width:3rem;padding:.35rem .55rem;border:1px solid #96acb7;border-radius:.4rem;background:#eef3f5;color:#172f45} #lab-variables-and-memory .lab-cell.active{background:#ffe8a8;color:#473105;border-color:#8f6916} #lab-variables-and-memory .lab-cell small{font-size:.82rem} #lab-variables-and-memory pre{white-space:pre-wrap;overflow-wrap:anywhere}
+</style>
+<script>
+(() => {
+  const root = document.getElementById('lab-variables-and-memory');
+  const get = selector => root.querySelector(selector);
+  const status = get('[data-status]');
+  let sum = 7;
+  let saved = null;
+  function show(code, explanation) {
+    get('[data-sum]').textContent = String(sum);
+    get('[data-saved]').textContent = saved === null ? '—' : String(saved);
+    get('[data-line]').textContent = code;
+    status.textContent = explanation;
+  }
+  get('[data-copy]').onclick = () => {
+    const first = saved === null;
+    saved = sum;
+    show(first ? 'int saved = sum;' : 'saved = sum;', 'В saved записана копия числа ' + sum + '.');
+  };
+  get('[data-add]').onclick = () => {
+    const delta = Number(get('[data-delta]').value.replace('−', '-'));
+    const before = sum;
+    sum += delta;
+    show('sum += ' + delta + ';', 'Прежнее значение sum: ' + before + '. Новое: ' + sum + '. ' +
+      (saved === null ? 'Копия ещё не создана.' : 'В saved по-прежнему ' + saved + '.'));
+  };
+  get('[data-reset]').onclick = () => {
+    sum = 7;
+    saved = null;
+    get('[data-delta]').value = '5';
+    show('int sum = 7;', 'У sum начальное значение 7. Имя saved появится при первом сохранении.');
+  };
+  get('[data-reset]').onclick();
+})();
+</script>
+</section>

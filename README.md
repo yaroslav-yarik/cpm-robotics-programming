@@ -6,9 +6,9 @@
 
 ## Справочник для 9–11 классов
 
-[Открыть интерактивные примеры](https://yaroslav-yarik.github.io/cpm-robotics-programming/).
+[Читать главы с интерактивными примерами](https://yaroslav-yarik.github.io/cpm-robotics-programming/).
 
-Если хочешь понять, как программа выполняется на компьютере, проследи путь одного числа от сложения битов до записи в память. В главах о C++ и алгоритмах рисунки стоят рядом с теми строками кода, которые они объясняют. [Открыть справочник](notes/cpp-algorithms/README.md) · [Начать с устройства процессора](notes/cpp-algorithms/hardware/cpu.md).
+Если хочешь понять, как программа выполняется на компьютере, проследи путь одного числа от сложения битов до записи в память. В главах о C++ и алгоритмах рисунки стоят рядом с теми строками кода, которые они объясняют. [Открыть справочник](https://yaroslav-yarik.github.io/cpm-robotics-programming/) · [Начать с устройства процессора](https://yaroslav-yarik.github.io/cpm-robotics-programming/hardware/cpu.html).
 
 ## Тренировки первого месяца
 
@@ -25,7 +25,7 @@
 
 ## Материалы
 
-- [Справочник по C++ и алгоритмам](notes/cpp-algorithms/README.md).
+- [Справочник по C++ и алгоритмам](https://yaroslav-yarik.github.io/cpm-robotics-programming/).
 - [Конспекты](notes/README.md).
 - [Разборы задач](editorials/README.md).
 - [Официальные требования сезона 2026/27](https://robot.mipt.ru/uchastnikam/reglament/requirements_26_27/).

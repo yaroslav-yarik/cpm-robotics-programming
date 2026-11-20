@@ -1,0 +1,33 @@
+<section class="experiment">
+<h3>Собери пары одинаковых чисел</h3>
+<p>Добавь 7, 5, 7 и ещё раз 7. Перед последним нажатием попробуй назвать число новых пар. Порядок и состав последовательности можно менять.</p>
+<div class="controls"><button type="button" data-value="7">Добавить 7</button><button type="button" data-value="5">Добавить 5</button><button type="button" data-value="-2">Добавить −2</button><button type="button" name="undo">Убрать последнее</button><button type="button" name="reset">Очистить</button></div>
+<p data-array></p><p data-counts></p><p data-result role="status"></p>
+<noscript>Для работы этого примера нужен JavaScript.</noscript>
+<script>
+(() => {
+  const section = document.currentScript.closest('.experiment');
+  const pick = selector => section.querySelector(selector);
+  const values = [];
+  const addButtons = section.querySelectorAll('[data-value]');
+  function render() {
+    const seen = new Map();
+    let pairs = 0, added = 0;
+    for (const n of values) {
+      added = seen.get(n) || 0;
+      pairs += added;
+      seen.set(n, added + 1);
+    }
+    pick('[data-array]').textContent = 'Последовательность [' + values.join(', ') + ']';
+    pick('[data-counts]').textContent = 'Частоты · ' + (Array.from(seen, ([n, count]) => n + ' → ' + count).join(' · ') || 'пока пусто');
+    pick('[data-result]').textContent = values.length ? 'Последнее число ' + values[values.length - 1] + ' встретилось раньше ' + added + ' раз. Оно дало ' + added + ' новых пар. Всего ' + pairs + '.' : 'Пока нет ни одной пары.';
+    pick('[name="undo"]').disabled = pick('[name="reset"]').disabled = !values.length;
+    for (const button of addButtons) button.disabled = values.length >= 20;
+  }
+  for (const button of addButtons) button.onclick = () => { values.push(Number(button.dataset.value)); render(); };
+  pick('[name="undo"]').onclick = () => { values.pop(); render(); };
+  pick('[name="reset"]').onclick = () => { values.length = 0; render(); };
+  render();
+})();
+</script>
+</section>

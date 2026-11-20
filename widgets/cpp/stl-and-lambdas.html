@@ -1,0 +1,48 @@
+<section class="experiment" id="lab-stl-and-lambdas">
+  <h3>В каком месте алгоритм остановит поиск?</h3>
+  <p>Сравни <code>find_if</code> и <code>count_if</code> на пяти показаниях. Выбери порог и открывай по одной проверке предиката.</p>
+  <div class="lab-controls"><label>Алгоритм <select data-op><option>find_if</option><option>count_if</option></select></label>
+  <label>Порог <select data-limit><option>−4</option><option selected>0</option><option>5</option><option>9</option></select></label>
+  <button type="button" data-step>Проверить число</button><button type="button" data-reset>Сначала</button></div>
+  <pre><code data-code></code></pre><div class="lab-cells" data-values></div>
+  <p data-status role="status"></p>
+<style>
+#lab-stl-and-lambdas .lab-controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin:.8rem 0} #lab-stl-and-lambdas .lab-cells{display:flex;flex-wrap:wrap;gap:.4rem;margin:.8rem 0} #lab-stl-and-lambdas .lab-cell{display:grid;justify-items:center;min-width:3rem;padding:.35rem .55rem;border:1px solid #96acb7;border-radius:.4rem;background:#eef3f5;color:#172f45} #lab-stl-and-lambdas .lab-cell.active{background:#ffe8a8;color:#473105;border-color:#8f6916} #lab-stl-and-lambdas .lab-cell small{font-size:.82rem} #lab-stl-and-lambdas pre{white-space:pre-wrap;overflow-wrap:anywhere}
+</style>
+<script>
+(() => {
+  const root = document.getElementById('lab-stl-and-lambdas');
+  const get = selector => root.querySelector(selector);
+  const status = get('[data-status]');
+  const values = [5, -3, 8, -1, 6];
+  let count = 0;
+  function render() {
+    const find = get('[data-op]').value === 'find_if';
+    const limit = Number(get('[data-limit]').value.replace('−', '-'));
+    const tested = values.slice(0, count);
+    const first = tested.findIndex(x => x < limit);
+    const matches = tested.filter(x => x < limit).length;
+    const done = count === values.length || (find && first >= 0);
+    get('[data-code]').textContent = '[limit](int value) { return value < limit; }   // limit = ' + limit;
+    get('[data-step]').disabled = done;
+    const cells = get('[data-values]');
+    cells.replaceChildren();
+    values.forEach((v, i) => {
+      const cell = document.createElement('span');
+      cell.className = 'lab-cell' + (i === count - 1 ? ' active' : '');
+      const label = document.createElement('small');
+      label.textContent = i < count ? (v < limit ? 'да' : 'нет') : 'ожидает';
+      cell.append('[' + i + '] ' + v, label); cells.append(cell);
+    });
+    if (done && find) status.textContent = first < 0 ? 'Все пять значений проверены. Совпадений нет, результат — end().' : 'Первое совпадение на позиции ' + first + '. Для ответа достаточно ' + count + ' проверок.';
+    else if (done) status.textContent = 'Все пять значений проверены. Число совпадений: ' + matches + '.';
+    else status.textContent = 'Проверено ' + count + ' из 5. Совпадений пока ' + matches + '. Следующая позиция: ' + count + '.';
+  }
+  const reset = () => { count = 0; render(); };
+  get('[data-op]').onchange = get('[data-limit]').onchange = reset;
+  get('[data-reset]').onclick = reset;
+  get('[data-step]').onclick = () => { if (!get('[data-step]').disabled) count++; render(); };
+  render();
+})();
+</script>
+</section>

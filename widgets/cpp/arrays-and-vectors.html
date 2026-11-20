@@ -1,0 +1,49 @@
+<section class="experiment" id="lab-arrays-and-vectors">
+  <h3>В какую клетку попадёт запись?</h3>
+  <p>Выбери строку и столбец. Посмотри, какой элемент изменит команда записи. Затем попробуй обратиться к элементу сразу за последним столбцом.</p>
+  <div class="lab-controls"><label>Строка i <select data-row><option>0</option><option selected>1</option><option>2</option></select></label>
+  <label>Столбец j <select data-col><option>0</option><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option></select></label>
+  <label>Число <select data-val><option selected>3</option><option>7</option><option>0</option></select></label>
+  <button type="button" data-write>Записать</button><button type="button" data-clear>Обнулить таблицу</button></div>
+  <table><caption>Значения в table</caption><thead><tr><th scope="col">i ∖ j</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th></tr></thead><tbody data-table></tbody></table><pre><code data-code></code></pre>
+  <p data-status role="status"></p>
+<style>
+#lab-arrays-and-vectors .lab-controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin:.8rem 0} #lab-arrays-and-vectors .lab-cells{display:flex;flex-wrap:wrap;gap:.4rem;margin:.8rem 0} #lab-arrays-and-vectors .lab-cell{display:grid;justify-items:center;min-width:3rem;padding:.35rem .55rem;border:1px solid #96acb7;border-radius:.4rem;background:#eef3f5;color:#172f45} #lab-arrays-and-vectors .lab-cell.active{background:#ffe8a8;color:#473105;border-color:#8f6916} #lab-arrays-and-vectors .lab-cell small{font-size:.82rem} #lab-arrays-and-vectors pre{white-space:pre-wrap;overflow-wrap:anywhere} #lab-arrays-and-vectors table{width:auto} #lab-arrays-and-vectors th,#lab-arrays-and-vectors td{text-align:center;padding:.3rem .5rem} #lab-arrays-and-vectors .target-cell{background:#ffe8a8;color:#473105;font-weight:bold;outline:2px solid #86640d;outline-offset:-2px}
+</style>
+<script>
+(() => {
+  const root = document.getElementById('lab-arrays-and-vectors');
+  const get = selector => root.querySelector(selector);
+  const status = get('[data-status]');
+  const rows = Array.from({length:3}, () => [0, 0, 0, 0, 0]);
+  function draw(write = false) {
+    const i = Number(get('[data-row]').value);
+    const j = Number(get('[data-col]').value);
+    const value = Number(get('[data-val]').value);
+    const valid = j < rows[i].length;
+    if (write && valid) rows[i][j] = value;
+    get('[data-code]').textContent = 'table.at(' + i + ').at(' + j + ') = ' + value + ';';
+    const table = get('[data-table]');
+    table.replaceChildren();
+    rows.forEach((row, r) => {
+      const tr = document.createElement('tr');
+      const th = document.createElement('th');
+      th.scope = 'row'; th.textContent = String(r); tr.append(th);
+      row.forEach((number, c) => {
+        const td = document.createElement('td');
+        td.textContent = String(number);
+        if (r === i && c === j) td.className = 'target-cell';
+        tr.append(td);
+      });
+      table.append(tr);
+    });
+    status.textContent = !valid ? 'Столбца 5 нет: индексы идут от 0 до 4. В C++ вызов at(5) выбросит std::out_of_range, таблица сохранит значения.' :
+      (write ? 'Записано ' + value : 'Сейчас ' + rows[i][j]) + ' в клетке [' + i + '][' + j + ']. От начала этой строки до клетки ' + j + ' элементов.';
+  }
+  get('[data-row]').onchange = get('[data-col]').onchange = get('[data-val]').onchange = () => draw();
+  get('[data-write]').onclick = () => draw(true);
+  get('[data-clear]').onclick = () => { rows.forEach(row => row.fill(0)); draw(); };
+  draw();
+})();
+</script>
+</section>

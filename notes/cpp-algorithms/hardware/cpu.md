@@ -1,5 +1,7 @@
 # Что делает процессор с одной строкой C++
 
+[Читать на сайте с интерактивами](https://yaroslav-yarik.github.io/cpm-robotics-programming/hardware/cpu.html).
+
 [Справочник](../README.md) · Устройство компьютера
 
 ```cpp
@@ -20,9 +22,9 @@ addi t0, t0, 5
 sw   t0, 0(a0)
 ```
 
-[Выполнить три команды и проследить за регистром](https://yaroslav-yarik.github.io/cpm-robotics-programming/cpu.html).
-
 ![Из памяти в t0 загружается 7, АЛУ вычисляет 12, по прежнему адресу записывается 12.](../assets/hardware/instruction.svg)
+
+<!-- interactive -->
 
 | Инструкция | Что она делает | Что стало с числом |
 |---|---|---|

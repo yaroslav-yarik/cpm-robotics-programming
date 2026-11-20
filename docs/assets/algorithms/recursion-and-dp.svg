@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="284" viewBox="0 0 560 284" role="img" aria-labelledby="title desc"><title id="title">Дерево сумм подмножеств</title><desc id="desc">Из суммы 0 ветвимся в 0 и 2. Их потомки дают ответы 0, −1, 2 и 1.</desc><rect width="560" height="284" fill="#fff"/>
+<text x="24" y="32" text-anchor="start" fill="#172e44" font-family="Arial,sans-serif" font-size="22" font-weight="700">Что хранит каждый вызов?</text>
+<path d="M 280 89 L 150 123" fill="none" stroke="#006d69" stroke-width="3" stroke-linecap="round"/>
+<path d="M 280 89 L 410 123" fill="none" stroke="#006d69" stroke-width="3" stroke-linecap="round"/>
+<path d="M 150 159 L 73 197" fill="none" stroke="#006d69" stroke-width="3" stroke-linecap="round"/>
+<path d="M 150 159 L 208 197" fill="none" stroke="#006d69" stroke-width="3" stroke-linecap="round"/>
+<path d="M 410 159 L 350 197" fill="none" stroke="#006d69" stroke-width="3" stroke-linecap="round"/>
+<path d="M 410 159 L 490 197" fill="none" stroke="#006d69" stroke-width="3" stroke-linecap="round"/>
+<rect x="252" y="55" width="56" height="35" rx="6" fill="#cdeee9" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="280.0" y="79.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">0</text>
+<rect x="122" y="123" width="56" height="35" rx="6" fill="#cdeee9" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="150.0" y="147.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">0</text>
+<rect x="382" y="123" width="56" height="35" rx="6" fill="#cdeee9" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="410.0" y="147.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">2</text>
+<rect x="45" y="197" width="56" height="35" rx="6" fill="#ffdf96" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="73.0" y="221.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">0</text>
+<rect x="180" y="197" width="56" height="35" rx="6" fill="#ffdf96" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="208.0" y="221.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">−1</text>
+<rect x="322" y="197" width="56" height="35" rx="6" fill="#ffdf96" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="350.0" y="221.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">2</text>
+<rect x="462" y="197" width="56" height="35" rx="6" fill="#ffdf96" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="490.0" y="221.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">1</text>
+<text x="163" y="96" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="16" font-weight="400">+0</text>
+<text x="398" y="96" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="16" font-weight="400">+2</text>
+<text x="87" y="180" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="15" font-weight="400">+0</text>
+<text x="216" y="180" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="15" font-weight="400">−1</text>
+<text x="354" y="180" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="15" font-weight="400">+0</text>
+<text x="484" y="180" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="15" font-weight="400">−1</text>
+<text x="26" y="264" text-anchor="start" fill="#172e44" font-family="Arial,sans-serif" font-size="17" font-weight="400">Вершина — текущая сумма. Лист — готовое подмножество.</text></svg>

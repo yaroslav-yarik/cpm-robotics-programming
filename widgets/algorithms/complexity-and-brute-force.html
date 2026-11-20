@@ -1,0 +1,43 @@
+<section class="experiment">
+<h3>Сколько сравнений успеет сделать цикл?</h3>
+<p>Измени размер массива и искомую сумму. Если совпадение встретится рано, часть пар так и останется непроверенной.</p>
+<label>Число элементов <select name="length"><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option></select></label>
+<label>Искомая сумма <select name="sum"><option>7</option><option>9</option><option selected>10</option><option>14</option><option>20</option></select></label>
+<p data-array></p><div class="controls"><button type="button" name="next">Проверить пару</button><button type="button" name="reset">Сначала</button></div>
+<p data-count role="status"></p><ol data-log></ol>
+<noscript>Для работы этого примера нужен JavaScript.</noscript>
+<script>
+(() => {
+  const section = document.currentScript.closest('.experiment');
+  const pick = selector => section.querySelector(selector);
+  const source = [6, 4, 3, 8, 5, 2];
+  const length = pick('[name="length"]'), target = pick('[name="sum"]');
+  const next = pick('[name="next"]'), log = pick('[data-log]');
+  let left, right, checks;
+  function reset() {
+    left = 0; right = 1; checks = 0;
+    log.replaceChildren();
+    next.disabled = false;
+    pick('[data-array]').textContent = 'Массив [' + source.slice(0, Number(length.value)).join(', ') + ']';
+    const maximum = Number(length.value) * (Number(length.value) - 1) / 2;
+    pick('[data-count]').textContent = 'Всего возможных пар ' + maximum + '. Проверено 0.';
+  }
+  next.onclick = () => {
+    const n = Number(length.value);
+    const sum = source[left] + source[right];
+    const item = document.createElement('li');
+    item.textContent = 'a[' + left + '] + a[' + right + '] = ' + source[left] + ' + ' + source[right] + ' = ' + sum;
+    log.append(item);
+    checks++;
+    right++;
+    if (right === n) { left++; right = left + 1; }
+    const found = sum === Number(target.value);
+    next.disabled = found || right === n;
+    const status = found ? 'Совпадение. Цикл завершён.' : right === n ? 'Все пары исчерпаны. Совпадений нет.' : 'Следующая пара индексов (' + left + ', ' + right + ').';
+    pick('[data-count]').textContent = 'Проверено ' + checks + ' из ' + (n * (n - 1) / 2) + '. ' + status;
+  };
+  length.onchange = target.onchange = pick('[name="reset"]').onclick = reset;
+  reset();
+})();
+</script>
+</section>

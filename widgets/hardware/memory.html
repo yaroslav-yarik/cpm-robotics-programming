@@ -1,0 +1,37 @@
+<section class="experiment">
+<h3>Заполни две строки кэша</h3>
+<p>Нажми по очереди на элементы 0, 1, 4, 2. Перед каждым чтением попробуй угадать, понадобится ли загрузка. После очистки можно проверить другой порядок.</p>
+<div class="controls" data-cells aria-label="Чтение элементов массива"><button type="button" data-index="0">a[0]</button><button type="button" data-index="1">a[1]</button><button type="button" data-index="2">a[2]</button><button type="button" data-index="3">a[3]</button><button type="button" data-index="4">a[4]</button><button type="button" data-index="5">a[5]</button><button type="button" data-index="6">a[6]</button><button type="button" data-index="7">a[7]</button></div>
+<p><samp data-cache></samp></p><p role="status"></p>
+<button type="button" data-reset>Очистить кэш</button>
+<script>
+(() => {
+  const root = document.currentScript.closest(".experiment");
+  const find = selector => root.querySelector(selector);
+  const cached = new Set();
+  let reads = 0;
+  function show(message) {
+    const status = name => cached.has(name) ? 'загружена' : 'пусто';
+    find('[data-cache]').textContent = 'A [0–15]: ' + status('A') + ' · B [16–31]: ' + status('B');
+    find('[role=status]').textContent = message + ' Чтений: ' + reads + ', попаданий: ' + (reads - cached.size) + ', промахов: ' + cached.size + '.';
+  }
+  find('[data-cells]').addEventListener('click', event => {
+    const button = event.target.closest('button[data-index]');
+    if (!button) return;
+    const index = Number(button.dataset.index);
+    const line = index < 4 ? 'A' : 'B';
+    const hit = cached.has(line);
+    cached.add(line);
+    reads++;
+    show('a[' + index + '], смещение ' + index * 4 + ' байт. ' + (hit ? 'Попадание: строка ' + line + ' уже в кэше.' : 'Промах: загружена целиком строка ' + line + '.'));
+  });
+  function reset() {
+    cached.clear();
+    reads = 0;
+    show('Обе строки свободны.');
+  }
+  find('[data-reset]').addEventListener('click', reset);
+  reset();
+})();
+</script>
+</section>

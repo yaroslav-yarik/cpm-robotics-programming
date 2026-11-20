@@ -1,0 +1,37 @@
+<section class="experiment">
+<h3>Как ключ меняет порядок слов</h3>
+<p>Сравни три правила на одних и тех же словах. При сортировке только по длине слова одинаковой длины сохраняют исходный порядок.</p>
+<label>Слова через пробел <input name="words" maxlength="90" value="aa b ab a" autocomplete="off"></label>
+<label>Правило <select name="rule"><option value="both">Длина, затем алфавит</option><option value="length">Только длина</option><option value="word">Только алфавит</option></select></label>
+<p>Введи от 1 до 10 слов из строчных латинских букв.</p><p data-result role="status"></p><ol data-order></ol>
+<noscript>Для работы этого примера нужен JavaScript.</noscript>
+<script>
+(() => {
+  const section = document.currentScript.closest('.experiment');
+  const pick = selector => section.querySelector(selector);
+  const words = pick('[name="words"]'), rule = pick('[name="rule"]'), order = pick('[data-order]');
+  function render() {
+    const items = words.value.trim().split(/\s+/);
+    order.replaceChildren();
+    if (items.length > 10 || items.some(w => !/^[a-z]+$/.test(w))) {
+      pick('[data-result]').textContent = 'Нужны 1–10 слов из букв a–z через пробел.'; return;
+    }
+    const ranked = items.map((word, index) => ({word, index}));
+    ranked.sort((a, b) => {
+      if (rule.value !== 'word' && a.word.length !== b.word.length) return a.word.length - b.word.length;
+      if (rule.value !== 'length' && a.word !== b.word) return a.word < b.word ? -1 : 1;
+      return a.index - b.index;
+    });
+    for (const {word, index} of ranked) {
+      const key = rule.value === 'both' ? '(' + word.length + ', ' + word + ')' : rule.value === 'length' ? word.length : word;
+      const li = document.createElement('li');
+      li.textContent = word + ' · ключ ' + key + ' · исходный индекс ' + index;
+      order.append(li);
+    }
+    pick('[data-result]').textContent = ranked.map(item => item.word).join(' → ');
+  }
+  words.oninput = rule.onchange = render;
+  render();
+})();
+</script>
+</section>

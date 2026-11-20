@@ -1,0 +1,29 @@
+<section class="experiment">
+<h3>Выбери границы суммы</h3>
+<p>Передвинь границу и проверь, какие числа остались в полуинтервале. Затем измени средний элемент и проследи, какие префиксы пересчитались.</p>
+<label>Левая граница <select name="left"><option>0</option><option selected>1</option><option>2</option><option>3</option></select></label>
+<label>Правая граница <select name="right"><option>0</option><option>1</option><option>2</option><option selected>3</option></select></label>
+<label>Значение a[1] <select name="middle"><option selected>-5</option><option>0</option><option>3</option><option>8</option></select></label>
+<p data-array></p><p data-prefix></p><p data-result role="status"></p>
+<noscript>Для работы этого примера нужен JavaScript.</noscript>
+<script>
+(() => {
+  const section = document.currentScript.closest('.experiment');
+  const pick = selector => section.querySelector(selector);
+  const left = pick('[name="left"]'), right = pick('[name="right"]'), middle = pick('[name="middle"]');
+  function render() {
+    const a = [2, Number(middle.value), 4], p = [0];
+    for (const value of a) p.push(p[p.length - 1] + value);
+    const l = Number(left.value), r = Number(right.value);
+    pick('[data-array]').textContent = 'Массив a = [' + a.join(', ') + ']';
+    pick('[data-prefix]').textContent = 'Префиксы p = [' + p.join(', ') + ']';
+    const values = a.slice(l, r);
+    pick('[data-result]').textContent = 'Участок [' + l + ', ' + r + ') ' + (values.length ? 'содержит ' + values.join(', ') : 'пуст') + '. Сумма p[' + r + '] − p[' + l + '] = ' + p[r] + ' − (' + p[l] + ') = ' + (p[r] - p[l]) + '.';
+  }
+  left.onchange = () => { if (Number(left.value) > Number(right.value)) right.value = left.value; render(); };
+  right.onchange = () => { if (Number(right.value) < Number(left.value)) left.value = right.value; render(); };
+  middle.onchange = render;
+  render();
+})();
+</script>
+</section>

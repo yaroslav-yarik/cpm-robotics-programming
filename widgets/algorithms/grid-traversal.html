@@ -1,0 +1,56 @@
+<section class="experiment">
+<h3>Перестрой карту и пусти волну</h3>
+<p>Нажимай на клетки, чтобы поставить или убрать стену. Затем открывай по одному слою поиска. Число в клетке означает минимальное расстояние от S.</p>
+<div data-board style="display:grid;grid-template-columns:repeat(3,minmax(3rem,5rem));gap:.3rem"></div>
+<div class="controls"><button type="button" name="next">Открыть следующий слой</button><button type="button" name="again">Начать волну заново</button><button type="button" name="reset">Исходная карта</button></div><p data-status role="status"></p>
+<noscript>Для работы этого примера нужен JavaScript.</noscript>
+<script>
+(() => {
+  const section = document.currentScript.closest('.experiment');
+  const pick = selector => section.querySelector(selector);
+  const start = 2, finish = 8, walls = new Set([4, 5]);
+  const board = pick('[data-board]'), cells = [];
+  let layer = 0;
+  function distances() {
+    const dist = Array(9).fill(-1), queue = [start];
+    dist[start] = 0;
+    for (let k = 0; k < queue.length; k++) {
+      const here = queue[k], row = Math.floor(here / 3), col = here % 3;
+      for (const [r, c] of [[row - 1, col], [row + 1, col], [row, col - 1], [row, col + 1]]) {
+        if (r < 0 || c < 0 || r >= 3 || c >= 3) continue;
+        const next = r * 3 + c;
+        if (dist[next] >= 0 || walls.has(next)) continue;
+        dist[next] = dist[here] + 1;
+        queue.push(next);
+      }
+    }
+    return dist;
+  }
+  function render() {
+    const dist = distances(), last = Math.max(...dist);
+    for (const [i, cell] of cells.entries()) {
+      const visible = dist[i] >= 0 && dist[i] <= layer;
+      const marker = i === start ? 'S ' : i === finish ? 'F ' : '';
+      cell.textContent = marker + (walls.has(i) ? '■' : visible ? dist[i] : '·');
+      cell.style.background = walls.has(i) ? '#405269' : visible ? '#d7efe5' : '#fff';
+      cell.style.color = walls.has(i) ? '#fff' : '#19324a';
+      cell.setAttribute('aria-label', 'Строка ' + (Math.floor(i / 3) + 1) + ', столбец ' + (i % 3 + 1) + '. ' + (marker || '') + (walls.has(i) ? 'Стена' : visible ? 'Расстояние ' + dist[i] : 'Пустая клетка'));
+      if (!cell.disabled) cell.setAttribute('aria-pressed', String(walls.has(i)));
+    }
+    pick('[name="next"]').disabled = layer >= last;
+    const result = dist[finish] >= 0 && dist[finish] <= layer ? 'До финиша ' + dist[finish] + ' ходов.' : layer >= last ? 'Финиш недостижим.' : 'Волна ещё не дошла до финиша.';
+    pick('[data-status]').textContent = 'Открыт слой ' + layer + '. ' + result;
+  }
+  for (let i = 0; i < 9; i++) {
+    const button = document.createElement('button');
+    button.type = 'button'; button.disabled = i === start || i === finish;
+    button.onclick = () => { if (walls.has(i)) walls.delete(i); else walls.add(i); layer = 0; render(); };
+    board.append(button); cells.push(button);
+  }
+  pick('[name="next"]').onclick = () => { layer++; render(); };
+  pick('[name="again"]').onclick = () => { layer = 0; render(); };
+  pick('[name="reset"]').onclick = () => { walls.clear(); walls.add(4); walls.add(5); layer = 0; render(); };
+  render();
+})();
+</script>
+</section>

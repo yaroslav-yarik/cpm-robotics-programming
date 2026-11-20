@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="205" viewBox="0 0 560 205" role="img" aria-labelledby="title desc"><title id="title">Границы префиксных сумм</title><desc id="desc">Под числами −5 и 4 выделен участок от границы p[1] до p[3]. Их разность равна −1.</desc><rect width="560" height="205" fill="#fff"/>
+<text x="24" y="32" text-anchor="start" fill="#172e44" font-family="Arial,sans-serif" font-size="22" font-weight="700">Префиксы стоят на границах элементов</text>
+<rect x="65" y="92" width="140" height="46" rx="6" fill="#edf2f7" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="135.0" y="122.14" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">2</text>
+<rect x="205" y="92" width="140" height="46" rx="6" fill="#cdeee9" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="275.0" y="122.14" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">−5</text>
+<rect x="345" y="92" width="140" height="46" rx="6" fill="#cdeee9" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="415.0" y="122.14" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">4</text>
+<text x="65" y="72" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="17" font-weight="700">p[0] = 0</text>
+<path d="M 65 79 L 65 88" fill="none" stroke="#006d69" stroke-width="3" stroke-linecap="round"/>
+<text x="205" y="72" text-anchor="middle" fill="#006d69" font-family="Arial,sans-serif" font-size="17" font-weight="700">p[1] = 2</text>
+<path d="M 205 79 L 205 88" fill="none" stroke="#006d69" stroke-width="3" stroke-linecap="round"/>
+<text x="345" y="72" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="17" font-weight="700">p[2] = −3</text>
+<path d="M 345 79 L 345 88" fill="none" stroke="#006d69" stroke-width="3" stroke-linecap="round"/>
+<text x="485" y="72" text-anchor="middle" fill="#006d69" font-family="Arial,sans-serif" font-size="17" font-weight="700">p[3] = 1</text>
+<path d="M 485 79 L 485 88" fill="none" stroke="#006d69" stroke-width="3" stroke-linecap="round"/>
+<path d="M 205 153 L 485 153" fill="none" stroke="#006d69" stroke-width="3" stroke-linecap="round"/>
+<path d="M 205 146 L 205 153" fill="none" stroke="#006d69" stroke-width="3" stroke-linecap="round"/>
+<path d="M 485 146 L 485 153" fill="none" stroke="#006d69" stroke-width="3" stroke-linecap="round"/>
+<text x="345" y="183" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="20" font-weight="700">[1, 3)   ·   1 − 2 = −1</text></svg>

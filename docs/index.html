@@ -1,6 +1,138 @@
-<!doctype html><html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Интерактивы · Справочник ЦПМ</title><link rel="stylesheet" href="style.css"><main><nav><a href="https://github.com/yaroslav-yarik/cpm-robotics-programming/blob/main/notes/cpp-algorithms/README.md">Справочник по C++ и алгоритмам</a></nav><h1>Интерактивные примеры</h1><ul class="experiments">
-<li><a href="memory.html">Запись через указатель</a><p>Выбери адрес и запиши 256. В каком из четырёх байтов появится единица?</p></li>
-<li><a href="cpu.html">Одна строка на процессоре</a><p>Выполни три команды. После какой из них новое число появится в памяти?</p></li>
-<li><a href="bits.html">Битовые операции</a><p>Переключай разряды двух чисел и проверь, как AND, OR и XOR меняют результат.</p></li>
-<li><a href="search.html">Двоичный поиск</a><p>Выбирай, какую часть массива оставить, чтобы найти первую подходящую позицию.</p></li>
-</ul></main></html>
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Справочник по C++ и алгоритмам · Справочник ЦПМ</title><link rel="stylesheet" href="style.css"></head><body><main class="reader"><nav class="reader-nav" aria-label="Разделы"><a href="#hardware">Устройство компьютера</a> <a href="#cpp">Язык C++</a> <a href="#algorithms">Базовые алгоритмы</a> <a href="#robotics">Прикладные алгоритмы</a></nav><article><h1>Справочник по C++ и алгоритмам</h1>
+<p>Для 9–11 классов. Если ты только начинаешь писать на C++, открой <a href="cpp/variables-and-memory.html">«Что такое переменная»</a>. Если решаешь задачу, выбери ниже раздел по тому, что нужно сделать.</p>
+<h2 id="hardware">Устройство компьютера</h2>
+<p>Представь, что программа выводит на экран нажатую клавишу. На рисунке стрелки показывают путь информации. Между нажатием и появлением буквы успевают поработать несколько устройств и операционная система.</p>
+<p><img src="assets/hardware/computer.svg" alt="Клавиатура сообщает о нажатии через контроллер. Программа обрабатывает событие и обновляет изображение. Контроллер экрана считывает пиксели."></p>
+<table>
+<thead>
+<tr>
+<th>Вопрос</th>
+<th>Где посмотреть</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Как электрические сигналы складываются в число?</td>
+<td><a href="hardware/logic.html">Логические элементы, перенос и регистр</a></td>
+</tr>
+<tr>
+<td>Что выполняется, когда в C++ написано <code>value = value + 5</code>?</td>
+<td><a href="hardware/cpu.html">Три инструкции процессора</a></td>
+</tr>
+<tr>
+<td>Почему два соседних числа часто читаются быстрее?</td>
+<td><a href="hardware/memory.html">Кэш, оперативная память и адреса</a></td>
+</tr>
+<tr>
+<td>Как напряжение датчика становится числом в программе?</td>
+<td><a href="hardware/io.html">Ввод и вывод</a></td>
+</tr>
+</tbody></table>
+<h2 id="cpp">Язык C++</h2>
+<table>
+<thead>
+<tr>
+<th>Тема</th>
+<th>Что можно разобрать на примере</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a href="cpp/variables-and-memory.html">Что такое переменная</a></td>
+<td>Как запомнить число, изменить его и сохранить копию</td>
+</tr>
+<tr>
+<td><a href="cpp/memory-layout.html">Как устроена память</a></td>
+<td>Где лежат элементы массива и что меняет запись через указатель</td>
+</tr>
+<tr>
+<td><a href="cpp/functions-and-pointers.html">Функции, ссылки и указатели</a></td>
+<td>Как передать значение в функцию и изменить переменную вызывающего кода</td>
+</tr>
+<tr>
+<td><a href="cpp/arrays-and-vectors.html">Массивы, векторы и итераторы</a></td>
+<td>Как хранить последовательность и обходить её элементы</td>
+</tr>
+<tr>
+<td><a href="cpp/strings.html">Строки</a></td>
+<td>Как прочитать строку с пробелами, найти и выделить подстроку</td>
+</tr>
+<tr>
+<td><a href="cpp/stl-and-lambdas.html">Стандартные алгоритмы и лямбды</a></td>
+<td>Как искать и считать элементы по своему условию</td>
+</tr>
+<tr>
+<td><a href="cpp/sequence-operations.html">Редактирование последовательностей</a></td>
+<td>Как вставлять элементы, удалять повторы и преобразовывать значения</td>
+</tr>
+<tr>
+<td><a href="cpp/bits-and-bitset.html">Биты, маски и <code>std::bitset</code></a></td>
+<td>Как проверить один бит числа и хранить набор признаков</td>
+</tr>
+</tbody></table>
+<h2 id="algorithms">Базовые алгоритмы</h2>
+<p>В каждой теме есть код на C++ и Python. Индексы начинаются с нуля. В записи <code>[l, r)</code> левая граница входит в диапазон, правая остаётся за ним. Например, <code>[1, 4)</code> охватывает индексы 1, 2 и 3.</p>
+<table>
+<thead>
+<tr>
+<th>Тема</th>
+<th>Когда пригодится</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a href="algorithms/complexity-and-brute-force.html">Сложность и перебор</a></td>
+<td>Нужно оценить, сколько вариантов успеет проверить программа</td>
+</tr>
+<tr>
+<td><a href="algorithms/sorting.html">Сортировка и ключи</a></td>
+<td>Есть несколько правил упорядочивания записей</td>
+</tr>
+<tr>
+<td><a href="algorithms/binary-search.html">Двоичный поиск</a></td>
+<td>Нужно найти границу в отсортированных данных или минимальный подходящий ответ</td>
+</tr>
+<tr>
+<td><a href="algorithms/prefix-sums.html">Префиксные суммы</a></td>
+<td>Один массив или таблица, много запросов суммы</td>
+</tr>
+<tr>
+<td><a href="algorithms/two-pointers-and-window.html">Два указателя и скользящее окно</a></td>
+<td>Ищем пару с заданной суммой или самый длинный допустимый отрезок</td>
+</tr>
+<tr>
+<td><a href="algorithms/frequencies.html">Частоты</a></td>
+<td>Нужно посчитать вхождения значений или пары равных элементов</td>
+</tr>
+<tr>
+<td><a href="algorithms/grid-traversal.html">Обходы клеточной карты</a></td>
+<td>Ищем достижимые клетки или кратчайший путь по клеткам</td>
+</tr>
+<tr>
+<td><a href="algorithms/recursion-and-dp.html">Рекурсия и динамическое программирование</a></td>
+<td>Перебираем подмножества или собираем ответ из меньших подзадач</td>
+</tr>
+</tbody></table>
+<h2 id="robotics">Прикладные алгоритмы</h2>
+<table>
+<thead>
+<tr>
+<th>Тема</th>
+<th>Когда пригодится</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a href="robotics/state-and-events.html">Состояние и события</a></td>
+<td>Нужно запомнить режим и обработать смену состояния</td>
+</tr>
+<tr>
+<td><a href="robotics/signals.html">Обработка сигналов</a></td>
+<td>В последовательности измерений ищем устойчивый сигнал или серию</td>
+</tr>
+<tr>
+<td><a href="robotics/grids-and-images.html">Клеточные карты и изображения</a></td>
+<td>Работаем с координатами, поворотами и препятствиями</td>
+</tr>
+</tbody></table>
+<p>Примеры по языку используют C++17. Возможности C++20 отмечены отдельно.</p>
+<h2>Программирование для практического тура</h2>
+<h2>Программирование для ЕТЗ</h2>
+</article></main></body></html>

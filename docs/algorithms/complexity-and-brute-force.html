@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Сложность и перебор · Справочник ЦПМ</title><link rel="stylesheet" href="../style.css"></head><body><main class="reader"><nav class="reader-nav"><a href="../index.html">Оглавление</a><span> / </span><a href="../index.html#algorithms">Базовые алгоритмы</a><a class="jump" href="#practice">К опыту</a></nav><article><h1>Сложность и перебор</h1>
+<h2>Как посчитать объём работы</h2>
+<p>Пусть в списке <code>n</code> чисел. Чтобы найти максимум, нужно посмотреть на каждое число. Если увеличить список вдвое, сравнений тоже станет примерно вдвое больше. Такое время называют <strong>линейным</strong> и записывают <code>O(n)</code>. Для хранения текущего максимума достаточно одной переменной при любой длине списка, поэтому дополнительная память составляет <code>O(1)</code>.</p>
+<p>Обозначение <code>O</code> даёт верхнюю оценку роста затрат при увеличении входных данных. В таблице указаны обычные оценки для операций с машинными числами.</p>
+<table>
+<thead>
+<tr>
+<th>Время</th>
+<th>Пример</th>
+<th>Как растёт работа</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>O(1)</code></td>
+<td>Обращение к элементу массива по индексу</td>
+<td>Число действий постоянно</td>
+</tr>
+<tr>
+<td><code>O(log n)</code></td>
+<td>Двоичный поиск</td>
+<td>При удвоении размера добавляется примерно один шаг</td>
+</tr>
+<tr>
+<td><code>O(n)</code></td>
+<td>Поиск максимума</td>
+<td>При удвоении размера работы примерно вдвое больше</td>
+</tr>
+<tr>
+<td><code>O(n log n)</code></td>
+<td>Сортировка сравнением, например сортировка слиянием</td>
+<td>При удвоении размера работы чуть больше чем вдвое</td>
+</tr>
+<tr>
+<td><code>O(n²)</code></td>
+<td>Перебор всех пар</td>
+<td>При удвоении размера работы примерно вчетверо больше</td>
+</tr>
+<tr>
+<td><code>O(2ⁿ)</code></td>
+<td>Перебор подмножеств</td>
+<td>Уже <strong>один новый элемент</strong> удваивает число вариантов</td>
+</tr>
+</tbody></table>
+<h2>Как перебрать пары без повторов</h2>
+<p>Найдём два разных индекса, по которым стоят числа с суммой 10. В массиве <code>[6, 4, 3]</code> подходят индексы 0 и 1. Для массива <code>[5]</code> ответ отрицательный. Чтобы получить 10, пришлось бы взять одну и ту же пятёрку дважды.</p>
+<ol>
+<li>Выбираем индекс <code>i</code> первого числа.</li>
+<li>Второй индекс <code>j</code> перебираем от <code>i + 1</code> до последнего элемента. Так каждая пара встретится ровно один раз.</li>
+<li>Как только сумма совпала, возвращаем положительный ответ. Отрицательный ответ можно дать лишь после окончания обоих циклов.</li>
+</ol>
+<p><img src="../assets/algorithms/complexity-and-brute-force.svg" alt="В верхнем треугольнике суммы 10, 9 и 7. Первая проверка находит 10, до остальных цикл не доходит."></p>
+<div id="practice"><section class="experiment">
+<h3>Сколько сравнений успеет сделать цикл?</h3>
+<p>Измени размер массива и искомую сумму. Если совпадение встретится рано, часть пар так и останется непроверенной.</p>
+<label>Число элементов <select name="length"><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option></select></label>
+<label>Искомая сумма <select name="sum"><option>7</option><option>9</option><option selected>10</option><option>14</option><option>20</option></select></label>
+<p data-array></p><div class="controls"><button type="button" name="next">Проверить пару</button><button type="button" name="reset">Сначала</button></div>
+<p data-count role="status"></p><ol data-log></ol>
+<noscript>Для работы этого примера нужен JavaScript.</noscript>
+<script>
+(() => {
+  const section = document.currentScript.closest('.experiment');
+  const pick = selector => section.querySelector(selector);
+  const source = [6, 4, 3, 8, 5, 2];
+  const length = pick('[name="length"]'), target = pick('[name="sum"]');
+  const next = pick('[name="next"]'), log = pick('[data-log]');
+  let left, right, checks;
+  function reset() {
+    left = 0; right = 1; checks = 0;
+    log.replaceChildren();
+    next.disabled = false;
+    pick('[data-array]').textContent = 'Массив [' + source.slice(0, Number(length.value)).join(', ') + ']';
+    const maximum = Number(length.value) * (Number(length.value) - 1) / 2;
+    pick('[data-count]').textContent = 'Всего возможных пар ' + maximum + '. Проверено 0.';
+  }
+  next.onclick = () => {
+    const n = Number(length.value);
+    const sum = source[left] + source[right];
+    const item = document.createElement('li');
+    item.textContent = 'a[' + left + '] + a[' + right + '] = ' + source[left] + ' + ' + source[right] + ' = ' + sum;
+    log.append(item);
+    checks++;
+    right++;
+    if (right === n) { left++; right = left + 1; }
+    const found = sum === Number(target.value);
+    next.disabled = found || right === n;
+    const status = found ? 'Совпадение. Цикл завершён.' : right === n ? 'Все пары исчерпаны. Совпадений нет.' : 'Следующая пара индексов (' + left + ', ' + right + ').';
+    pick('[data-count]').textContent = 'Проверено ' + checks + ' из ' + (n * (n - 1) / 2) + '. ' + status;
+  };
+  length.onchange = target.onchange = pick('[name="reset"]').onclick = reset;
+  reset();
+})();
+</script>
+</section>
+</div>
+
+<p>В каждой отмеченной клетке алгоритм читает два числа, складывает их и сравнивает сумму с целью. Процессор может оставить первое число в регистре на весь внутренний цикл. Число проверок пар мы можем вывести точно, а число машинных инструкций зависит от компилятора.</p>
+<p>Для первого индекса есть <code>n − 1</code> возможных партнёров, для второго — <code>n − 2</code>, для последнего — ни одного. Всего это <code>n(n − 1)/2</code> пар. Поэтому время в худшем случае составляет <code>O(n²)</code>, дополнительная память — <code>O(1)</code>. При небольших входных данных такой перебор удобно использовать для проверки более быстрого решения.</p>
+<p>В примерах справочника нумерация начинается с нуля. Запись <code>[l, r)</code> включает индекс <code>l</code> и исключает <code>r</code>. Для сумм в C++ используем <code>long long</code>. При решении задачи проверь по ограничениям, помещаются ли в этот тип промежуточные результаты.</p>
+<p><strong>C++17</strong></p>
+<pre><code class="language-cpp">#include &lt;cstddef&gt;
+#include &lt;vector&gt;
+
+using Int = long long;
+using Numbers = std::vector&lt;Int&gt;;
+
+bool pair_brute(const Numbers&amp; a, Int target) {
+    for (std::size_t i = 0; i &lt; a.size(); ++i) {
+        for (std::size_t j = i + 1; j &lt; a.size(); ++j) {
+            if (a[i] + a[j] == target) return true;
+        }
+    }
+    return false;
+}
+</code></pre>
+<details>
+<summary>Тот же алгоритм на Python</summary>
+
+<pre><code class="language-python">def pair_brute(a, target):
+    for i in range(len(a)):
+        for j in range(i + 1, len(a)):
+            if a[i] + a[j] == target:
+                return True
+    return False
+</code></pre>
+</details>
+
+<hr>
+<p><a href="sorting.html">→ Сортировка и ключи</a></p>
+</article></main></body></html>

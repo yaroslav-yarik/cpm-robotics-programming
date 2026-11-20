@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Двоичный поиск · Справочник ЦПМ</title><link rel="stylesheet" href="../style.css"></head><body><main class="reader"><nav class="reader-nav"><a href="../index.html">Оглавление</a><span> / </span><a href="../index.html#algorithms">Базовые алгоритмы</a><a class="jump" href="#practice">К опыту</a></nav><article><h1>Двоичный поиск</h1>
+<h2>Как найти первую тройку</h2>
+<p>В массиве <code>[1, 3, 3, 7]</code> число 3 встречается дважды. Если нужно узнать, сколько здесь троек, удобно найти две позиции.</p>
+<table>
+<thead>
+<tr>
+<th>Граница</th>
+<th>Что ищем</th>
+<th>Индекс</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Нижняя</td>
+<td>Первый элемент, который <strong>больше или равен</strong> 3</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Верхняя</td>
+<td>Первый элемент, который <strong>строго больше</strong> 3</td>
+<td>3</td>
+</tr>
+</tbody></table>
+<p>Тройки занимают индексы от 1 включительно до 3 исключительно. Их количество равно <code>3 − 1 = 2</code>. Для числа 4 обе границы равны 3, поэтому четвёрок в массиве нет. Если подходящего элемента нет, граница равна длине массива <code>n</code>. В пустом массиве она равна нулю.</p>
+<h3>Почему можно отбросить половину</h3>
+<p>Массив отсортирован по возрастанию с возможными повторами. Посмотрим на поиск нижней границы тройки. До индекса <code>left</code> лежат заведомо маленькие элементы. Начиная с <code>right</code>, все существующие элементы уже подходят. Проверить осталось участок <code>[left, right)</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Проверяемый участок</th>
+<th>Середина</th>
+<th>Решение</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>[0, 4)</code></td>
+<td><code>a[2] = 3</code></td>
+<td>Тройка подходит. Ищем, есть ли подходящий элемент левее, <code>right = 2</code></td>
+</tr>
+<tr>
+<td><code>[0, 2)</code></td>
+<td><code>a[1] = 3</code></td>
+<td>Так же передвигаем <code>right</code> на 1</td>
+</tr>
+<tr>
+<td><code>[0, 1)</code></td>
+<td><code>a[0] = 1</code></td>
+<td>Единица мала. Переходим к <code>left = 1</code></td>
+</tr>
+</tbody></table>
+<p><img src="../assets/algorithms/binary-search.svg" alt="Поиск проверяет позиции 2, 1 и 0. Ответом становится индекс 1."></p>
+<div id="practice"><section class="experiment">
+<style>
+    .search-controls,.search-choices { display:flex; flex-wrap:wrap; align-items:center; gap:.75rem; }
+    .search-controls { margin:1.5rem 0; }
+    .search-controls select,.search-controls button,.search-choices button { min-height:44px; }
+    .search-board { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:clamp(.15rem,1vw,.65rem); padding:0; margin:1rem 0; list-style:none; max-width:42rem; }
+    .search-board li { border:1px solid #a2b1c4; background:#e9eef4; color:#192c43; border-radius:.45rem; padding:.5rem .08rem; text-align:center; }
+    .search-board small,.search-board strong,.search-board span { display:block; }
+    .search-board strong { font:700 clamp(1.4rem,4vw,2.2rem)/1.4 monospace; }
+    .search-board span { min-height:1.4em; font:.875rem/1.4 monospace; }
+    .search-board .active { background:white; border-color:#50748b; }
+    .search-board .mid { background:#ffdf8e; border:2px solid #835400; }
+    .search-board .answer { background:#c4ecdb; border:2px solid #196344; }
+    .search-board .sentinel { border-style:dashed; }
+    .search-note { min-height:2.8em; }
+    .search-choices button { font-family:monospace; }
+    #history { padding-inline-start:1.8rem; }
+    #history li { margin:.4rem 0; }
+    [hidden] { display:none !important; }
+  </style>
+<h3>Двоичный поиск</h3>
+  <p>Найди индекс первого числа, которое больше или равно цели. Если подходят обе тройки, ответом будет индекс первой. Если не подходит ни один элемент, ответом будет длина массива.</p>
+  <div class="search-controls">
+    <label for="goal">Цель</label>
+    <select id="goal">
+      <option>0</option><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option>
+    </select>
+    <button type="button" id="restart">Начать заново</button>
+  </div>
+  <section aria-labelledby="question">
+    <h4 id="question">Какую границу передвинуть?</h4>
+    <p>Проверяем индексы от <code>l</code> включительно до <code>r</code> исключительно. <code>mid</code> — индекс середины. Крайняя правая пунктирная клетка обозначает конец массива.</p>
+    <ol class="search-board" id="array" aria-label="Массив и положение границ"></ol>
+    <p id="current" aria-live="polite"></p>
+    <div class="search-choices" id="choices">
+      <button type="button" id="left"></button>
+      <button type="button" id="right"></button>
+    </div>
+    <p class="search-note" id="feedback" role="status"></p>
+  </section>
+  <section id="trace" hidden>
+    <h4>Твои шаги</h4>
+    <ol id="history"></ol>
+  </section>
+<script>
+(() => {
+"use strict";
+const values = [1, 3, 3, 7];
+const byId = id => document.getElementById(id);
+let left, right;
+function midpoint() {
+  return left + Math.floor((right - left) / 2);
+}
+function render() {
+  const done = left === right;
+  const mid = midpoint();
+  const goal = Number(byId("goal").value);
+  const array = byId("array");
+  array.replaceChildren();
+  for (let i = 0; i <= values.length; i++) {
+    const cell = document.createElement("li");
+    const index = document.createElement("small");
+    const value = document.createElement("strong");
+    const marks = document.createElement("span");
+    index.textContent = "i = " + i;
+    value.textContent = i === values.length ? "∅" : values[i];
+    marks.textContent = [i === left && "l", i === right && "r", !done && i === mid && "mid"].filter(Boolean).join(" ");
+    if (i === values.length) cell.classList.add("sentinel");
+    if (i >= left && i < right) cell.classList.add("active");
+    if (!done && i === mid) cell.classList.add("mid");
+    if (done && i === left) cell.classList.add("answer");
+    cell.append(index, value, marks);
+    array.append(cell);
+  }
+  byId("choices").hidden = done;
+  if (done) {
+    const explanation = left === values.length
+      ? "Все четыре числа меньше цели. Ответ 4 — позиция за последним элементом."
+      : "Первое число, которое подходит для цели " + goal + ", — " + values[left] + " на позиции " + left + ".";
+    byId("current").textContent = "Границы встретились: l = r = " + left + ". " + explanation;
+  } else {
+    byId("current").textContent = "Проверяем [" + left + ", " + right + "). Середина mid = " + mid + ", число a[mid] = " + values[mid] + ". Цель — " + goal + ".";
+    byId("left").textContent = "l = mid + 1 = " + (mid + 1);
+    byId("right").textContent = "r = mid = " + mid;
+  }
+}
+function move(side) {
+  if (left === right) return;
+  const mid = midpoint();
+  const goal = Number(byId("goal").value);
+  const tooSmall = values[mid] < goal;
+  if ((side === "left") !== tooSmall) {
+    byId("feedback").textContent = tooSmall
+      ? "Попробуй ещё раз. Число " + values[mid] + " меньше цели. Слева от него все числа не больше. Где ещё может быть ответ?"
+      : "Попробуй ещё раз. Эта позиция подходит. Если отбросить её вместе с левой половиной, можно пропустить первое подходящее число.";
+    return;
+  }
+  const before = "[" + left + ", " + right + ")";
+  let reason;
+  if (tooSmall) {
+    left = mid + 1;
+    reason = values[mid] + " < " + goal + ". Отбрасываем индексы до " + mid + " включительно.";
+  } else {
+    right = mid;
+    reason = values[mid] + " ≥ " + goal + ". Позиция " + mid + " подходит. Проверяем, есть ли подходящая левее.";
+  }
+  const entry = document.createElement("li");
+  entry.textContent = before + " → [" + left + ", " + right + "). " + reason;
+  byId("history").append(entry);
+  byId("trace").hidden = false;
+  byId("feedback").textContent = reason;
+  render();
+  if (left === right) byId("restart").focus();
+}
+function restart() {
+  left = 0;
+  right = values.length;
+  byId("history").replaceChildren();
+  byId("trace").hidden = true;
+  byId("feedback").textContent = "";
+  render();
+}
+byId("left").addEventListener("click", () => move("left"));
+byId("right").addEventListener("click", () => move("right"));
+byId("restart").addEventListener("click", restart);
+byId("goal").addEventListener("change", restart);
+restart();
+})();
+</script>
+</section>
+</div>
+
+<p>Индекс середины позволяет сразу вычислить адрес элемента в непрерывном массиве C++. Для объекта размером 8 байтов элемент с индексом 2 начинается на 16 байтов дальше первого. В большом массиве последовательные проверки могут попасть в разные <a href="../hardware/memory.html">строки кэша</a>, поэтому длительность одного шага бывает разной.</p>
+<p>Теперь <code>left == right == 1</code>. Это индекс первой тройки. Для верхней границы тройку считаем слишком маленькой и продолжаем поиск справа от неё.</p>
+<p>В C++ функция ниже с параметром <code>upper = true</code> ищет верхнюю границу. В Python показаны две отдельные функции. Обе границы находятся за <code>O(log n)</code> времени с <code>O(1)</code> дополнительной памяти.</p>
+<p><strong>C++17</strong></p>
+<pre><code class="language-cpp">#include &lt;cstddef&gt;
+#include &lt;vector&gt;
+
+using Int = long long;
+using Numbers = std::vector&lt;Int&gt;;
+
+std::size_t first_boundary(const Numbers&amp; a, Int target, bool upper = false) {
+    std::size_t left = 0, right = a.size();
+    while (left &lt; right) {
+        std::size_t middle = left + (right - left) / 2;
+        if (a[middle] &lt; target || (upper &amp;&amp; a[middle] == target)) {
+            left = middle + 1;
+        } else {
+            right = middle;
+        }
+    }
+    return left;
+}
+</code></pre>
+<details>
+<summary>Тот же алгоритм на Python</summary>
+
+<pre><code class="language-python">def lower_bound(a, target):
+    left, right = 0, len(a)
+    while left &lt; right:
+        middle = left + (right - left) // 2
+        if a[middle] &lt; target:
+            left = middle + 1
+        else:
+            right = middle
+    return left
+
+
+def upper_bound(a, target):
+    left, right = 0, len(a)
+    while left &lt; right:
+        middle = left + (right - left) // 2
+        if a[middle] &lt;= target:
+            left = middle + 1
+        else:
+            right = middle
+    return left
+</code></pre>
+</details>
+
+<p>В стандартных библиотеках уже есть обе операции. В Python это <code>bisect_left</code> и <code>bisect_right</code> из модуля <code>bisect</code>. В C++ функции <code>std::lower_bound</code> и <code>std::upper_bound</code> возвращают итераторы. Чтобы получить индекс в векторе, вычти <code>a.begin()</code> из итератора. Для проверки наличия числа сначала убедись, что индекс меньше <code>n</code>, и только затем сравни элемент с искомым числом.</p>
+<h2>Как найти минимальную вместимость</h2>
+<p>Нужно перевезти 11 одинаковых деталей не более чем за 3 рейса. Машина вместимостью 3 детали сделает четыре рейса. Машине вместимостью 4 хватит трёх. Ответ равен 4.</p>
+<p>Двоичным поиском можно найти эту границу даже без готового массива. Если вместимости хватает, любая большая вместимость тоже подойдёт. Такое свойство называется <strong>монотонностью</strong>. Для кандидата <code>c</code> делим число деталей на вместимость и добавляем один рейс, если остался ненулевой остаток.</p>
+<p>Функция ищет ответ среди целых чисел от 1 до <code>n</code>. Вместимость <code>n</code> заведомо подходит при хотя бы одном разрешённом рейсе. На каждом шаге мы уменьшаем диапазон примерно вдвое. Для <code>1 ≤ n ≤ 10¹⁸</code> время составляет <code>O(log n)</code>, дополнительная память — <code>O(1)</code>.</p>
+<p><strong>C++17</strong></p>
+<pre><code class="language-cpp">using Int = long long;
+
+Int min_batch_size(Int n, Int batches) {
+    Int left = 1, right = n;
+    while (left &lt; right) {
+        Int middle = left + (right - left) / 2;
+        Int needed = n / middle + (n % middle != 0);
+        if (needed &lt;= batches) right = middle;
+        else left = middle + 1;
+    }
+    return left;
+}
+</code></pre>
+<details>
+<summary>Тот же алгоритм на Python</summary>
+
+<pre><code class="language-python">def min_batch_size(n, batches):
+    left, right = 1, n
+    while left &lt; right:
+        middle = left + (right - left) // 2
+        needed = n // middle + (n % middle != 0)
+        if needed &lt;= batches:
+            right = middle
+        else:
+            left = middle + 1
+    return left
+</code></pre>
+</details>
+
+<hr>
+<p><a href="sorting.html">← Сортировка и ключи</a> · <a href="prefix-sums.html">→ Префиксные суммы</a></p>
+</article></main></body></html>

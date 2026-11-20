@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Функции, ссылки и указатели · Справочник ЦПМ</title><link rel="stylesheet" href="../style.css"></head><body><main class="reader"><nav class="reader-nav"><a href="../index.html">Оглавление</a><span> / </span><a href="../index.html#cpp">Язык C++</a><a class="jump" href="#practice">К опыту</a></nav><article><h1>Функции, ссылки и указатели</h1>
+<p>Функция — именованная часть программы, которую можно вызвать. Например, <code>square(4)</code> означает «вызвать функцию <code>square</code> и передать ей число 4». Чтобы воспользоваться результатом, его можно присвоить переменной.</p>
+<h2>Передача по значению</h2>
+<p>В вызове <code>square(4)</code> параметр <code>number</code> получает значение 4. Функция возвращает 16. Если вызвать <code>square(x)</code>, внутри функции появляется собственный параметр с копией значения <code>x</code>. Присваивание параметру не меняет <code>x</code> в вызывающем коде.</p>
+<pre><code class="language-cpp">int square(int number) {
+    return number * number;
+}
+</code></pre>
+<pre><code class="language-cpp">int side = 4;
+int area = square(side);  // area получает 16, side по-прежнему равно 4.
+</code></pre>
+<p>В объявлении <code>int square(int number)</code> первый <code>int</code> задаёт тип результата, а <code>int number</code> объявляет параметр. При вызове значение аргумента <code>side</code> копируется в <code>number</code>.</p>
+<p>В примере предполагается, что результат помещается в <code>int</code>. <code>return</code> заканчивает работу функции и передаёт результат. Если функция только выполняет действие, можно объявить её с результатом <code>void</code>. Тогда <code>return;</code> означает «закончить работу сейчас».</p>
+<p><strong>Как процессор вызывает функцию.</strong> Если <code>square</code> вызывается отдельной командой, процессору понадобятся две вещи — значение аргумента и адрес команды, с которой продолжить работу после возврата. На многих платформах маленький аргумент передают в регистре. Функция умножает число, оставляет результат в оговорённом регистре и возвращает управление вызывающему коду.</p>
+<p><img src="../assets/cpp/call-return.svg" alt="Вызов передаёт 4 и сохраняет адрес продолжения, функция умножает 4 на 4 и возвращает 16."></p>
+<p>Компилятор также может подставить тело <code>square</code> прямо на место вызова. Такое преобразование называют <em>встраиванием</em>. Тогда переход к функции и обратный переход исчезают, а результат для <code>side = 4</code> остаётся равен 16.</p>
+<h2>Ссылка и изменение исходной переменной</h2>
+<p>Ссылка — другое имя уже существующего объекта. В записи <code>int&amp; alias = value;</code> выражения <code>alias</code> и <code>value</code> обозначают один и тот же <code>int</code>. Если записать <code>alias = 5;</code>, значение <code>value</code> тоже будет 5.</p>
+<p>Таким же способом работает параметр-ссылка. Если у функции параметр <code>int&amp; value</code>, то внутри функции имя <code>value</code> обозначает переданную переменную.</p>
+<pre><code class="language-cpp">void add_bonus(int&amp; score) {
+    score += 5;
+}
+</code></pre>
+<pre><code class="language-cpp">int points = 10;
+add_bonus(points);  // Теперь points равно 15.
+</code></pre>
+<p>При таком вызове <code>score</code> внутри функции и <code>points</code> снаружи обозначают одну переменную. Вызов <code>add_bonus(10)</code> не скомпилируется. Нужна изменяемая переменная, а у литерала 10 такой переменной нет. Ссылку создают сразу с начальным объектом. Позднее присваивание меняет значение объекта, к которому она относится.</p>
+<p>Для чтения можно использовать ссылку на константу, например <code>const std::string&amp; name</code>. Она позволяет обратиться к строке без копирования и запрещает менять строку через этот параметр. Для маленького числа вроде <code>int</code> обычно проще передать значение.</p>
+<div id="practice"><section class="experiment" id="lab-functions-and-pointers">
+  <h3>Что останется после возврата из функции?</h3>
+  <p>Два варианта <code>add_bonus</code> прибавляют пять. Выбери способ передачи и проследи, где хранится изменившееся число.</p>
+  <div class="lab-controls"><label>Параметр <select data-mode><option value="value">По значению · int score</option><option value="ref">По ссылке · int&amp; score</option></select></label>
+  <label>Исходные баллы <select data-start><option>0</option><option selected>10</option><option>20</option></select></label></div>
+  <pre><code data-code></code></pre>
+  <div class="lab-cells"><span class="lab-cell"><small>points снаружи</small><strong data-points></strong></span><span class="lab-cell"><small>score внутри</small><strong data-score></strong></span></div>
+  <div class="lab-controls"><button type="button" data-next>Вызвать функцию</button><button type="button" data-reset>Сначала</button></div>
+  <p data-status role="status"></p>
+<style>
+#lab-functions-and-pointers .lab-controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin:.8rem 0} #lab-functions-and-pointers .lab-cells{display:flex;flex-wrap:wrap;gap:.4rem;margin:.8rem 0} #lab-functions-and-pointers .lab-cell{display:grid;justify-items:center;min-width:3rem;padding:.35rem .55rem;border:1px solid #96acb7;border-radius:.4rem;background:#eef3f5;color:#172f45} #lab-functions-and-pointers .lab-cell.active{background:#ffe8a8;color:#473105;border-color:#8f6916} #lab-functions-and-pointers .lab-cell small{font-size:.82rem} #lab-functions-and-pointers pre{white-space:pre-wrap;overflow-wrap:anywhere}
+</style>
+<script>
+(() => {
+  const root = document.getElementById('lab-functions-and-pointers');
+  const get = selector => root.querySelector(selector);
+  const status = get('[data-status]');
+  let step = 0;
+  function draw() {
+    const ref = get('[data-mode]').value === 'ref';
+    const start = Number(get('[data-start]').value);
+    const newPoints = ref && step >= 2 ? start + 5 : start;
+    get('[data-code]').textContent = 'void add_bonus(int' + (ref ? '&' : '') + ' score) { score += 5; }\nint points = ' + start + ';\nadd_bonus(points);';
+    get('[data-points]').textContent = String(newPoints);
+    get('[data-score]').textContent = step === 1 ? String(start) : step === 2 ? String(start + 5) : '—';
+    status.textContent = [
+      'До вызова существует только points.',
+      ref ? 'Имя score обозначает ту же переменную, что и points.' : 'Для параметра score создана отдельная копия.',
+      ref ? 'Запись через score изменила points на ' + newPoints + '.' : 'Изменилась копия score. В points всё ещё ' + start + '.',
+      'Функция завершилась. Имя score больше недоступно. У вызывающего кода points = ' + newPoints + '.'
+    ][step];
+    get('[data-next]').textContent = ['Вызвать функцию','Выполнить score += 5','Вернуться из функции','Вызов завершён'][step];
+    get('[data-next]').disabled = step === 3;
+  }
+  const restart = () => { step = 0; draw(); };
+  get('[data-mode]').onchange = restart;
+  get('[data-start]').onchange = restart;
+  get('[data-reset]').onclick = restart;
+  get('[data-next]').onclick = () => { if (step < 3) step++; draw(); };
+  draw();
+})();
+</script>
+</section>
+</div>
+
+<h2>Адрес и указатель</h2>
+<p>У объекта есть адрес. Его можно представить как номер ячейки, по которому программа находит объект. Указатель хранит адрес. В выражении <code>&amp;score</code> знак <code>&amp;</code> означает «получить адрес переменной <code>score</code>».</p>
+<table>
+<thead>
+<tr>
+<th>Запись</th>
+<th>Читаем так</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>int* address = &amp;score;</code></td>
+<td><code>address</code> хранит адрес переменной типа <code>int</code></td>
+</tr>
+<tr>
+<td><code>*address</code></td>
+<td>Объект по этому адресу</td>
+</tr>
+<tr>
+<td><code>*address = 20;</code></td>
+<td>Записать 20 в объект по этому адресу</td>
+</tr>
+<tr>
+<td><code>&amp;address</code></td>
+<td>Адрес самой переменной-указателя. Его тип <code>int**</code></td>
+</tr>
+</tbody></table>
+<p>В объявлении <code>int* address</code> звёздочка относится к типу. В выражении <code>*address</code> она означает <strong>разыменование</strong>. Запись <code>address = &amp;other;</code> меняет адрес, который хранит указатель. Запись <code>*address = other;</code> оставляет адрес прежним и копирует значение в объект по этому адресу.</p>
+<h2>Как передача аргумента меняет результат</h2>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+// Функции square и add_bonus определены выше.
+
+void swap_scores(int* left, int* right) {
+    // Оба указателя должны указывать на существующие int.
+    int saved = *left;
+    *left = *right;
+    *right = saved;
+}
+
+int main() {
+    int first = 10;
+    int second = 20;
+
+    std::cout &lt;&lt; square(first) &lt;&lt; &#39; &#39; &lt;&lt; first &lt;&lt; &#39;\n&#39;;  // 100 10
+    add_bonus(first);
+    std::cout &lt;&lt; first &lt;&lt; &#39;\n&#39;;                         // 15
+    swap_scores(&amp;first, &amp;second);
+    std::cout &lt;&lt; first &lt;&lt; &#39; &#39; &lt;&lt; second &lt;&lt; &#39;\n&#39;;         // 20 15
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>После операции</th>
+<th align="right"><code>first</code></th>
+<th align="right"><code>second</code></th>
+<th align="right"><code>saved</code> внутри функции</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>add_bonus(first)</code></td>
+<td align="right">15</td>
+<td align="right">20</td>
+<td align="right">—</td>
+</tr>
+<tr>
+<td><code>int saved = *left</code></td>
+<td align="right">15</td>
+<td align="right">20</td>
+<td align="right">15</td>
+</tr>
+<tr>
+<td><code>*left = *right</code></td>
+<td align="right">20</td>
+<td align="right">20</td>
+<td align="right">15</td>
+</tr>
+<tr>
+<td><code>*right = saved</code></td>
+<td align="right">20</td>
+<td align="right">15</td>
+<td align="right">15</td>
+</tr>
+</tbody></table>
+<p>При вызове <code>swap_scores</code> адреса копируются в параметры <code>left</code> и <code>right</code>. Эти копии адресов по-прежнему ведут к исходным переменным. Поэтому присваивания <code>*left</code> и <code>*right</code> меняют <code>first</code> и <code>second</code>. Для такого обмена в обычном C++ также есть <code>std::swap</code> из <code>&lt;utility&gt;</code>.</p>
+<h2>Время жизни</h2>
+<p>Разыменовывай указатель, только если известно, что он указывает на существующий объект. Для обозначения отсутствующего адреса используется <code>nullptr</code>. Проверка <code>p != nullptr</code> полезна, когда по договорённости указатель либо действительный, либо пустой.</p>
+<p><strong>Висячий указатель</strong> хранит адрес объекта, время жизни которого уже закончилось. Проверка на <code>nullptr</code> такой указатель не распознаёт.</p>
+<p>Объявление <code>int* p;</code> само по себе не связывает <code>p</code> с переменной. Указатель на локальный объект с автоматическим временем жизни становится непригоден для разыменования после выхода из блока, где этот объект объявлен. Поэтому, если результат функции хранится в локальной переменной <code>int result = 42;</code>, возвращай само значение командой <code>return result;</code>.</p>
+<h2>Перегрузка и аргументы по умолчанию</h2>
+<p><strong>Перегрузка</strong> позволяет дать одно имя функциям с разными наборами параметров. Для <code>print(int)</code> и <code>print(double)</code> вызов <code>print(2)</code> выберет первую, а <code>print(2.0)</code> — вторую. Одного различия в возвращаемом типе для перегрузки недостаточно.</p>
+<p><strong>Аргумент по умолчанию</strong> можно указать в объявлении, например <code>int add(int value, int bonus = 5);</code>. Вызов <code>add(10)</code> будет передавать второй аргумент 5. Вызов <code>add(10, 2)</code> передаст 2.</p>
+<hr>
+<p><a href="memory-layout.html">← Как устроена память</a> · <a href="arrays-and-vectors.html">→ Массивы, векторы и итераторы</a></p>
+</article></main></body></html>

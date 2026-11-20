@@ -1,0 +1,45 @@
+<section class="experiment">
+<h3>Прочитай индикатор до и после срока</h3>
+<p>Сейчас 10 мс, срок выключения — 15 мс. Переведи часы на 4 мс и прочитай индикатор. Затем проверь, что вернёт чтение ровно в момент 15 мс. Новая команда включения отсчитывает пять миллисекунд от текущего момента.</p>
+<div class="controls"><button type="button" data-advance="1">+1 мс</button><button type="button" data-advance="4">+4 мс</button><button type="button" data-read>Прочитать индикатор</button><button type="button" data-arm>Включить на 5 мс</button><button type="button" data-reset>Сначала</button></div>
+<p><samp data-clock></samp></p><p role="status"></p>
+<script>
+(() => {
+  const root = document.currentScript.closest(".experiment");
+  const find = selector => root.querySelector(selector);
+  let now = 10;
+  let deadline = 15;
+  function show(message) {
+    find('[data-clock]').textContent = 'now = ' + now + ' мс · off_at = ' + (deadline === null ? 'нет срока' : deadline + ' мс');
+    find('[role=status]').textContent = message;
+  }
+  for (const button of root.querySelectorAll('[data-advance]')) {
+    button.addEventListener('click', () => {
+      now += Number(button.dataset.advance);
+      show('Часы передвинуты. Переменная off_at обновится при чтении.');
+    });
+  }
+  find('[data-read]').addEventListener('click', () => {
+    if (deadline === null) return show('Погас. Активного срока нет.');
+    if (now >= deadline) {
+      const previous = deadline;
+      deadline = null;
+      show('Погас. ' + now + ' ≥ ' + previous + ', срок удалён.');
+    } else {
+      show('Горит. До срока ещё ' + (deadline - now) + ' мс.');
+    }
+  });
+  find('[data-arm]').addEventListener('click', () => {
+    deadline = now + 5;
+    show('Индикатор включён. Новый срок ' + now + ' + 5 = ' + deadline + ' мс.');
+  });
+  function reset() {
+    now = 10;
+    deadline = 15;
+    show('Индикатор включён.');
+  }
+  find('[data-reset]').addEventListener('click', reset);
+  reset();
+})();
+</script>
+</section>

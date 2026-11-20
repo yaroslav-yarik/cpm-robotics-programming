@@ -1,0 +1,29 @@
+<section class="experiment">
+<h3>Найди границу между двумя кодами</h3>
+<p>Установи напряжение чуть ниже 3 В, а затем ровно 3 В. Сравни результаты при разрядности три и четыре бита.</p>
+<label>Напряжение <input data-mv type="range" min="0" max="4000" step="10" value="2700"></label>
+<label>Разрядность <select data-bits><option value="3">3 бита</option><option value="4">4 бита</option></select></label>
+<p><samp data-volts></samp></p><meter style="width:min(100%,24rem)" min="0" max="7" value="5" aria-label="Выходной код АЦП"></meter>
+<p role="status"></p>
+<script>
+(() => {
+  const root = document.currentScript.closest(".experiment");
+  const find = selector => root.querySelector(selector);
+  const volts = mv => (mv / 1000).toLocaleString('ru-RU', {maximumFractionDigits: 3});
+  function update() {
+    const mv = Number(find('[data-mv]').value);
+    const bits = Number(find('[data-bits]').value);
+    const levels = 2 ** bits;
+    const width = 4000 / levels;
+    const code = Math.min(levels - 1, Math.floor(mv / width));
+    const upperBound = code === levels - 1 ? ' включительно' : ' исключительно';
+    find('[data-volts]').textContent = volts(mv) + ' В → ' + code.toString(2).padStart(bits, '0') + '₂ = ' + code;
+    find('meter').max = levels - 1;
+    find('meter').value = code;
+    find('[role=status]').textContent = 'Шаг ' + volts(width) + ' В. Этот код объединяет напряжения от ' + volts(code * width) + ' В включительно до ' + volts((code + 1) * width) + ' В' + upperBound + '.';
+  }
+  root.addEventListener('input', update);
+  update();
+})();
+</script>
+</section>

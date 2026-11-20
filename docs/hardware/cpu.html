@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Что делает процессор с одной строкой C++ · Справочник ЦПМ</title><link rel="stylesheet" href="../style.css"></head><body><main class="reader"><nav class="reader-nav"><a href="../index.html">Оглавление</a><span> / </span><a href="../index.html#hardware">Устройство компьютера</a><a class="jump" href="#practice">К опыту</a></nav><article><h1>Что делает процессор с одной строкой C++</h1>
+<pre><code class="language-cpp">void add_five(int&amp; value) {
+    value = value + 5;
+}
+</code></pre>
+<p>Допустим, в элементе массива лежит 7 и мы передали этот элемент в <code>add_five</code>. После вызова там должно быть 12. Как процессор доберётся до семёрки, если в исходнике написано только имя <code>value</code>?</p>
+<h2>Адрес, регистр и команда</h2>
+<p>Компилятор переводит операции C++ в <strong>машинные инструкции</strong> выбранного процессора. Возьмём для разбора RISC-V на платформе, где C++ использует 32-битный тип <code>int</code>. Пусть адрес элемента уже передан в регистре <code>a0</code>. <strong>Регистр</strong> — маленькое хранилище внутри ядра, которое инструкция может назвать прямо. Другой регистр, <code>t0</code>, используем как временный. Ниже один возможный фрагмент тела функции в записи на ассемблере.</p>
+<pre><code class="language-asm">lw   t0, 0(a0)
+addi t0, t0, 5
+sw   t0, 0(a0)
+</code></pre>
+<p><img src="../assets/hardware/instruction.svg" alt="Из памяти в t0 загружается 7, АЛУ вычисляет 12, по прежнему адресу записывается 12."></p>
+<div id="practice"><section class="experiment">
+
+<h3>Одна строка на процессоре</h3><p>Выполни <code>value = value + 5;</code> по одной машинной инструкции. Определи момент, когда результат уже вычислен, а в памяти ещё лежит старое число.</p>
+<label for="initial">Начальное значение <output id="amount" for="initial">7</output></label><br><input id="initial" type="range" min="-16" max="32" value="7">
+<ol class="ops"><li><code>lw t0, 0(a0)</code> — прочитать из памяти</li><li><code>addi t0, t0, 5</code> — прибавить 5</li><li><code>sw t0, 0(a0)</code> — записать по адресу</li></ol>
+<div class="chips"><div class="chip" id="regBox">Регистр t0<strong id="reg">?</strong></div><div class="chip" id="memBox">Память · 0x1000<strong id="mem">7</strong></div></div>
+<div class="controls"><button id="next" class="primary">Выполнить lw</button><button id="back">Шаг назад</button><button id="reset">Сначала</button></div>
+<p id="explain" class="readout" role="status"></p><p>Регистр <code>a0</code> всё время хранит адрес <code>0x1000</code>. Знак вопроса означает, что прежнее значение <code>t0</code> нам неизвестно. В этой модели RISC-V показан один возможный вариант компиляции.</p>
+<script>
+(() => {
+const element = id => document.getElementById(id);
+const commands = ['lw', 'addi', 'sw'];
+let step = 0;
+function render() {
+  const initial = Number(element('initial').value);
+  const result = initial + 5;
+  element('amount').textContent = initial;
+  element('reg').textContent = ['?', initial, result, result][step];
+  element('mem').textContent = step === 3 ? result : initial;
+  element('regBox').classList.toggle('changed', step === 1 || step === 2);
+  element('memBox').classList.toggle('changed', step === 3);
+  document.querySelectorAll('.ops li').forEach((row, i) => {
+    if (i === step) row.setAttribute('aria-current', 'step');
+    else row.removeAttribute('aria-current');
+  });
+  element('explain').textContent = [
+    'Сейчас число находится по адресу 0x1000. Следующая команда прочитает его.',
+    'Из памяти в t0 скопировано ' + initial + '. По адресу 0x1000 всё ещё хранится ' + initial + '.',
+    'В t0 уже ' + result + '. По адресу 0x1000 пока ' + initial + '. Сложение изменило только регистр.',
+    'Команда sw записала ' + result + ' по адресу 0x1000. Теперь память и t0 содержат одно значение.'
+  ][step];
+  element('next').textContent = step === 3 ? 'Запись завершена' : 'Выполнить ' + commands[step];
+  element('next').disabled = step === 3;
+  element('back').disabled = step === 0;
+  element('reset').disabled = step === 0;
+}
+element('next').onclick = () => { step = Math.min(3, step + 1); render(); };
+element('back').onclick = () => { step = Math.max(0, step - 1); render(); };
+element('initial').oninput = element('reset').onclick = () => { step = 0; render(); };
+render();
+})();
+</script>
+</section>
+</div>
+
+<table>
+<thead>
+<tr>
+<th>Инструкция</th>
+<th>Что она делает</th>
+<th>Что стало с числом</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>lw</code> — load word</td>
+<td>Читает четыре байта по адресу из <code>a0</code> со смещением ноль</td>
+<td>В <code>t0</code> теперь 7</td>
+</tr>
+<tr>
+<td><code>addi</code> — add immediate</td>
+<td>Передаёт значение регистра и число 5 в арифметико-логическое устройство (АЛУ)</td>
+<td>В <code>t0</code> теперь 12. По адресу пока лежит 7</td>
+</tr>
+<tr>
+<td><code>sw</code> — store word</td>
+<td>Записывает четыре байта из <code>t0</code> по тому же адресу</td>
+<td>Следующее чтение этого элемента программой даст 12</td>
+</tr>
+</tbody></table>
+<p>Ноль в <code>0(a0)</code> — отступ от адреса. После всех трёх инструкций <code>a0</code> всё ещё указывает на тот же элемент. Получить данные процессор может из <a href="memory.html">кэша</a>, поэтому отдельная загрузка не обязательно означает обращение к микросхеме оперативной памяти.</p>
+<h2>Откуда процессор узнаёт, что делать дальше?</h2>
+<p>Машинная инструкция — набор битов. Часть битов обозначает операцию, другие поля задают регистры или число. <strong>Счётчик команд</strong> хранит адрес инструкции. Процессор выбирает команду по адресу, распознаёт её поля и выполняет действие. В обычной последовательности управление переходит к следующей инструкции. Условный переход может заменить следующий адрес другим. Так можно вернуться к началу цикла, если остались элементы.</p>
+<p>Один такт — один период тактового сигнала. У разных команд бывают разные задержки. В современном ядре несколько инструкций могут одновременно находиться на разных стадиях обработки. Поэтому число строк C++ и даже число машинных инструкций сами по себе не дают времени выполнения.</p>
+<h2>Всегда ли возникнут эти три инструкции?</h2>
+<p>C++ задаёт наблюдаемый результат. Компилятор может встроить функцию в место вызова, удержать промежуточное значение в регистре или заранее вычислить константу. Если позже результат вообще не используется, вычисление иногда исчезает целиком. Для Python путь тоже проходит через процессор. Например, в CPython операции программы выполняет интерпретатор, и сложение двух объектов Python требует иной последовательности машинных инструкций.</p>
+<p>В лабораторной Berkeley можно увидеть похожий цикл: чтение слова, прибавление единицы, запись и переход к новому адресу. <a href="https://github.com/61c-teach/fa20-lab-starter/blob/e4545d88812dcc2c618f0b194f5acc2b6681b9e2/lab07/cache.s">CS61C, осень 2020, cache.s</a>.</p>
+</article></main></body></html>

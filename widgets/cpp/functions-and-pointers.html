@@ -1,0 +1,43 @@
+<section class="experiment" id="lab-functions-and-pointers">
+  <h3>Что останется после возврата из функции?</h3>
+  <p>Два варианта <code>add_bonus</code> прибавляют пять. Выбери способ передачи и проследи, где хранится изменившееся число.</p>
+  <div class="lab-controls"><label>Параметр <select data-mode><option value="value">По значению · int score</option><option value="ref">По ссылке · int&amp; score</option></select></label>
+  <label>Исходные баллы <select data-start><option>0</option><option selected>10</option><option>20</option></select></label></div>
+  <pre><code data-code></code></pre>
+  <div class="lab-cells"><span class="lab-cell"><small>points снаружи</small><strong data-points></strong></span><span class="lab-cell"><small>score внутри</small><strong data-score></strong></span></div>
+  <div class="lab-controls"><button type="button" data-next>Вызвать функцию</button><button type="button" data-reset>Сначала</button></div>
+  <p data-status role="status"></p>
+<style>
+#lab-functions-and-pointers .lab-controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin:.8rem 0} #lab-functions-and-pointers .lab-cells{display:flex;flex-wrap:wrap;gap:.4rem;margin:.8rem 0} #lab-functions-and-pointers .lab-cell{display:grid;justify-items:center;min-width:3rem;padding:.35rem .55rem;border:1px solid #96acb7;border-radius:.4rem;background:#eef3f5;color:#172f45} #lab-functions-and-pointers .lab-cell.active{background:#ffe8a8;color:#473105;border-color:#8f6916} #lab-functions-and-pointers .lab-cell small{font-size:.82rem} #lab-functions-and-pointers pre{white-space:pre-wrap;overflow-wrap:anywhere}
+</style>
+<script>
+(() => {
+  const root = document.getElementById('lab-functions-and-pointers');
+  const get = selector => root.querySelector(selector);
+  const status = get('[data-status]');
+  let step = 0;
+  function draw() {
+    const ref = get('[data-mode]').value === 'ref';
+    const start = Number(get('[data-start]').value);
+    const newPoints = ref && step >= 2 ? start + 5 : start;
+    get('[data-code]').textContent = 'void add_bonus(int' + (ref ? '&' : '') + ' score) { score += 5; }\nint points = ' + start + ';\nadd_bonus(points);';
+    get('[data-points]').textContent = String(newPoints);
+    get('[data-score]').textContent = step === 1 ? String(start) : step === 2 ? String(start + 5) : '—';
+    status.textContent = [
+      'До вызова существует только points.',
+      ref ? 'Имя score обозначает ту же переменную, что и points.' : 'Для параметра score создана отдельная копия.',
+      ref ? 'Запись через score изменила points на ' + newPoints + '.' : 'Изменилась копия score. В points всё ещё ' + start + '.',
+      'Функция завершилась. Имя score больше недоступно. У вызывающего кода points = ' + newPoints + '.'
+    ][step];
+    get('[data-next]').textContent = ['Вызвать функцию','Выполнить score += 5','Вернуться из функции','Вызов завершён'][step];
+    get('[data-next]').disabled = step === 3;
+  }
+  const restart = () => { step = 0; draw(); };
+  get('[data-mode]').onchange = restart;
+  get('[data-start]').onchange = restart;
+  get('[data-reset]').onclick = restart;
+  get('[data-next]').onclick = () => { if (step < 3) step++; draw(); };
+  draw();
+})();
+</script>
+</section>

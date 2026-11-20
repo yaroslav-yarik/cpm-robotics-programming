@@ -1,0 +1,33 @@
+<section class="experiment">
+<h3>Какой край можно отбросить?</h3>
+<p>Для отсортированного массива [1, 2, 4, 8] выбери нужную сумму. На каждом шаге сравни числа на краях и реши, можно ли убрать одно из них.</p>
+<label>Цель <select name="goal"><option>3</option><option selected>6</option><option>7</option><option>9</option><option>12</option></select></label>
+<p data-window></p><div class="controls"><button type="button" data-move="left">Убрать слева</button><button type="button" data-move="right">Убрать справа</button><button type="button" data-move="found">Пара найдена</button><button type="button" name="reset">Сначала</button></div><p data-status role="status"></p>
+<noscript>Для работы этого примера нужен JavaScript.</noscript>
+<script>
+(() => {
+  const section = document.currentScript.closest('.experiment');
+  const pick = selector => section.querySelector(selector);
+  const a = [1, 2, 4, 8], goal = pick('[name="goal"]'), moves = section.querySelectorAll('[data-move]');
+  let l, r;
+  function show(message, done) {
+    for (const button of moves) button.disabled = done;
+    pick('[data-window]').textContent = 'Индексы от ' + l + ' до ' + r + ' · [' + a.slice(l, r + 1).join(', ') + ']' + (l < r ? ' · Сумма краёв ' + a[l] + ' + ' + a[r] + ' = ' + (a[l] + a[r]) : '');
+    pick('[data-status]').textContent = message;
+  }
+  function reset() { l = 0; r = a.length - 1; show('Сравни сумму краёв с ' + goal.value + '.', false); }
+  function move(action) {
+    const sum = a[l] + a[r], target = Number(goal.value);
+    const correct = sum < target ? 'left' : sum > target ? 'right' : 'found';
+    const reason = sum < target ? 'Даже с самым большим оставшимся числом левое даёт слишком мало.' : sum > target ? 'Даже с самым маленьким оставшимся числом правое даёт слишком много.' : 'Сумма двух краёв совпала с целью.';
+    if (action !== correct) { show('Попробуй ещё раз. ' + reason, false); return; }
+    if (action === 'found') { show('Верно. Подходят индексы ' + l + ' и ' + r + '.', true); return; }
+    if (action === 'left') l++; else r--;
+    show(l === r ? 'Остался один индекс. Пары разных элементов нет.' : reason + ' Сравни новые края.', l === r);
+  }
+  for (const button of moves) button.onclick = () => move(button.dataset.move);
+  goal.onchange = pick('[name="reset"]').onclick = reset;
+  reset();
+})();
+</script>
+</section>

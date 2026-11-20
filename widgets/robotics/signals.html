@@ -1,0 +1,50 @@
+<section class="experiment">
+<h3>Измени отсчёты кнопки</h3>
+<p>Каждая кнопка ниже — один отсчёт. Нажми на него, чтобы сменить сырой уровень. Попробуй получить подтверждённую единицу уже на втором чтении. Затем увеличь требуемую длину серии.</p>
+<label>Нужны подряд <select data-count><option value="1">1 отсчёт</option><option selected value="2">2 отсчёта</option><option value="3">3 отсчёта</option><option value="4">4 отсчёта</option></select></label>
+<table><thead><tr><th scope="col">Чтение</th><th scope="col">1</th><th scope="col">2</th><th scope="col">3</th><th scope="col">4</th></tr></thead><tbody>
+<tr><th scope="row">Вход</th><td><button type="button" data-sample="0" aria-label="Единица на входе при чтении 1" aria-pressed="true">1</button></td><td><button type="button" data-sample="1" aria-label="Единица на входе при чтении 2" aria-pressed="false">0</button></td><td><button type="button" data-sample="2" aria-label="Единица на входе при чтении 3" aria-pressed="true">1</button></td><td><button type="button" data-sample="3" aria-label="Единица на входе при чтении 4" aria-pressed="true">1</button></td></tr>
+<tr><th scope="row">Длина серии</th><td data-run></td><td data-run></td><td data-run></td><td data-run></td></tr>
+<tr><th scope="row">Выход</th><td data-out></td><td data-out></td><td data-out></td><td data-out></td></tr></tbody></table>
+<p role="status"></p><button type="button" data-reset>Исходный сигнал</button>
+<script>
+(() => {
+  const root = document.currentScript.closest(".experiment");
+  const find = selector => root.querySelector(selector);
+  const buttons = Array.from(root.querySelectorAll('[data-sample]'));
+  const runs = root.querySelectorAll('[data-run]');
+  const outputs = root.querySelectorAll('[data-out]');
+  const threshold = find('[data-count]');
+  let samples;
+  function update() {
+    let confirmed = 0;
+    let length = 0;
+    const changes = [];
+    samples.forEach((value, i) => {
+      length = value === samples[i - 1] ? length + 1 : 1;
+      if (length >= Number(threshold.value) && confirmed !== value) {
+        confirmed = value;
+        changes.push('чтение ' + (i + 1) + ' → ' + value);
+      }
+      buttons[i].textContent = value;
+      buttons[i].setAttribute('aria-pressed', String(Boolean(value)));
+      runs[i].textContent = length;
+      outputs[i].textContent = confirmed;
+    });
+    find('[role=status]').textContent = changes.length ? 'Изменения выхода: ' + changes.join(', ') + '.' : 'Выход остаётся равным начальному уровню 0.';
+  }
+  buttons.forEach((button, i) => button.addEventListener('click', () => {
+    samples[i] ^= 1;
+    update();
+  }));
+  function reset() {
+    samples = [1, 0, 1, 1];
+    threshold.value = '2';
+    update();
+  }
+  threshold.addEventListener('change', update);
+  find('[data-reset]').addEventListener('click', reset);
+  reset();
+})();
+</script>
+</section>

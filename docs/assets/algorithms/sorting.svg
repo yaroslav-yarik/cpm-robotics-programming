@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="260" viewBox="0 0 560 260" role="img" aria-labelledby="title desc"><title id="title">Сравнение ключей длины и слова</title><desc id="desc">При сравнении b и aa решение даёт длина. Для aa и ab решает вторая буква.</desc><rect width="560" height="260" fill="#fff"/>
+<text x="24" y="32" text-anchor="start" fill="#172e44" font-family="Arial,sans-serif" font-size="22" font-weight="700">Где заканчивается сравнение ключей?</text>
+<rect x="28" y="65" width="64" height="39" rx="6" fill="#edf2f7" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="60.0" y="91.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">b</text>
+<rect x="100" y="65" width="64" height="39" rx="6" fill="#edf2f7" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="132.0" y="91.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">aa</text>
+<text x="202" y="91" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="23" font-weight="400">→</text>
+<rect x="235" y="65" width="92" height="39" rx="6" fill="#cdeee9" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="281.0" y="91.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">1 &lt; 2</text>
+<text x="353" y="91" text-anchor="start" fill="#172e44" font-family="Arial,sans-serif" font-size="17" font-weight="400">Решает длина</text>
+<rect x="28" y="123" width="64" height="39" rx="6" fill="#edf2f7" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="60.0" y="149.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">aa</text>
+<rect x="100" y="123" width="64" height="39" rx="6" fill="#edf2f7" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="132.0" y="149.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">ab</text>
+<text x="202" y="149" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="23" font-weight="400">→</text>
+<rect x="235" y="123" width="92" height="39" rx="6" fill="#cdeee9" stroke="#a5b5c2" stroke-width="1.5"/>
+<text x="281.0" y="149.64" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="21" font-weight="700">2 = 2</text>
+<text x="353" y="149" text-anchor="start" fill="#172e44" font-family="Arial,sans-serif" font-size="17" font-weight="400">Сравним буквы</text>
+<text x="32" y="204" text-anchor="start" fill="#172e44" font-family="Arial,sans-serif" font-size="23" font-weight="700">aa</text>
+<text x="85" y="204" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="16" font-weight="400">и</text>
+<text x="108" y="204" text-anchor="start" fill="#172e44" font-family="Arial,sans-serif" font-size="23" font-weight="700">ab</text>
+<text x="175" y="204" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="23" font-weight="400">→</text>
+<text x="224" y="204" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="19" font-weight="400">a = a</text>
+<text x="290" y="204" text-anchor="middle" fill="#172e44" font-family="Arial,sans-serif" font-size="23" font-weight="400">→</text>
+<text x="347" y="204" text-anchor="middle" fill="#006d69" font-family="Arial,sans-serif" font-size="19" font-weight="700">a &lt; b</text>
+<text x="28" y="239" text-anchor="start" fill="#172e44" font-family="Arial,sans-serif" font-size="17" font-weight="400">Первое различие во второй букве: aa идёт раньше ab.</text></svg>

@@ -1,1 +1,33 @@
 *{box-sizing:border-box} :root{color-scheme:light;--ink:#172f45;--accent:#06665d;--pale:#e2f4ed;--line:#c4d2db;font:100%/1.55 "Segoe UI",Arial,sans-serif;color:var(--ink);background:#f1f5f8}body{margin:0}main{max-width:60rem;margin:0 auto;padding:clamp(1rem,4vw,3rem);background:#fff;min-height:100vh}h1,h2,h3{line-height:1.17;text-wrap:balance}h1{font-size:clamp(1.85rem,5vw,3.3rem);letter-spacing:-.04em;margin:.65em 0 .35em}h2{margin-top:1.5em}p{max-width:73ch}nav{font-size:.95rem;margin-block:.4rem 1.3rem}a{color:#075c70;text-underline-offset:.21em}button,input,select{font:inherit}button,select,input[type=number]{border:1px solid #7991a2;border-radius:.45rem;padding:.45rem .7rem;background:white;color:var(--ink)}button,select{cursor:pointer}button:hover:enabled{background:#e6f3ef}button:disabled{opacity:.55;cursor:default}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #af5805;outline-offset:2px}code,pre,samp{font-family:Consolas,monospace}pre{overflow-x:auto}fieldset{min-width:0}input[type=range]{accent-color:var(--accent);width:min(20rem,100%)}.experiments{padding:0;list-style:none;border-top:1px solid var(--line)}.experiments li{padding:1rem .2rem;border-bottom:1px solid var(--line)}.experiments a{font-size:1.2rem;font-weight:700}.experiments p{margin:.25rem 0}.chips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem}.chip{border:1px solid var(--line);border-radius:.65rem;padding:1rem;background:#f6f8fa}.chip strong{display:block;font:700 2rem Consolas,monospace}.chip.changed{background:var(--pale);border-color:var(--accent)}.ops{list-style-position:inside;padding:0}.ops li{padding:.45rem .6rem;border-left:4px solid transparent}.ops li[aria-current=step]{border-color:var(--accent);background:var(--pale);font-weight:700}.controls{display:flex;gap:.6rem;flex-wrap:wrap;margin-block:1rem}.primary{background:var(--accent);color:white}.primary:hover:enabled{background:#084e48}.readout{min-height:3em}.home{margin-top:1.6rem}
+
+.reader { max-width: 64rem; padding-bottom: 4rem; }
+.reader-nav { display:flex; align-items:center; gap:.65rem; flex-wrap:wrap; border-bottom:1px solid var(--line); padding-bottom:.8rem; }
+.reader-nav .jump { margin-left:auto; }
+.reader article > p, .reader article > ul, .reader article > ol { max-width:75ch; }
+.reader h2 { margin-top:2em; }
+.reader article > h2 { padding-top:.45em; border-top:1px solid var(--line); }
+.reader img { max-width:100%; height:auto; display:block; margin:1.3rem 0; }
+.reader table { border-collapse:collapse; font-variant-numeric:tabular-nums; }
+.reader article > table, .reader details > table { display:block; overflow-x:auto; margin:1.2rem 0; }
+.reader th,.reader td { padding:.45rem .65rem; border:1px solid var(--line); text-align:left; }
+.reader th { background:#edf3f5; }
+.reader article :not(pre) > code { background:#edf2f6; border-radius:.2rem; padding:.07em .22em; overflow-wrap:anywhere; }
+.reader pre { background:#eff4f6; border:1px solid #d7e1e7; border-radius:.4rem; padding:.85rem 1rem; line-height:1.5; font-size:.95rem; }
+.reader summary { cursor:pointer; font-weight:600; color:var(--accent); }
+.reader details { border-left:3px solid var(--line); margin:1rem 0; padding:.4rem .9rem; }
+#practice { scroll-margin-top:1rem; margin:1.6rem 0; }
+.experiment { background:#f5faf8; border:1px solid #a8c8bd; border-left:5px solid #227c6e; border-radius:.6rem; padding:clamp(.8rem,2vw,1.5rem); }
+.experiment h3:first-of-type { margin-top:0; font-size:1.45rem; }
+.experiment h4 { font-size:1.08rem; margin:1.3rem 0 .3rem; }
+.experiment input:not([type=radio]), .experiment select { max-width:100%; }
+.experiment button { min-height:2.55rem; }
+.experiment [aria-pressed=true] { background:#18655b; color:white; }
+.experiment [role=status] { overflow-wrap:anywhere; }
+.lab-controls { display:flex; flex-wrap:wrap; gap:.6rem; align-items:center; }
+.experiment table { max-width:100%; }
+@media(max-width:40rem){
+ .reader { padding:1rem; }
+ .reader th, .reader td { padding:.3rem; }
+ .reader article > table { font-size:.93rem; }
+ .experiment { padding:.7rem; }
+}

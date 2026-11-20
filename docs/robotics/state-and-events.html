@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Состояние и события · Справочник ЦПМ</title><link rel="stylesheet" href="../style.css"></head><body><main class="reader"><nav class="reader-nav"><a href="../index.html">Оглавление</a><span> / </span><a href="../index.html#robotics">Прикладные алгоритмы</a><a class="jump" href="#practice">К опыту</a></nav><article><h1>Состояние и события</h1>
+<p>В журнале записаны команды «включить индикатор» и «прочитать индикатор». Чтобы ответить на очередное чтение, достаточно помнить, когда индикатор должен погаснуть. Эту часть истории, которую программа сохраняет для следующего шага, называют <strong>состоянием</strong>.</p>
+<p>Вид состояния зависит от задачи. Для настроек подойдёт набор флагов, для счётчика понадобится предыдущее показание, а для таймера — время выключения.</p>
+<h2>Флаги в одной маске</h2>
+<p><strong>Флаг</strong> хранит ответ «да» или «нет». Пусть бит 0 отвечает за звук, бит 1 за вибрацию, бит 2 за подсветку. Биты считаем справа налево. В состоянии <code>0101</code> включены звук и подсветка.</p>
+<table>
+<thead>
+<tr>
+<th>Что требуется</th>
+<th>Маска</th>
+<th>Результат <code>0101 &amp; маска</code></th>
+<th>Всё включено?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Звук</td>
+<td><code>0001</code></td>
+<td><code>0001</code></td>
+<td>Да</td>
+</tr>
+<tr>
+<td>Подсветка и вибрация</td>
+<td><code>0110</code></td>
+<td><code>0100</code></td>
+<td>Нет, вибрация выключена</td>
+</tr>
+</tbody></table>
+<p>Побитовое И (<code>&amp;</code>) оставляет единицы, общие для состояния и маски. Если результат равен всей маске, выполнены все требования. Если достаточно одного из запрошенных признаков, проверяют <code>(state &amp; required) != 0</code>. <a href="../cpp/bits-and-bitset.html">Подробнее о битовых операциях</a>.</p>
+<p><strong>C++17</strong></p>
+<pre><code class="language-cpp">#include &lt;cstdint&gt;
+
+bool has_all_flags(std::uint64_t state, std::uint64_t required) {
+    return (state &amp; required) == required;
+}
+</code></pre>
+<details>
+<summary>Тот же алгоритм на Python</summary>
+
+<pre><code class="language-python">def has_all_flags(state, required):
+    return (state &amp; required) == required
+</code></pre>
+</details>
+
+<p>Маска <code>0</code> означает, что требований нет. Функция вернёт истину для любого состояния. Обе реализации рассчитаны на неотрицательные маски.</p>
+<h2>Разность показаний циклического счётчика</h2>
+<p>Пусть счётчик показывает только последнюю цифру числа шагов. Сначала на нём было <code>8</code>, затем стало <code>2</code>. Можно проследить переход по одному шагу:</p>
+<pre><code class="language-text">8 → 9 → 0 → 1 → 2
+</code></pre>
+<p>Прошло как минимум четыре шага. Тот же результат дали бы 14 или 24 шага. Поэтому точно восстановить разность по двум показаниям можно, если счётчик движется только вперёд и между чтениями проходит меньше <code>m</code> шагов, где <code>m</code> — число разных показаний.</p>
+<p>Входные показания лежат в диапазоне <code>[0, m)</code>, а <code>m &gt; 0</code>. В Python остаток при положительном делителе неотрицателен. В C++ можно взять разность и при необходимости прибавить модуль.</p>
+<p><strong>C++17</strong></p>
+<pre><code class="language-cpp">long long counter_gap(long long previous, long long current,
+                      long long modulus) {
+    const long long difference = current - previous;
+    return difference &lt; 0 ? difference + modulus : difference;
+}
+</code></pre>
+<details>
+<summary>Тот же алгоритм на Python</summary>
+
+<pre><code class="language-python">def counter_gap(previous, current, modulus):
+    return (current - previous) % modulus
+</code></pre>
+</details>
+
+<p>Если нужен итог за весь журнал, сложи промежутки между <strong>соседними</strong> показаниями. Разность первого и последнего теряет обороты, случившиеся в промежутке.</p>
+<h2>Когда обновлять состояние таймера</h2>
+<p>Индикатор включили в момент <code>10</code> на <code>5</code> миллисекунд. Срок выключения <code>off_at</code> равен <code>15</code>.</p>
+<p><img src="../assets/io/timer.svg" alt="Индикатор горит в промежутке от 10 до 15 миллисекунд. В момент 15 срок уже наступил."></p>
+<div id="practice"><section class="experiment">
+<h3>Прочитай индикатор до и после срока</h3>
+<p>Сейчас 10 мс, срок выключения — 15 мс. Переведи часы на 4 мс и прочитай индикатор. Затем проверь, что вернёт чтение ровно в момент 15 мс. Новая команда включения отсчитывает пять миллисекунд от текущего момента.</p>
+<div class="controls"><button type="button" data-advance="1">+1 мс</button><button type="button" data-advance="4">+4 мс</button><button type="button" data-read>Прочитать индикатор</button><button type="button" data-arm>Включить на 5 мс</button><button type="button" data-reset>Сначала</button></div>
+<p><samp data-clock></samp></p><p role="status"></p>
+<script>
+(() => {
+  const root = document.currentScript.closest(".experiment");
+  const find = selector => root.querySelector(selector);
+  let now = 10;
+  let deadline = 15;
+  function show(message) {
+    find('[data-clock]').textContent = 'now = ' + now + ' мс · off_at = ' + (deadline === null ? 'нет срока' : deadline + ' мс');
+    find('[role=status]').textContent = message;
+  }
+  for (const button of root.querySelectorAll('[data-advance]')) {
+    button.addEventListener('click', () => {
+      now += Number(button.dataset.advance);
+      show('Часы передвинуты. Переменная off_at обновится при чтении.');
+    });
+  }
+  find('[data-read]').addEventListener('click', () => {
+    if (deadline === null) return show('Погас. Активного срока нет.');
+    if (now >= deadline) {
+      const previous = deadline;
+      deadline = null;
+      show('Погас. ' + now + ' ≥ ' + previous + ', срок удалён.');
+    } else {
+      show('Горит. До срока ещё ' + (deadline - now) + ' мс.');
+    }
+  });
+  find('[data-arm]').addEventListener('click', () => {
+    deadline = now + 5;
+    show('Индикатор включён. Новый срок ' + now + ' + 5 = ' + deadline + ' мс.');
+  });
+  function reset() {
+    now = 10;
+    deadline = 15;
+    show('Индикатор включён.');
+  }
+  find('[data-reset]').addEventListener('click', reset);
+  reset();
+})();
+</script>
+</section>
+</div>
+
+<p>В микроконтроллере время может отсчитывать <strong>аппаратный таймер</strong>. В его счётчик приходят тактовые импульсы. Например, если после делителя приходит 1000 импульсов в секунду, каждый увеличивает счётчик на единицу раз в миллисекунду. Программа может прочитать текущее показание и сравнить со сроком. В нашей функции роль такого показания играет аргумент <code>now</code>. Для физического светодиода понадобится ещё обновить выходной сигнал. <a href="../hardware/io.html">Как программа связана с устройствами</a></p>
+<table>
+<thead>
+<tr>
+<th>Момент чтения <code>now</code></th>
+<th>Что видим</th>
+<th>Почему</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>14</code></td>
+<td>Горит</td>
+<td>До выключения ещё 1 мс</td>
+</tr>
+<tr>
+<td><code>15</code></td>
+<td>Погас</td>
+<td>Срок наступил именно сейчас</td>
+</tr>
+<tr>
+<td><code>16</code></td>
+<td>Погас</td>
+<td>Новых команд включения не было</td>
+</tr>
+</tbody></table>
+<p>При чтении сначала сравниваем <code>off_at</code> с <code>now</code>. Если срок уже наступил, убираем его. Отсутствие срока обозначает погасший индикатор.</p>
+<p><strong>C++17</strong></p>
+<pre><code class="language-cpp">#include &lt;optional&gt;
+
+bool read_indicator(std::optional&lt;long long&gt;&amp; off_at, long long now) {
+    if (off_at &amp;&amp; *off_at &lt;= now) {
+        off_at.reset();
+    }
+    return off_at.has_value();
+}
+</code></pre>
+<details>
+<summary>Тот же алгоритм на Python</summary>
+
+<pre><code class="language-python">def read_indicator(off_at, now):
+    if off_at is not None and off_at &lt;= now:
+        off_at = None
+    return off_at, off_at is not None
+</code></pre>
+</details>
+
+<p>Python возвращает обновлённый срок и результат чтения. C++ обновляет срок через ссылку и возвращает результат чтения. Команда включения устанавливает срок <code>now + duration</code>. Обработка занимает <code>O(1)</code> на событие и обходится без прохода по миллисекундам. Если две команды пришли в один момент, порядок их обработки нужно определить заранее.</p>
+<hr>
+<p><a href="signals.html">→ Обработка сигналов</a></p>
+</article></main></body></html>

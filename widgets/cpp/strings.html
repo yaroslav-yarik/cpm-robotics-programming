@@ -1,0 +1,56 @@
+<section class="experiment" id="lab-strings">
+  <h3>Что лежит в s[i]?</h3>
+  <p>Введи короткий текст, затем выбери любой байт. Для кириллицы и эмодзи сравни индекс байта с порядковым номером кодовой точки Unicode.</p>
+  <div class="lab-controls"><label>Текст в UTF-8 <input type="text" data-text value="Я!" maxlength="24"></label></div>
+  <div class="lab-cells" data-bytes aria-label="Байты строки"></div><pre><code data-code></code></pre>
+  <p data-status role="status"></p>
+<style>
+#lab-strings .lab-controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin:.8rem 0} #lab-strings .lab-cells{display:flex;flex-wrap:wrap;gap:.4rem;margin:.8rem 0} #lab-strings .lab-cell{display:grid;justify-items:center;min-width:3rem;padding:.35rem .55rem;border:1px solid #96acb7;border-radius:.4rem;background:#eef3f5;color:#172f45} #lab-strings .lab-cell.active{background:#ffe8a8;color:#473105;border-color:#8f6916} #lab-strings .lab-cell small{font-size:.82rem} #lab-strings pre{white-space:pre-wrap;overflow-wrap:anywhere}
+</style>
+<script>
+(() => {
+  const root = document.getElementById('lab-strings');
+  const get = selector => root.querySelector(selector);
+  const status = get('[data-status]');
+  const encoder = new TextEncoder();
+  function rebuild() {
+    const text = get('[data-text]').value;
+    const cells = get('[data-bytes]');
+    cells.replaceChildren();
+    let offset = 0;
+    let firstButton;
+    for (const character of text) {
+      const bytes = encoder.encode(character);
+      for (const [within, byte] of bytes.entries()) {
+        const index = offset + within;
+        const hex = byte.toString(16).toUpperCase().padStart(2, '0');
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'lab-cell';
+        button.textContent = '[' + index + '] ' + hex;
+        button.setAttribute('aria-pressed', 'false');
+        button.onclick = () => {
+          cells.querySelectorAll('button').forEach(item => {
+            item.classList.toggle('active', item === button);
+            item.setAttribute('aria-pressed', String(item === button));
+          });
+          get('[data-code]').textContent = 's.size() = ' + encoder.encode(text).length + '  ·  static_cast<unsigned char>(s[' + index + ']) = 0x' + hex;
+          const codePoint = character.codePointAt(0).toString(16).toUpperCase().padStart(4, '0');
+          status.textContent = 'Символ «' + character + '» (U+' + codePoint + ') занимает ' + bytes.length + ' байт. Здесь выбран байт ' + (within + 1) + ' из ' + bytes.length + '. Кодовых точек в строке: ' + Array.from(text).length + '.';
+        };
+        cells.append(button);
+        firstButton ??= button;
+      }
+      offset += bytes.length;
+    }
+    if (firstButton) firstButton.onclick();
+    else {
+      get('[data-code]').textContent = 's.size() = 0';
+      status.textContent = 'Строка пуста. Байт текста выбрать пока нельзя.';
+    }
+  }
+  get('[data-text]').oninput = rebuild;
+  rebuild();
+})();
+</script>
+</section>

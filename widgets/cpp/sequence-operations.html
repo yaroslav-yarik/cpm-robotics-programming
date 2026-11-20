@@ -1,0 +1,50 @@
+<section class="experiment" id="lab-sequence-operations">
+  <h3>Сколько чисел придётся сдвинуть?</h3>
+  <p>В буфере вектора есть место ещё для одного элемента. Выбери позицию вставки и перемести хвост по одной ячейке. Сравни вставку в начало и в конец.</p>
+  <div class="lab-controls"><label>Позиция <select data-pos><option>0</option><option selected>1</option><option>2</option><option>3</option></select></label><label>Новое число <select data-new><option selected>99</option><option>42</option></select></label></div>
+  <div class="lab-cells" data-buffer></div><pre><code data-code></code></pre>
+  <div class="lab-controls"><button data-step type="button">Сдвинуть элемент</button><button data-reset type="button">Сначала</button></div>
+  <p data-status role="status"></p>
+<style>
+#lab-sequence-operations .lab-controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin:.8rem 0} #lab-sequence-operations .lab-cells{display:flex;flex-wrap:wrap;gap:.4rem;margin:.8rem 0} #lab-sequence-operations .lab-cell{display:grid;justify-items:center;min-width:3rem;padding:.35rem .55rem;border:1px solid #96acb7;border-radius:.4rem;background:#eef3f5;color:#172f45} #lab-sequence-operations .lab-cell.active{background:#ffe8a8;color:#473105;border-color:#8f6916} #lab-sequence-operations .lab-cell small{font-size:.82rem} #lab-sequence-operations pre{white-space:pre-wrap;overflow-wrap:anywhere}
+</style>
+<script>
+(() => {
+  const root = document.getElementById('lab-sequence-operations');
+  const get = selector => root.querySelector(selector);
+  const status = get('[data-status]');
+  const initial = [10, 20, 30];
+  let step = 0;
+  function render() {
+    const pos = Number(get('[data-pos]').value);
+    const value = Number(get('[data-new]').value);
+    const shifts = initial.length - pos;
+    const done = step === shifts + 1;
+    const buffer = [...initial, null];
+    let changed = -1;
+    for (let i = 0; i < Math.min(step, shifts); i++) {
+      changed = initial.length - i;
+      buffer[changed] = buffer[changed - 1];
+    }
+    if (done) { changed = pos; buffer[pos] = value; }
+    const cells = get('[data-buffer]'); cells.replaceChildren();
+    buffer.forEach((x, i) => {
+      const cell = document.createElement('span');
+      cell.className = 'lab-cell' + (i === changed ? ' active' : '');
+      const index = document.createElement('small'); index.textContent = 'слот ' + i;
+      cell.append(index, x === null ? 'запас' : String(x)); cells.append(cell);
+    });
+    get('[data-code]').textContent = 'a.insert(a.begin() + ' + pos + ', ' + value + ');';
+    get('[data-step]').disabled = done;
+    get('[data-step]').textContent = done ? 'Вставка завершена' : step === shifts ? 'Записать ' + value : 'Сдвинуть ' + buffer[initial.length - step - 1] + ' вправо';
+    status.textContent = done ? 'Получился вектор [' + buffer.join(', ') + ']. Сдвигов: ' + shifts + '. Затем один раз записали ' + value + '.' :
+      'Сдвигов выполнено: ' + step + ' из ' + shifts + '. ' + (step < shifts ? 'Переносим хвост с конца, чтобы сохранить каждое число.' : 'Теперь можно записать новое число в слот ' + pos + '.');
+  }
+  const reset = () => { step = 0; render(); };
+  get('[data-pos]').onchange = get('[data-new]').onchange = reset;
+  get('[data-step]').onclick = () => { if (!get('[data-step]').disabled) step++; render(); };
+  get('[data-reset]').onclick = reset;
+  render();
+})();
+</script>
+</section>
